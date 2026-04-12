@@ -22,9 +22,7 @@
 using ValueType = double;
 using IndexType = int;
 
-// ============================================================
 //  Estructura CSR
-// ============================================================
 struct CsrMatrix {
     IndexType  num_rows{0};
     IndexType  num_cols{0};
@@ -37,38 +35,18 @@ struct CsrMatrix {
     std::string source_file{"(generada)"};
 };
 
-// ============================================================
 //  Carga de archivo Matrix Market → CSR
-// ============================================================
-
-/**
- * load_matrix_market
- * ------------------
- * Lee un archivo .mtx (formato Matrix Market, variante "coordinate")
- * y devuelve la matriz en formato CSR.
- *
- * Correcciones respecto a la versión anterior:
- *   1. Valida que el formato sea "coordinate" (rechaza "array" denso).
- *   2. Detecta y rechaza matrices "complex" (dos valores por entrada).
- *   3. Lee nnz_file como long long para evitar overflow en matrices grandes.
- *   4. Usa un cursor de escritura por fila al llenar col_idxs/values,
- *      en lugar de asumir que el índice de iteración coincide con la
- *      posición CSR (evita bugs con duplicados o entradas fuera de orden).
- *   5. Acumula duplicados (r,c) en lugar de insertarlos dos veces.
- *   6. Salta correctamente todas las líneas de comentario (%).
- */
 CsrMatrix load_matrix_market(const std::string& filename)
 {
     std::ifstream file(filename);
     if (!file.is_open())
         throw std::runtime_error("No se pudo abrir el archivo: " + filename);
 
-    // ── Leer línea de cabecera (%%MatrixMarket ...) ──────────────────────
-    std::string header;
+    std::string header;     // ── Leer línea de cabecera
     if (!std::getline(file, header))
         throw std::runtime_error("Archivo vacío o cabecera faltante: " + filename);
 
-    // Convertir cabecera a minúsculas para comparación robusta
+    // Convertir cabecera a minúsculas para comparación
     std::string hdr_lower = header;
     std::transform(hdr_lower.begin(), hdr_lower.end(),
                    hdr_lower.begin(), ::tolower);
@@ -91,16 +69,16 @@ CsrMatrix load_matrix_market(const std::string& filename)
     bool is_pattern   = (hdr_lower.find("pattern")   != std::string::npos);
     bool is_skew      = (hdr_lower.find("skew")      != std::string::npos);
 
-    // ── Saltar líneas de comentario (todas las que empiezan con %) ────────
+    // Saltar líneas de comentario (todas las que empiezan con %)
     std::string line;
     while (std::getline(file, line)) {
         if (line.empty()) continue;
         if (line[0] != '%') break;   // primera línea de datos
     }
 
-    // ── Leer dimensiones ─────────────────────────────────────────────────
+    // Leer dimensiones 
     IndexType   M, N;
-    long long   nnz_file;   // <── long long para evitar overflow en matrices grandes
+    long long   nnz_file;   // long long para evitar overflow en matrices grandes
     {
         std::istringstream ss(line);
         if (!(ss >> M >> N >> nnz_file))
@@ -119,8 +97,6 @@ CsrMatrix load_matrix_market(const std::string& filename)
 
     // ── Leer entradas COO ────────────────────────────────────────────────
     // Usamos un map<(r,c), v> para acumular duplicados automáticamente.
-    // Para matrices muy grandes esto puede sustituirse por un vector+sort
-    // con merge posterior, pero el map es más claro y seguro.
     using Key = std::pair<IndexType, IndexType>;
     std::map<Key, ValueType> coo_map;
 
@@ -166,7 +142,7 @@ CsrMatrix load_matrix_market(const std::string& filename)
     std::cout << "[MTX] Entradas leídas del archivo : " << entries_read << "\n"
               << "[MTX] NNZ efectivos (tras dedup)  : " << coo_map.size() << "\n";
 
-    // ── Construir CSR ────────────────────────────────────────────────────
+    // ── Construir CSR 
     CsrMatrix mat;
     mat.num_rows    = M;
     mat.num_cols    = N;
@@ -177,17 +153,15 @@ CsrMatrix load_matrix_market(const std::string& filename)
     mat.col_idxs.resize(mat.nnz);
     mat.values.resize(mat.nnz);
 
-    // Paso 1: contar entradas por fila
+    // Contar entradas por fila
     for (const auto& kv : coo_map)
         mat.row_ptrs[kv.first.first + 1]++;
 
-    // Paso 2: prefix sum → row_ptrs queda como offsets de inicio de cada fila
+    // prefix sum → row_ptrs queda como offsets de inicio de cada fila
     for (IndexType i = 0; i < M; ++i)
         mat.row_ptrs[i + 1] += mat.row_ptrs[i];
 
     // Paso 3: llenar col_idxs y values usando un cursor por fila
-    // Esto es CORRECTO independientemente del orden en que lleguen las entradas,
-    // y funciona aunque haya habido duplicados (ya resueltos por el map).
     std::vector<IndexType> cursor(mat.row_ptrs.begin(),
                                   mat.row_ptrs.begin() + M);
 
@@ -201,17 +175,14 @@ CsrMatrix load_matrix_market(const std::string& filename)
         mat.values[pos]      = val;
     }
 
-    // Verificación de integridad: el cursor debe haber avanzado hasta
-    // el inicio de la fila siguiente para cada fila.
+    // Verificación de integridad
     assert(mat.row_ptrs[M] == static_cast<IndexType>(mat.nnz));
 
     std::cout << "[MTX] CSR construido correctamente.\n";
     return mat;
 }
 
-// ============================================================
 //  Generación de matriz aleatoria (modo sintético)
-// ============================================================
 CsrMatrix generate_random_matrix(IndexType rows, IndexType cols,
                                   int avg_nnz, unsigned seed = 42)
 {
@@ -258,9 +229,7 @@ CsrMatrix generate_random_matrix(IndexType rows, IndexType cols,
     return A;
 }
 
-// ============================================================
 //  Inicialización de vectores
-// ============================================================
 void init_vector(std::vector<ValueType>& v, ValueType fill = -1.0)
 {
     const IndexType n = static_cast<IndexType>(v.size());
@@ -282,10 +251,7 @@ void init_vector(std::vector<ValueType>& v, ValueType fill = -1.0)
     }
 }
 
-// ============================================================
 //  Kernels SpMV
-// ============================================================
-
 void spmv_static(const CsrMatrix& A,
                  const std::vector<ValueType>& x,
                        std::vector<ValueType>& y)
@@ -362,9 +328,7 @@ void spmv_auto(const CsrMatrix& A,
     }
 }
 
-// ============================================================
 //  Validación: compara resultado paralelo contra referencia serial
-// ============================================================
 bool validate_result(const CsrMatrix& A,
                      const std::vector<ValueType>& x,
                      const std::vector<ValueType>& y,
@@ -397,9 +361,7 @@ bool validate_result(const CsrMatrix& A,
     return false;
 }
 
-// ============================================================
 //  Métricas de rendimiento
-// ============================================================
 double compute_bandwidth_gibs(const CsrMatrix& mat, double elapsed_s)
 {
     // Bytes accedidos: values + col_idxs + row_ptrs + x (lectura) + y (escritura)
@@ -420,9 +382,7 @@ double compute_bandwidth_gbs(const CsrMatrix& mat, double elapsed_s)
     return (bytes / 1e9) / elapsed_s;
 }
 
-// ============================================================
 //  Framework de benchmark
-// ============================================================
 struct BenchmarkResult {
     const char* strategy{nullptr};
     double min_time_s{0};
@@ -492,9 +452,7 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
     return res;
 }
 
-// ============================================================
 //  Exportación CSV
-// ============================================================
 void export_csv(const std::string& filename,
                 const CsrMatrix& A,
                 const std::vector<BenchmarkResult>& results)
@@ -532,9 +490,7 @@ void export_csv(const std::string& filename,
     std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
 }
 
-// ============================================================
 //  Main
-// ============================================================
 int main(int argc, char* argv[])
 {
     // Uso: ./spmv [archivo.mtx] [hilos] [reps] [prefijo_csv]
@@ -559,7 +515,7 @@ int main(int argc, char* argv[])
               << "  SpMV CSR Benchmark\n"
               << "=======================================================\n";
 
-    // ── Cargar o generar matriz ──────────────────────────────────────────
+    // ── Cargar o generar matriz 
     CsrMatrix A;
     if (mtx_file.empty()) {
         constexpr IndexType ROWS    = 1000000;
@@ -583,17 +539,17 @@ int main(int argc, char* argv[])
                   (static_cast<double>(A.num_rows) * A.num_cols))
               << " %\n" << std::defaultfloat;
 
-    // ── Preparar vectores ────────────────────────────────────────────────
+    // ── Preparar vectores 
     std::vector<ValueType> x(A.num_cols), y(A.num_rows);
     init_vector(x);         // valores aleatorios en [0,1]
     init_vector(y, 0.0);    // ceros
 
-    // ── Validación previa ────────────────────────────────────────────────
+    // ── Validación previa 
     std::cout << "\n[INFO] Validacion con spmv_static...\n";
     spmv_static(A, x, y);
     validate_result(A, x, y);
 
-    // ── Benchmark de las 4 estrategias ───────────────────────────────────
+    // ── Benchmark de las 4 estrategias 
     std::vector<BenchmarkResult> results;
 
     init_vector(y, 0.0);
@@ -612,7 +568,7 @@ int main(int argc, char* argv[])
     results.push_back(
         benchmark_spmv(A, x, y, "Auto",     spmv_auto,    reps));
 
-    // ── Tabla resumen ────────────────────────────────────────────────────
+    // ── Tabla resumen
     std::cout << "\n"
               << "+----------------------+----------+----------+----------+----------+\n"
               << "| Estrategia           | min (ms) | avg (ms) | GFlops   | GiB/s    |\n"
@@ -627,7 +583,7 @@ int main(int argc, char* argv[])
     }
     std::cout << "+----------------------+----------+----------+----------+----------+\n";
 
-    // ── Mejor estrategia ─────────────────────────────────────────────────
+    // ── Mejor estrategia 
     auto best = std::max_element(results.begin(), results.end(),
         [](const BenchmarkResult& a, const BenchmarkResult& b) {
             return a.gflops < b.gflops;
@@ -637,13 +593,13 @@ int main(int argc, char* argv[])
               << best->gflops << " GFlops | "
               << best->bandwidth_gibs << " GiB/s)\n";
 
-    // ── Primeras entradas del resultado ──────────────────────────────────
+    // ── Primeras entradas del resultado 
     std::cout << "\n=== Primeras entradas de y = A*x ===\n";
     const int print_n = std::min(10, A.num_rows);
     for (int i = 0; i < print_n; ++i)
         printf("  y[%4d] = %.6f\n", i, y[i]);
 
-    // ── Exportar CSV ─────────────────────────────────────────────────────
+    // ── Exportar CSV 
     if (!csv_prefix.empty())
         export_csv(csv_prefix + ".csv", A, results);
 
