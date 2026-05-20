@@ -25,29 +25,19 @@ static inline void ompt_measure_pause() {
 #endif
 }
 
-static inline void perf_events_disable_all_threads() {
+static inline void perf_events_disable_this_thread() {
 #ifdef __linux__
-#ifdef _OPENMP
-#pragma omp parallel
-    { (void)prctl(PR_TASK_PERF_EVENTS_DISABLE); }
-#else
     (void)prctl(PR_TASK_PERF_EVENTS_DISABLE);
 #endif
-#endif
 }
 
-static inline void perf_events_enable_all_threads() {
+static inline void perf_events_enable_this_thread() {
 #ifdef __linux__
-#ifdef _OPENMP
-#pragma omp parallel
-    { (void)prctl(PR_TASK_PERF_EVENTS_ENABLE); }
-#else
     (void)prctl(PR_TASK_PERF_EVENTS_ENABLE);
 #endif
-#endif
 }
 
-static constexpr int WARMUP_ITERS = 2; // igual que spmv.cpp / spmv_dynamic.cpp
+static constexpr int WARMUP_ITERS = 2;
 static constexpr int REPS = 30;
 
 static inline double now_sec() {
@@ -55,7 +45,6 @@ static inline double now_sec() {
     return std::chrono::duration<double>(clock::now().time_since_epoch()).count();
 }
 
-// Inicialización SECUENCIAL (baseline OpenMP sin first-touch)
 static void init_matrix_seq(float* A, int n) {
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
@@ -64,8 +53,7 @@ static void init_matrix_seq(float* A, int n) {
     }
 }
 
-static void stencil2D_omp_static(const float* A, float* result, int n) {
-#pragma omp parallel for collapse(2) schedule(static)
+static void stencil2D_serial(const float* A, float* result, int n) {
     for (int j = 1; j < n - 1; ++j) {
         for (int k = 1; k < n - 1; ++k) {
             result[j * n + k] = 0.2f * (
@@ -113,26 +101,15 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Info OpenMP (una sola vez; no contaminar el benchmark)
-    // [COMMENTED: info logging disabled for clean benchmark]
-    // #pragma omp parallel
-    // {
-    // #pragma omp single
-    //     {
-    //         std::cout << "[OMP] Max threads available: " << omp_get_max_threads() << "\n";
-    //         std::cout << "[OMP] Number of threads (actual): " << omp_get_num_threads() << "\n";
-    //     }
-    // }
-
     init_matrix_seq(A, n);
     std::memset(result, 0, static_cast<size_t>(n) * n * sizeof(float));
 
     // Warm-up
-    perf_events_disable_all_threads();
+    perf_events_disable_this_thread();
     for (int i = 0; i < WARMUP_ITERS; ++i) {
-        stencil2D_omp_static(A, result, n);
+        stencil2D_serial(A, result, n);
     }
-    perf_events_enable_all_threads();
+    perf_events_enable_this_thread();
 
     // Timed repetitions
     std::vector<double> times;
@@ -141,13 +118,13 @@ int main(int argc, char* argv[]) {
     ompt_measure_start();
     for (int r = 0; r < REPS; ++r) {
         const double t0 = now_sec();
-        stencil2D_omp_static(A, result, n);
+        stencil2D_serial(A, result, n);
         const double t1 = now_sec();
         times.push_back(t1 - t0);
     }
     ompt_measure_pause();
 
-    // checksum
+    // Simple checksum to keep results live
     double checksum = 0.0;
     for (int j = 1; j < n - 1; ++j) {
         checksum += result[j * n + (j % (n - 2) + 1)];
@@ -156,7 +133,7 @@ int main(int argc, char* argv[]) {
     // [COMMENTED: stats logging disabled for clean benchmark]
     // const Stats st = compute_stats(times);
     //
-    // std::cout << "[Stencil2D] Variant: OpenMP (static) + SeqInit\n";
+    // std::cout << "[Stencil2D] Variant: Serial\n";
     // std::cout << "N=" << n << " warmup=" << WARMUP_ITERS << " reps=" << REPS << "\n";
     // std::cout << std::fixed << std::setprecision(6);
     // std::cout << "Time: "

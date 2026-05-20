@@ -1,0 +1,13 @@
+tag,cycles,instructions,cache_references,cache_misses,cpu_migrations
+stencil_serial_n50_t2_pcores_bclose,4069716,3545248,45510,26226,0
+stencil_serial_n50_t2_pcores_bspread,5283153,3538725,43724,27425,0
+stencil_serial_n50_t2_pthreads_bspread,5706482,3547861,52631,25370,0
+spmv_serial_n50_t2_pcores_bclose,4787359,3750707,49264,29376,0
+spmv_serial_n50_t2_pcores_bspread,8402509,3757526,46554,30110,0
+spmv_serial_n50_t2_pthreads_bspread,7374613,3759259,46286,30405,0
+stencil_n50_t2_pcores_bclose,24340727,9992191,136514,49192,14
+stencil_n50_t2_pcores_bspread,13952261,10833244,120314,49822,14
+stencil_n50_t2_pthreads_bspread,13652052,9853672,122004,51315,14
+spmv_n50_t2_pcores_bclose,46210268231,32679162339,635409459,201934976,22
+spmv_n50_t2_pcores_bspread,45945020281,32669184006,635119004,209407363,18
+spmv_n50_t2_pthreads_bspread,46566442441,32652006059,636261502,205645246,15

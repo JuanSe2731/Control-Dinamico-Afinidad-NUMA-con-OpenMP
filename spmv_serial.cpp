@@ -15,6 +15,37 @@
 #include <tuple>
 #include <map>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+#ifdef __linux__
+#include <sys/prctl.h>
+#endif
+
+static inline void ompt_measure_start() {
+#ifdef _OPENMP
+    (void)omp_control_tool(omp_control_tool_start, 1, nullptr);
+#endif
+}
+
+static inline void ompt_measure_pause() {
+#ifdef _OPENMP
+    (void)omp_control_tool(omp_control_tool_pause, 1, nullptr);
+#endif
+}
+
+static inline void perf_events_disable_this_thread() {
+#ifdef __linux__
+    (void)prctl(PR_TASK_PERF_EVENTS_DISABLE);
+#endif
+}
+
+static inline void perf_events_enable_this_thread() {
+#ifdef __linux__
+    (void)prctl(PR_TASK_PERF_EVENTS_ENABLE);
+#endif
+}
+
 using ValueType = double;
 using IndexType = int;
 
@@ -85,7 +116,7 @@ CsrMatrix load_matrix_market(const std::string& filename)
     if (M <= 0 || N <= 0 || nnz_file <= 0)
         throw std::runtime_error("Dimensiones o NNZ inválidos en el archivo.");
 
-    std::cout << "[MTX] Dimensiones: " << M << " × " << N
+ if (false)     std::cout << "[MTX] Dimensiones: " << M << " × " << N
               << "  NNZ declarado=" << nnz_file
               << (is_symmetric ? "  [simétrica]" : "")
               << (is_pattern   ? "  [patrón]"    : "")
@@ -135,7 +166,7 @@ CsrMatrix load_matrix_market(const std::string& filename)
             throw std::runtime_error("Más entradas de las declaradas en el archivo.");
     }
 
-    std::cout << "[MTX] Entradas leídas del archivo : " << entries_read << "\n"
+ if (false)     std::cout << "[MTX] Entradas leídas del archivo : " << entries_read << "\n"
               << "[MTX] NNZ efectivos (tras dedup)  : " << coo_map.size() << "\n";
 
     // ── Construir CSR 
@@ -174,7 +205,7 @@ CsrMatrix load_matrix_market(const std::string& filename)
     // Verificación de integridad
     assert(mat.row_ptrs[M] == static_cast<IndexType>(mat.nnz));
 
-    std::cout << "[MTX] CSR construido correctamente.\n";
+ if (false)     std::cout << "[MTX] CSR construido correctamente.\n";
     return mat;
 }
 
@@ -190,7 +221,7 @@ CsrMatrix generate_random_matrix(IndexType rows, IndexType cols,
     std::mt19937 gen(seed);
     std::poisson_distribution<> poisson(avg_nnz);
 
-    std::cout << "[GEN] Calculando estructura de filas...\n";
+ if (false)     std::cout << "[GEN] Calculando estructura de filas...\n";
     A.row_ptrs.resize(rows + 1, 0);
     for (IndexType i = 0; i < rows; ++i) {
         int nnz_row = std::max(1, (int)poisson(gen));
@@ -198,7 +229,7 @@ CsrMatrix generate_random_matrix(IndexType rows, IndexType cols,
     }
     A.nnz = A.row_ptrs[rows];
 
-    std::cout << "[GEN] NNZ total: " << A.nnz
+ if (false)     std::cout << "[GEN] NNZ total: " << A.nnz
               << "  (densidad: "
               << std::scientific << std::setprecision(3)
               << (double)A.nnz / ((double)rows * cols) * 100.0
@@ -274,14 +305,14 @@ bool validate_result(const CsrMatrix& A,
         if (rel > tol) {
             ++errors;
             if (errors <= 3)
-                std::cerr << "  [VAL] Error en fila " << i
+                if (false) std::cerr << "  [VAL] Error en fila " << i
                           << ": calc=" << y[i]
                           << " ref=" << y_ref[i]
                           << " rel_err=" << rel << "\n";
         }
     }
-    if (errors == 0) { std::cout << "  [VAL] PASSED\n"; return true; }
-    std::cout << "  [VAL] FAILED (" << errors << " errores de "
+    if (errors == 0) { if (false) std::cout << "  [VAL] PASSED\n"; return true; }
+ if (false)     std::cout << "  [VAL] FAILED (" << errors << " errores de "
               << A.num_rows << " filas)\n";
     return false;
 }
@@ -331,21 +362,25 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
                                 int reps   = 10,
                                 int warmup = 2)
 {
-    std::cout << "\n[BENCH] Estrategia: " << strategy_name << "\n";
+ if (false)     std::cout << "\n[BENCH] Estrategia: " << strategy_name << "\n";
 
     // Warm-up: evita medir efectos de cache fría en las primeras iteraciones
+    perf_events_disable_this_thread();
     for (int i = 0; i < warmup; ++i) spmv_func(A, x, y);
+    perf_events_enable_this_thread();
 
     std::vector<double> times;
     times.reserve(reps);
 
+    ompt_measure_start();
     for (int r = 0; r < reps; ++r) {
         auto t0 = std::chrono::high_resolution_clock::now();
         spmv_func(A, x, y);
         auto t1 = std::chrono::high_resolution_clock::now();
         times.push_back(std::chrono::duration<double>(t1 - t0).count());
-        printf("  Rep %2d: %.4f ms\n", r, times[r] * 1e3);
+        if (false) printf("  Rep %2d: %.4f ms\n", r, times[r] * 1e3);
     }
+    ompt_measure_pause();
 
     std::sort(times.begin(), times.end());
     double min_t = times.front();
@@ -360,10 +395,10 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
     double bw_gibs = compute_bandwidth_gibs(A, min_t);
     double bw_gbs  = compute_bandwidth_gbs(A, min_t);
 
-    printf("  Tiempo  : %.4f ms (min) | %.4f ms (avg) | %.4f ms (max) | stddev=%.4f ms\n",
+ if (false)     printf("  Tiempo  : %.4f ms (min) | %.4f ms (avg) | %.4f ms (max) | stddev=%.4f ms\n",
            min_t*1e3, avg_t*1e3, max_t*1e3, stddev*1e3);
-    printf("  GFlops  : %.3f\n", gflops);
-    printf("  BW GiB/s: %.3f  |  BW GB/s: %.3f\n", bw_gibs, bw_gbs);
+ if (false)     printf("  GFlops  : %.3f\n", gflops);
+ if (false)     printf("  BW GiB/s: %.3f  |  BW GB/s: %.3f\n", bw_gibs, bw_gbs);
 
     BenchmarkResult res;
     res.strategy       = strategy_name;
@@ -407,22 +442,66 @@ void export_csv(const std::string& filename,
           << r.bandwidth_gibs << ","
           << r.bandwidth_gbs  << "\n";
     }
-    std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
+ if (false)     std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
 }
 
 //  Main
 int main(int argc, char* argv[])
 {
-    // Uso: ./spmv [archivo.mtx] [reps] [prefijo_csv]
-    std::string mtx_file   = "";
-    int         reps        = 10;
-    std::string csv_prefix  = "";
+    // Modos soportados (retrocompatible):
+    //   1) Archivo MatrixMarket:
+    //        ./spmv_serial <archivo.mtx> [reps] [csv_prefix]
+    //   2) Sintético (recomendado para este repo):
+    //        ./spmv_serial <N> [avg_nnz] [reps] [csv_prefix]
+    //      donde N genera una matriz NxN con nnz promedio por fila.
 
-    if (argc >= 2) mtx_file   = argv[1];
-    if (argc >= 3) reps        = std::stoi(argv[2]);
-    if (argc >= 4) csv_prefix  = argv[3];
+    std::string arg1       = (argc >= 2) ? argv[1] : "";
+    int         reps       = 30;
+    int         avg_nnz    = 32;
+    std::string csv_prefix = "";
 
-    std::cout << "=======================================================\n"
+    auto is_integer = [](const std::string& s) {
+        if (s.empty()) return false;
+        for (unsigned char ch : s) if (ch < '0' || ch > '9') return false;
+        return true;
+    };
+
+    bool synthetic_mode = is_integer(arg1);
+
+    if (synthetic_mode) {
+        // ./spmv_serial N [avg_nnz] [reps] [csv_prefix]
+        const int N = std::stoi(arg1);
+        if (argc >= 3) avg_nnz    = std::stoi(argv[2]);
+        if (argc >= 4) reps       = std::stoi(argv[3]);
+        if (argc >= 5) csv_prefix = argv[4];
+
+        if (N <= 0) return 1;
+
+        CsrMatrix A = generate_random_matrix(N, N, avg_nnz);
+
+        std::vector<ValueType> x(A.num_cols), y(A.num_rows);
+        init_vector(x);
+        init_vector(y, 0.0);
+
+        spmv_serial(A, x, y);
+        validate_result(A, x, y);
+
+        std::vector<BenchmarkResult> results;
+        init_vector(y, 0.0);
+        results.push_back(benchmark_spmv(A, x, y, "Serial", spmv_serial, reps));
+
+        if (!csv_prefix.empty())
+            export_csv(csv_prefix + ".csv", A, results);
+
+        return 0;
+    }
+
+    // ./spmv_serial <archivo.mtx> [reps] [csv_prefix]
+    std::string mtx_file = arg1;
+    if (argc >= 3) reps       = std::stoi(argv[2]);
+    if (argc >= 4) csv_prefix = argv[3];
+
+ if (false)     std::cout << "=======================================================\n"
               << "  SpMV CSR Benchmark  (monohilo)\n"
               << "=======================================================\n";
 
@@ -432,16 +511,16 @@ int main(int argc, char* argv[])
         constexpr IndexType ROWS    = 5000000;
         constexpr IndexType COLS    = 5000000;
         constexpr int       AVG_NNZ = 128;
-        std::cout << "\n[INFO] Sin archivo .mtx → generando matriz aleatoria "
+        if (false) std::cout << "\n[INFO] Sin archivo .mtx → generando matriz aleatoria "
                   << ROWS << " x " << COLS
                   << "  avg_nnz_por_fila=" << AVG_NNZ << "\n";
         A = generate_random_matrix(ROWS, COLS, AVG_NNZ);
     } else {
-        std::cout << "\n[INFO] Cargando archivo: " << mtx_file << "\n";
+        if (false) std::cout << "\n[INFO] Cargando archivo: " << mtx_file << "\n";
         A = load_matrix_market(mtx_file);
     }
 
-    std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
+ if (false)     std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
               << "  NNZ=" << A.nnz
               << "  fuente=" << A.source_file << "\n"
               << "[MAT] Densidad: "
@@ -456,7 +535,7 @@ int main(int argc, char* argv[])
     init_vector(y, 0.0);    // ceros
 
     // ── Validación previa 
-    std::cout << "\n[INFO] Validacion con spmv_serial...\n";
+ if (false)     std::cout << "\n[INFO] Validacion con spmv_serial...\n";
     spmv_serial(A, x, y);
     validate_result(A, x, y);
 
@@ -468,25 +547,25 @@ int main(int argc, char* argv[])
         benchmark_spmv(A, x, y, "Serial", spmv_serial, reps));
 
     // ── Tabla resumen
-    std::cout << "\n"
+ if (false)     std::cout << "\n"
               << "+----------------------+----------+----------+----------+----------+\n"
               << "| Estrategia           | min (ms) | avg (ms) | GFlops   | GiB/s    |\n"
               << "+----------------------+----------+----------+----------+----------+\n";
     for (const auto& r : results) {
-        printf("| %-20s | %8.3f | %8.3f | %8.3f | %8.3f |\n",
+        if (false) printf("| %-20s | %8.3f | %8.3f | %8.3f | %8.3f |\n",
                r.strategy,
                r.min_time_s * 1e3,
                r.avg_time_s * 1e3,
                r.gflops,
                r.bandwidth_gibs);
     }
-    std::cout << "+----------------------+----------+----------+----------+----------+\n";
+ if (false)     std::cout << "+----------------------+----------+----------+----------+----------+\n";
 
     // ── Primeras entradas del resultado 
-    std::cout << "\n=== Primeras entradas de y = A*x ===\n";
+ if (false)     std::cout << "\n=== Primeras entradas de y = A*x ===\n";
     const int print_n = std::min(10, A.num_rows);
     for (int i = 0; i < print_n; ++i)
-        printf("  y[%4d] = %.6f\n", i, y[i]);
+        if (false) printf("  y[%4d] = %.6f\n", i, y[i]);
 
     // ── Exportar CSV 
     if (!csv_prefix.empty())

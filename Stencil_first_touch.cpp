@@ -47,7 +47,7 @@ static inline void perf_events_enable_all_threads() {
 #endif
 }
 
-static constexpr int WARMUP_ITERS = 2; // igual que spmv.cpp / spmv_dynamic.cpp
+static constexpr int WARMUP_ITERS = 2;
 static constexpr int REPS = 30;
 
 static inline double now_sec() {
@@ -55,11 +55,21 @@ static inline double now_sec() {
     return std::chrono::duration<double>(clock::now().time_since_epoch()).count();
 }
 
-// Inicialización SECUENCIAL (baseline OpenMP sin first-touch)
-static void init_matrix_seq(float* A, int n) {
+// First-touch initialization: parallel init with same iteration space + schedule
+static void init_matrix_first_touch(float* A, int n) {
+#pragma omp parallel for collapse(2) schedule(static)
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
             A[i * n + j] = static_cast<float>(i * n + j);
+        }
+    }
+}
+
+static void init_result_first_touch(float* result, int n) {
+#pragma omp parallel for collapse(2) schedule(static)
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            result[i * n + j] = 0.0f;
         }
     }
 }
@@ -113,8 +123,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Info OpenMP (una sola vez; no contaminar el benchmark)
-    // [COMMENTED: info logging disabled for clean benchmark]
+    // [COMMENTED: OMP info logging disabled for clean benchmark]
     // #pragma omp parallel
     // {
     // #pragma omp single
@@ -124,8 +133,8 @@ int main(int argc, char* argv[]) {
     //     }
     // }
 
-    init_matrix_seq(A, n);
-    std::memset(result, 0, static_cast<size_t>(n) * n * sizeof(float));
+    init_matrix_first_touch(A, n);
+    init_result_first_touch(result, n);
 
     // Warm-up
     perf_events_disable_all_threads();
@@ -156,7 +165,7 @@ int main(int argc, char* argv[]) {
     // [COMMENTED: stats logging disabled for clean benchmark]
     // const Stats st = compute_stats(times);
     //
-    // std::cout << "[Stencil2D] Variant: OpenMP (static) + SeqInit\n";
+    // std::cout << "[Stencil2D] Variant: OpenMP + FirstTouchInit (static)\n";
     // std::cout << "N=" << n << " warmup=" << WARMUP_ITERS << " reps=" << REPS << "\n";
     // std::cout << std::fixed << std::setprecision(6);
     // std::cout << "Time: "

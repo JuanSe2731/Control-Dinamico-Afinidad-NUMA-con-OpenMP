@@ -13,16 +13,54 @@
 #include <string>
 #include <vector>
 #include <tuple>
-#include <map>
+#include <cctype>
+#include <cstdint>  
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+#ifdef __linux__
+#include <sys/prctl.h>
+#endif
 
-using ValueType = double;
-using IndexType = int;
+static inline void ompt_measure_start() {
+#ifdef _OPENMP
+    (void)omp_control_tool(omp_control_tool_start, 1, nullptr);
+#endif
+}
 
-//  Estructura CSR
+static inline void ompt_measure_pause() {
+#ifdef _OPENMP
+    (void)omp_control_tool(omp_control_tool_pause, 1, nullptr);
+#endif
+}
+
+static inline void perf_events_disable_all_threads() {
+#ifdef __linux__
+#ifdef _OPENMP
+#pragma omp parallel
+    { (void)prctl(PR_TASK_PERF_EVENTS_DISABLE); }
+#else
+    (void)prctl(PR_TASK_PERF_EVENTS_DISABLE);
+#endif
+#endif
+}
+
+static inline void perf_events_enable_all_threads() {
+#ifdef __linux__
+#ifdef _OPENMP
+#pragma omp parallel
+    { (void)prctl(PR_TASK_PERF_EVENTS_ENABLE); }
+#else
+    (void)prctl(PR_TASK_PERF_EVENTS_ENABLE);
+#endif
+#endif
+}
+
+// Ajusta estos typedefs a tu proyecto:
+using IndexType = int;      // o int64_t
+using ValueType = double;   // o float
+
 struct CsrMatrix {
     IndexType  num_rows{0};
     IndexType  num_cols{0};
@@ -35,154 +73,217 @@ struct CsrMatrix {
     std::string source_file{"(generada)"};
 };
 
-//  Carga de archivo Matrix Market → CSR
+struct Triplet {
+    IndexType r;
+    IndexType c;
+    ValueType v;
+};
+
+static inline std::string to_lower_copy(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+                   [](unsigned char ch) { return (char)std::tolower(ch); });
+    return s;
+}
+
+// Lee Matrix Market y construye CSR con llenado paralelo por filas.
 CsrMatrix load_matrix_market(const std::string& filename)
 {
     std::ifstream file(filename);
-    if (!file.is_open())
+    if (!file.is_open()) {
         throw std::runtime_error("No se pudo abrir el archivo: " + filename);
+    }
 
-    std::string header;     // ── Leer línea de cabecera
-    if (!std::getline(file, header))
+    // 1) Cabecera
+    std::string header;
+    if (!std::getline(file, header)) {
         throw std::runtime_error("Archivo vacío o cabecera faltante: " + filename);
+    }
 
-    // Convertir cabecera a minúsculas para comparación
-    std::string hdr_lower = header;
-    std::transform(hdr_lower.begin(), hdr_lower.end(),
-                   hdr_lower.begin(), ::tolower);
+    std::string hdr = to_lower_copy(header);
 
-    // Validar que sea formato "coordinate" (disperso)
-    // El formato "array" es denso y requiere un parser completamente distinto
-    if (hdr_lower.find("coordinate") == std::string::npos)
+    if (hdr.find("matrixmarket") == std::string::npos) {
+        throw std::runtime_error("Cabecera MatrixMarket inválida.");
+    }
+    if (hdr.find("coordinate") == std::string::npos) {
         throw std::runtime_error(
-            "Solo se soporta formato 'coordinate' (disperso). "
-            "El archivo parece ser formato 'array' (denso).");
-
-    // Rechazar matrices complejas: tienen 2 valores reales por entrada
-    if (hdr_lower.find("complex") != std::string::npos)
+            "Solo se soporta formato 'coordinate' (disperso).");
+    }
+    if (hdr.find("complex") != std::string::npos) {
         throw std::runtime_error(
-            "Matrices 'complex' no están soportadas. "
-            "Solo se aceptan 'real', 'integer' o 'pattern'.");
+            "Matrices 'complex' no están soportadas.");
+    }
 
-    bool is_symmetric = (hdr_lower.find("symmetric") != std::string::npos ||
-                         hdr_lower.find("hermitian")  != std::string::npos);
-    bool is_pattern   = (hdr_lower.find("pattern")   != std::string::npos);
-    bool is_skew      = (hdr_lower.find("skew")      != std::string::npos);
+    const bool is_pattern   = (hdr.find("pattern")   != std::string::npos);
+    const bool is_symmetric = (hdr.find("symmetric") != std::string::npos) ||
+                              (hdr.find("hermitian") != std::string::npos);
+    const bool is_skew      = (hdr.find("skew")      != std::string::npos);
 
-    // Saltar líneas de comentario (todas las que empiezan con %)
+    // 2) Leer línea de dimensiones (saltando comentarios)
     std::string line;
     while (std::getline(file, line)) {
         if (line.empty()) continue;
-        if (line[0] != '%') break;   // primera línea de datos
+        if (line[0] == '%') continue;
+        break;
+    }
+    if (line.empty()) {
+        throw std::runtime_error("No se encontró línea de dimensiones M N nnz.");
     }
 
-    // Leer dimensiones 
-    IndexType   M, N;
-    long long   nnz_file;   // long long para evitar overflow en matrices grandes
+    IndexType M = 0, N = 0;
+    long long nnz_file = 0;
     {
         std::istringstream ss(line);
-        if (!(ss >> M >> N >> nnz_file))
-            throw std::runtime_error(
-                "No se pudieron leer las dimensiones M N nnz del archivo.");
+        if (!(ss >> M >> N >> nnz_file)) {
+            throw std::runtime_error("No se pudieron leer M N nnz.");
+        }
+    }
+    if (M <= 0 || N <= 0 || nnz_file < 0) {
+        throw std::runtime_error("Dimensiones o nnz inválidos.");
     }
 
-    if (M <= 0 || N <= 0 || nnz_file <= 0)
-        throw std::runtime_error("Dimensiones o NNZ inválidos en el archivo.");
-
-    std::cout << "[MTX] Dimensiones: " << M << " × " << N
-              << "  NNZ declarado=" << nnz_file
-              << (is_symmetric ? "  [simétrica]" : "")
-              << (is_pattern   ? "  [patrón]"    : "")
+    std::cout << "[MTX] Dimensiones: " << M << " x " << N
+              << "  nnz declarado=" << nnz_file
+              << (is_symmetric ? " [symmetric/hermitian]" : "")
+              << (is_skew ? " [skew]" : "")
+              << (is_pattern ? " [pattern]" : "")
               << "\n";
 
-    // ── Leer entradas COO ────────────────────────────────────────────────
-    // Usamos un map<(r,c), v> para acumular duplicados automáticamente.
-    using Key = std::pair<IndexType, IndexType>;
-    std::map<Key, ValueType> coo_map;
+    // 3) Leer entradas COO (secuencial) -> vector de triplets
+    // Reservamos con margen para symmetric/skew.
+    std::vector<Triplet> entries;
+    entries.reserve((size_t)std::max<long long>(1, nnz_file * (is_symmetric || is_skew ? 2 : 1)));
 
     long long entries_read = 0;
-    IndexType r_in, c_in;
-    ValueType v_in;
+    IndexType r_in = 0, c_in = 0;
+    ValueType v_in = 0;
 
     while (file >> r_in >> c_in) {
         if (!is_pattern) {
-            if (!(file >> v_in))
-                throw std::runtime_error("Error leyendo valor en entrada " +
-                                         std::to_string(entries_read + 1));
+            if (!(file >> v_in)) {
+                throw std::runtime_error(
+                    "Error leyendo valor en entrada " + std::to_string(entries_read + 1));
+            }
         } else {
-            v_in = 1.0;   // matrices patrón: todos los valores son 1
+            v_in = (ValueType)1;
         }
 
-        // Convertir a indexación base-0
+        // 1-based -> 0-based
         IndexType r = r_in - 1;
         IndexType c = c_in - 1;
 
-        if (r < 0 || r >= M || c < 0 || c >= N)
-            throw std::runtime_error(
-                "Índice fuera de rango en entrada " +
-                std::to_string(entries_read + 1) +
-                ": (" + std::to_string(r_in) + "," + std::to_string(c_in) + ")");
+        if (r < 0 || r >= M || c < 0 || c >= N) {
+            throw std::runtime_error("Índice fuera de rango en entrada " +
+                                     std::to_string(entries_read + 1));
+        }
 
-        // Acumular (maneja duplicados sumando sus valores)
-        coo_map[{r, c}] += v_in;
+        // entrada original
+        entries.push_back({r, c, v_in});
 
-        // Expandir simétrica/hermitiana (solo entradas fuera de la diagonal)
-        if (is_symmetric && r != c)
-            coo_map[{c, r}] += v_in;
-
-        // Expansión skew-symmetric: A[c][r] = -A[r][c]
-        if (is_skew && r != c)
-            coo_map[{c, r}] -= v_in;
+        // expansiones por simetría/skew
+        if (is_symmetric && r != c) {
+            entries.push_back({c, r, v_in});
+        }
+        if (is_skew && r != c) {
+            entries.push_back({c, r, (ValueType)(-v_in)});
+        }
 
         ++entries_read;
-        if (entries_read > nnz_file * 2 + 10)   // margen de seguridad
-            throw std::runtime_error("Más entradas de las declaradas en el archivo.");
     }
 
-    std::cout << "[MTX] Entradas leídas del archivo : " << entries_read << "\n"
-              << "[MTX] NNZ efectivos (tras dedup)  : " << coo_map.size() << "\n";
+    std::cout << "[MTX] Entradas leídas del archivo: " << entries_read << "\n";
+    std::cout << "[MTX] Entradas COO (con expansión): " << entries.size() << "\n";
 
-    // ── Construir CSR 
+    // 4) Ordenar por (row, col) y deduplicar sumando valores
+    std::sort(entries.begin(), entries.end(),
+              [](const Triplet& a, const Triplet& b) {
+                  if (a.r != b.r) return a.r < b.r;
+                  return a.c < b.c;
+              });
+
+    std::vector<Triplet> coo;
+    coo.reserve(entries.size());
+
+    for (const auto& t : entries) {
+        if (!coo.empty() && coo.back().r == t.r && coo.back().c == t.c) {
+            coo.back().v += t.v; // dedup
+        } else {
+            coo.push_back(t);
+        }
+    }
+
+    // (Opcional) eliminar ceros numéricos tras suma
+    // Si no quieres esto, comenta este bloque.
+    {
+        size_t w = 0;
+        for (size_t i = 0; i < coo.size(); ++i) {
+            if (coo[i].v != (ValueType)0) {
+                coo[w++] = coo[i];
+            }
+        }
+        coo.resize(w);
+    }
+
+    std::cout << "[MTX] NNZ efectivos (tras dedup): " << coo.size() << "\n";
+
+    // 5) Construcción CSR
     CsrMatrix mat;
-    mat.num_rows    = M;
-    mat.num_cols    = N;
-    mat.nnz         = static_cast<long long>(coo_map.size());
+    mat.num_rows = M;
+    mat.num_cols = N;
+    mat.nnz      = (long long)coo.size();
     mat.source_file = filename;
 
-    mat.row_ptrs.assign(M + 1, 0);
-    mat.col_idxs.resize(mat.nnz);
-    mat.values.resize(mat.nnz);
+    mat.row_ptrs.assign((size_t)M + 1, 0);
+    mat.col_idxs.resize((size_t)mat.nnz);
+    mat.values.resize((size_t)mat.nnz);
 
-    // Contar entradas por fila
-    for (const auto& kv : coo_map)
-        mat.row_ptrs[kv.first.first + 1]++;
-
-    // prefix sum → row_ptrs queda como offsets de inicio de cada fila
-    for (IndexType i = 0; i < M; ++i)
-        mat.row_ptrs[i + 1] += mat.row_ptrs[i];
-
-    // Paso 3: llenar col_idxs y values usando un cursor por fila
-    std::vector<IndexType> cursor(mat.row_ptrs.begin(),
-                                  mat.row_ptrs.begin() + M);
-
-    for (const auto& kv : coo_map) {
-        IndexType row = kv.first.first;
-        IndexType col = kv.first.second;
-        ValueType val = kv.second;
-
-        IndexType pos        = cursor[row]++;   // posición de escritura para esta fila
-        mat.col_idxs[pos]    = col;
-        mat.values[pos]      = val;
+    // 5.1) Contar nnz por fila (secuencial, muy barato)
+    for (const auto& t : coo) {
+        mat.row_ptrs[(size_t)t.r + 1]++;
     }
 
-    // Verificación de integridad
-    assert(mat.row_ptrs[M] == static_cast<IndexType>(mat.nnz));
+    // 5.2) Prefix-sum row_ptrs
+    for (IndexType i = 0; i < M; ++i) {
+        mat.row_ptrs[(size_t)i + 1] += mat.row_ptrs[(size_t)i];
+    }
 
-    std::cout << "[MTX] CSR construido correctamente.\n";
+    assert(mat.row_ptrs[(size_t)M] == (IndexType)mat.nnz);
+
+    // 5.3) First-touch de row_ptrs (opcional, pero útil NUMA)
+    #pragma omp parallel for schedule(static)
+    for (IndexType i = 0; i <= M; ++i) {
+        volatile IndexType x = mat.row_ptrs[(size_t)i];
+        (void)x;
+    }
+
+    // 5.4) Obtener límites por fila en coo (porque coo está ordenado por fila)
+    std::vector<IndexType> row_begin((size_t)M + 1, 0);
+    {
+        size_t k = 0;
+        for (IndexType r = 0; r < M; ++r) {
+            row_begin[(size_t)r] = (IndexType)k;
+            while (k < coo.size() && coo[k].r == r) ++k;
+        }
+        row_begin[(size_t)M] = (IndexType)coo.size();
+    }
+
+    // 5.5) Llenado paralelo de col_idxs y values por filas
+    // Cada fila r escribe solo en [row_ptrs[r], row_ptrs[r+1]) => sin races.
+    #pragma omp parallel for schedule(static)
+    for (IndexType r = 0; r < M; ++r) {
+        IndexType out = mat.row_ptrs[(size_t)r];
+        for (IndexType k = row_begin[(size_t)r]; k < row_begin[(size_t)r + 1]; ++k) {
+            mat.col_idxs[(size_t)out] = coo[(size_t)k].c;
+            mat.values[(size_t)out]   = coo[(size_t)k].v;
+            ++out;
+        }
+    }
+
+    std::cout << "[MTX] CSR construido correctamente (llenado paralelo por filas).\n";
     return mat;
 }
 
 //  Generación de matriz aleatoria (modo sintético)
+//  Usa schedule(static) — no forma parte de las métricas de rendimiento
 CsrMatrix generate_random_matrix(IndexType rows, IndexType cols,
                                   int avg_nnz, unsigned seed = 42)
 {
@@ -229,7 +330,6 @@ CsrMatrix generate_random_matrix(IndexType rows, IndexType cols,
     return A;
 }
 
-//  Inicialización de vectores
 void init_vector(std::vector<ValueType>& v, ValueType fill = -1.0)
 {
     const IndexType n = static_cast<IndexType>(v.size());
@@ -238,39 +338,26 @@ void init_vector(std::vector<ValueType>& v, ValueType fill = -1.0)
         for (IndexType i = 0; i < n; ++i) v[i] = fill;
         return;
     }
-    // fill < 0 → valores aleatorios
+
+    // Seed base distinta en cada ejecución
+    static const unsigned base_seed = static_cast<unsigned>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count() ^
+        (unsigned)std::random_device{}()
+    );
+
 #pragma omp parallel for schedule(static)
     for (IndexType i = 0; i < n; ++i) {
 #ifdef _OPENMP
-        std::mt19937 lgen(42u + (unsigned)(omp_get_thread_num() * 99991u + i));
+        std::mt19937 lgen(base_seed + (unsigned)(omp_get_thread_num() * 99991u + i));
 #else
-        std::mt19937 lgen(42u + (unsigned)i);
+        std::mt19937 lgen(base_seed + (unsigned)i);
 #endif
         std::uniform_real_distribution<ValueType> d(0.0, 1.0);
         v[i] = d(lgen);
     }
 }
 
-//  Kernels SpMV
-void spmv_static(const CsrMatrix& A,
-                 const std::vector<ValueType>& x,
-                       std::vector<ValueType>& y)
-{
-    const IndexType* rp  = A.row_ptrs.data();
-    const IndexType* ci  = A.col_idxs.data();
-    const ValueType* val = A.values.data();
-    const ValueType* xv  = x.data();
-          ValueType* yv  = y.data();
-
-#pragma omp parallel for schedule(static)
-    for (IndexType row = 0; row < A.num_rows; ++row) {
-        ValueType sum = 0.0;
-        for (IndexType k = rp[row]; k < rp[row + 1]; ++k)
-            sum += val[k] * xv[ci[k]];
-        yv[row] = sum;
-    }
-}
-
+//  Kernel SpMV con schedule(dynamic) — ÚNICA variante para métricas
 void spmv_dynamic(const CsrMatrix& A,
                   const std::vector<ValueType>& x,
                         std::vector<ValueType>& y)
@@ -282,44 +369,6 @@ void spmv_dynamic(const CsrMatrix& A,
           ValueType* yv  = y.data();
 
 #pragma omp parallel for schedule(dynamic, 256)
-    for (IndexType row = 0; row < A.num_rows; ++row) {
-        ValueType sum = 0.0;
-        for (IndexType k = rp[row]; k < rp[row + 1]; ++k)
-            sum += val[k] * xv[ci[k]];
-        yv[row] = sum;
-    }
-}
-
-void spmv_guided(const CsrMatrix& A,
-                 const std::vector<ValueType>& x,
-                       std::vector<ValueType>& y)
-{
-    const IndexType* rp  = A.row_ptrs.data();
-    const IndexType* ci  = A.col_idxs.data();
-    const ValueType* val = A.values.data();
-    const ValueType* xv  = x.data();
-          ValueType* yv  = y.data();
-
-#pragma omp parallel for schedule(guided)
-    for (IndexType row = 0; row < A.num_rows; ++row) {
-        ValueType sum = 0.0;
-        for (IndexType k = rp[row]; k < rp[row + 1]; ++k)
-            sum += val[k] * xv[ci[k]];
-        yv[row] = sum;
-    }
-}
-
-void spmv_auto(const CsrMatrix& A,
-               const std::vector<ValueType>& x,
-                     std::vector<ValueType>& y)
-{
-    const IndexType* rp  = A.row_ptrs.data();
-    const IndexType* ci  = A.col_idxs.data();
-    const ValueType* val = A.values.data();
-    const ValueType* xv  = x.data();
-          ValueType* yv  = y.data();
-
-#pragma omp parallel for schedule(auto)
     for (IndexType row = 0; row < A.num_rows; ++row) {
         ValueType sum = 0.0;
         for (IndexType k = rp[row]; k < rp[row + 1]; ++k)
@@ -364,13 +413,12 @@ bool validate_result(const CsrMatrix& A,
 //  Métricas de rendimiento
 double compute_bandwidth_gibs(const CsrMatrix& mat, double elapsed_s)
 {
-    // Bytes accedidos: values + col_idxs + row_ptrs + x (lectura) + y (escritura)
     double bytes =
-          static_cast<double>(mat.nnz)          * sizeof(ValueType)   // values
-        + static_cast<double>(mat.nnz)          * sizeof(IndexType)   // col_idxs
-        + static_cast<double>(mat.num_rows + 1) * sizeof(IndexType)   // row_ptrs
-        + static_cast<double>(mat.num_cols)     * sizeof(ValueType)   // x lectura
-        + static_cast<double>(mat.num_rows)     * sizeof(ValueType);  // y escritura
+          static_cast<double>(mat.nnz)          * sizeof(ValueType)
+        + static_cast<double>(mat.nnz)          * sizeof(IndexType)
+        + static_cast<double>(mat.num_rows + 1) * sizeof(IndexType)
+        + static_cast<double>(mat.num_cols)     * sizeof(ValueType)
+        + static_cast<double>(mat.num_rows)     * sizeof(ValueType);
     return (bytes / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
 }
 
@@ -406,22 +454,25 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
                                 int reps   = 10,
                                 int warmup = 2)
 {
-    std::cout << "\n[BENCH] Estrategia: " << strategy_name << "\n";
+ if (false)     std::cout << "\n[BENCH] Estrategia: " << strategy_name << "\n";
 
-    // Warm-up: evita medir efectos de cache fría en las primeras iteraciones
+    // Warm-up con la misma función (spmv_dynamic); no se mide
+    perf_events_disable_all_threads();
     for (int i = 0; i < warmup; ++i) spmv_func(A, x, y);
+    perf_events_enable_all_threads();
 
     std::vector<double> times;
     times.reserve(reps);
 
+    ompt_measure_start();
     for (int r = 0; r < reps; ++r) {
         auto t0 = std::chrono::high_resolution_clock::now();
         spmv_func(A, x, y);
         auto t1 = std::chrono::high_resolution_clock::now();
         times.push_back(std::chrono::duration<double>(t1 - t0).count());
-        printf("  Rep %2d: %.4f ms\n", r, times[r] * 1e3);
+        if (false) printf("  Rep %2d: %.4f ms\n", r, times[r] * 1e3);
     }
-
+    ompt_measure_pause();
     std::sort(times.begin(), times.end());
     double min_t = times.front();
     double max_t = times.back();
@@ -430,15 +481,14 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
     for (double t : times) var += (t - avg_t) * (t - avg_t);
     double stddev = std::sqrt(var / reps);
 
-    // GFlops: SpMV hace exactamente 2*nnz operaciones (1 mul + 1 add por nnz)
     double gflops  = (2.0 * static_cast<double>(A.nnz)) / (min_t * 1e9);
     double bw_gibs = compute_bandwidth_gibs(A, min_t);
     double bw_gbs  = compute_bandwidth_gbs(A, min_t);
 
-    printf("  Tiempo  : %.4f ms (min) | %.4f ms (avg) | %.4f ms (max) | stddev=%.4f ms\n",
+ if (false)     printf("  Tiempo  : %.4f ms (min) | %.4f ms (avg) | %.4f ms (max) | stddev=%.4f ms\n",
            min_t*1e3, avg_t*1e3, max_t*1e3, stddev*1e3);
-    printf("  GFlops  : %.3f\n", gflops);
-    printf("  BW GiB/s: %.3f  |  BW GB/s: %.3f\n", bw_gibs, bw_gbs);
+ if (false)     printf("  GFlops  : %.3f\n", gflops);
+ if (false)     printf("  BW GiB/s: %.3f  |  BW GB/s: %.3f\n", bw_gibs, bw_gbs);
 
     BenchmarkResult res;
     res.strategy       = strategy_name;
@@ -512,25 +562,30 @@ int main(int argc, char* argv[])
 #endif
 
     std::cout << "=======================================================\n"
-              << "  SpMV CSR Benchmark\n"
+              << "  SpMV CSR Benchmark  (schedule: dynamic)\n"
               << "=======================================================\n";
 
-    // ── Cargar o generar matriz 
+    // ── Cargar o generar matriz
     CsrMatrix A;
     if (mtx_file.empty()) {
-        constexpr IndexType ROWS    = 1000000;
-        constexpr IndexType COLS    = 1000000;
-        constexpr int       AVG_NNZ = 32;
+        constexpr IndexType ROWS    = 5000000;
+        constexpr IndexType COLS    = 5000000;
+        constexpr int       AVG_NNZ = 128;
         std::cout << "\n[INFO] Sin archivo .mtx → generando matriz aleatoria "
                   << ROWS << " x " << COLS
                   << "  avg_nnz_por_fila=" << AVG_NNZ << "\n";
-        A = generate_random_matrix(ROWS, COLS, AVG_NNZ);
+	unsigned run_seed = static_cast<unsigned>(
+    	std::chrono::high_resolution_clock::now().time_since_epoch().count() ^
+    	(unsigned)std::random_device{}()
+	);
+	std::cout << "[RNG] Seed de ejecucion: " << run_seed << "\n";
+	A = generate_random_matrix(ROWS, COLS, AVG_NNZ, run_seed);
     } else {
         std::cout << "\n[INFO] Cargando archivo: " << mtx_file << "\n";
         A = load_matrix_market(mtx_file);
     }
 
-    std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
+std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
               << "  NNZ=" << A.nnz
               << "  fuente=" << A.source_file << "\n"
               << "[MAT] Densidad: "
@@ -539,34 +594,22 @@ int main(int argc, char* argv[])
                   (static_cast<double>(A.num_rows) * A.num_cols))
               << " %\n" << std::defaultfloat;
 
-    // ── Preparar vectores 
+    // ── Preparar vectores
     std::vector<ValueType> x(A.num_cols), y(A.num_rows);
-    init_vector(x);         // valores aleatorios en [0,1]
-    init_vector(y, 0.0);    // ceros
+    init_vector(x);         // schedule(static) — solo inicialización
+    init_vector(y, 0.0);
 
-    // ── Validación previa 
-    std::cout << "\n[INFO] Validacion con spmv_static...\n";
-    spmv_static(A, x, y);
+    // ── Validación previa
+    std::cout << "\n[INFO] Validacion con spmv_dynamic...\n";
+    spmv_dynamic(A, x, y);
     validate_result(A, x, y);
 
-    // ── Benchmark de las 4 estrategias 
+    // ── Benchmark — ÚNICA estrategia medida: Dynamic
     std::vector<BenchmarkResult> results;
 
     init_vector(y, 0.0);
     results.push_back(
-        benchmark_spmv(A, x, y, "Static",   spmv_static,  reps));
-
-    init_vector(y, 0.0);
-    results.push_back(
-        benchmark_spmv(A, x, y, "Dynamic",  spmv_dynamic, reps));
-
-    init_vector(y, 0.0);
-    results.push_back(
-        benchmark_spmv(A, x, y, "Guided",   spmv_guided,  reps));
-
-    init_vector(y, 0.0);
-    results.push_back(
-        benchmark_spmv(A, x, y, "Auto",     spmv_auto,    reps));
+        benchmark_spmv(A, x, y, "Dynamic", spmv_dynamic, reps));
 
     // ── Tabla resumen
     std::cout << "\n"
@@ -583,23 +626,13 @@ int main(int argc, char* argv[])
     }
     std::cout << "+----------------------+----------+----------+----------+----------+\n";
 
-    // ── Mejor estrategia 
-    auto best = std::max_element(results.begin(), results.end(),
-        [](const BenchmarkResult& a, const BenchmarkResult& b) {
-            return a.gflops < b.gflops;
-        });
-    std::cout << "\nMejor estrategia: " << best->strategy
-              << "  (" << std::fixed << std::setprecision(3)
-              << best->gflops << " GFlops | "
-              << best->bandwidth_gibs << " GiB/s)\n";
-
-    // ── Primeras entradas del resultado 
+    // ── Primeras entradas del resultado
     std::cout << "\n=== Primeras entradas de y = A*x ===\n";
     const int print_n = std::min(10, A.num_rows);
     for (int i = 0; i < print_n; ++i)
         printf("  y[%4d] = %.6f\n", i, y[i]);
 
-    // ── Exportar CSV 
+    // ── Exportar CSV
     if (!csv_prefix.empty())
         export_csv(csv_prefix + ".csv", A, results);
 
