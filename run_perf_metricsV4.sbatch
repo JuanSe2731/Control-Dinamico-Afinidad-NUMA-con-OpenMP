@@ -15,6 +15,6 @@
 
 set -euo pipefail
 
-cd "${SLURM_SUBMIT_DIR}"
+cd "/scratch/CAGE/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
 
 srun ./run_perf_metricsV4.sh
