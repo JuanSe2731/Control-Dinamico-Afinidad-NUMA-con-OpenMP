@@ -1,11 +1,14 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
+#include <string>
 #include <vector>
 
 #include <omp.h>
@@ -49,6 +52,7 @@ static inline void perf_events_enable_all_threads() {
 
 static constexpr int WARMUP_ITERS = 2; // igual que spmv.cpp / spmv_dynamic.cpp
 static constexpr int REPS = 30;
+static constexpr bool kPrint = false;
 
 static inline double now_sec() {
     using clock = std::chrono::high_resolution_clock;
@@ -83,6 +87,17 @@ struct Stats {
     double min_s{0}, avg_s{0}, max_s{0}, stddev_s{0};
 };
 
+struct BenchmarkResult {
+    const char* strategy{nullptr};
+    double min_time_s{0};
+    double avg_time_s{0};
+    double max_time_s{0};
+    double stddev_s{0};
+    double gflops{0};
+    double bandwidth_gibs{0};
+    double bandwidth_gbs{0};
+};
+
 static Stats compute_stats(std::vector<double>& times) {
     std::sort(times.begin(), times.end());
     const double min_t = times.front();
@@ -94,9 +109,54 @@ static Stats compute_stats(std::vector<double>& times) {
     return Stats{min_t, avg_t, max_t, stddev};
 }
 
+static double compute_gflops(int n, double elapsed_s) {
+    const double points = static_cast<double>(n - 2) * (n - 2);
+    const double flops = 5.0 * points;
+    return flops / (elapsed_s * 1e9);
+}
+
+static double compute_bandwidth_gibs(int n, double elapsed_s) {
+    const double points = static_cast<double>(n - 2) * (n - 2);
+    const double bytes = points * 6.0 * sizeof(float);
+    return (bytes / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
+}
+
+static double compute_bandwidth_gbs(int n, double elapsed_s) {
+    const double points = static_cast<double>(n - 2) * (n - 2);
+    const double bytes = points * 6.0 * sizeof(float);
+    return (bytes / 1e9) / elapsed_s;
+}
+
+static void export_csv(const std::string& filename,
+                       int n,
+                       int threads,
+                       const std::vector<BenchmarkResult>& results) {
+    std::ofstream f(filename);
+    if (!f.is_open()) {
+        std::cerr << "[CSV] No se pudo crear: " << filename << "\n";
+        return;
+    }
+
+    f << "strategy,n,threads,min_ms,avg_ms,max_ms,stddev_ms,gflops,bw_gibs,bw_gbs\n";
+    for (const auto& r : results) {
+        f << r.strategy << ","
+          << n << ","
+          << threads << ","
+          << std::fixed << std::setprecision(6)
+          << r.min_time_s * 1e3 << ","
+          << r.avg_time_s * 1e3 << ","
+          << r.max_time_s * 1e3 << ","
+          << r.stddev_s * 1e3 << ","
+          << r.gflops << ","
+          << r.bandwidth_gibs << ","
+          << r.bandwidth_gbs << "\n";
+    }
+    std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
+}
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " N\n";
+        std::cerr << "Usage: " << argv[0] << " N [threads] [reps] [csv_prefix]\n";
         return 1;
     }
 
@@ -105,6 +165,27 @@ int main(int argc, char* argv[]) {
         std::cerr << "ERROR: N must be >= 3\n";
         return 1;
     }
+
+    int threads = 0;
+#ifdef _OPENMP
+    threads = omp_get_max_threads();
+#endif
+    int reps = REPS;
+    std::string csv_prefix;
+    if (argc >= 3) threads = std::atoi(argv[2]);
+    if (argc >= 4) reps = std::atoi(argv[3]);
+    if (argc >= 5) csv_prefix = argv[4];
+    if (threads <= 0 || reps <= 0) {
+        std::cerr << "ERROR: threads y reps deben ser > 0\n";
+        return 1;
+    }
+
+    if (!kPrint) {
+        std::freopen("/dev/null", "w", stdout);
+    }
+#ifdef _OPENMP
+    omp_set_num_threads(threads);
+#endif
 
     float* A = static_cast<float*>(std::malloc(static_cast<size_t>(n) * n * sizeof(float)));
     float* result = static_cast<float*>(std::malloc(static_cast<size_t>(n) * n * sizeof(float)));
@@ -136,10 +217,10 @@ int main(int argc, char* argv[]) {
 
     // Timed repetitions
     std::vector<double> times;
-    times.reserve(REPS);
+    times.reserve(reps);
 
     ompt_measure_start();
-    for (int r = 0; r < REPS; ++r) {
+    for (int r = 0; r < reps; ++r) {
         const double t0 = now_sec();
         stencil2D_omp_static(A, result, n);
         const double t1 = now_sec();
@@ -153,18 +234,39 @@ int main(int argc, char* argv[]) {
         checksum += result[j * n + (j % (n - 2) + 1)];
     }
 
-    // [COMMENTED: stats logging disabled for clean benchmark]
-    // const Stats st = compute_stats(times);
-    //
-    // std::cout << "[Stencil2D] Variant: OpenMP (static) + SeqInit\n";
-    // std::cout << "N=" << n << " warmup=" << WARMUP_ITERS << " reps=" << REPS << "\n";
-    // std::cout << std::fixed << std::setprecision(6);
-    // std::cout << "Time: "
-    //           << (st.min_s * 1e3) << " ms (min), "
-    //           << (st.avg_s * 1e3) << " ms (avg), "
-    //           << (st.max_s * 1e3) << " ms (max), stddev="
-    //           << (st.stddev_s * 1e3) << " ms\n";
-    // std::cout << "Checksum: " << checksum << "\n";
+    const Stats st = compute_stats(times);
+    const double gflops = compute_gflops(n, st.min_s);
+    const double bw_gibs = compute_bandwidth_gibs(n, st.min_s);
+    const double bw_gbs = compute_bandwidth_gbs(n, st.min_s);
+
+    std::cout << "[Stencil2D] Variant: OpenMP (static) + SeqInit\n";
+    std::cout << "N=" << n << " warmup=" << WARMUP_ITERS << " reps=" << reps
+              << " threads=" << threads << "\n";
+    std::cout << std::fixed << std::setprecision(6);
+    std::cout << "Time: "
+              << (st.min_s * 1e3) << " ms (min), "
+              << (st.avg_s * 1e3) << " ms (avg), "
+              << (st.max_s * 1e3) << " ms (max), stddev="
+              << (st.stddev_s * 1e3) << " ms\n";
+    std::cout << "GFlops  : " << gflops << "\n";
+    std::cout << "BW GiB/s: " << bw_gibs << "  |  BW GB/s: " << bw_gbs << "\n";
+    std::cout << "Checksum: " << checksum << "\n";
+
+    std::vector<BenchmarkResult> results;
+    BenchmarkResult res;
+    res.strategy = "OpenMP-SeqInit";
+    res.min_time_s = st.min_s;
+    res.avg_time_s = st.avg_s;
+    res.max_time_s = st.max_s;
+    res.stddev_s = st.stddev_s;
+    res.gflops = gflops;
+    res.bandwidth_gibs = bw_gibs;
+    res.bandwidth_gbs = bw_gbs;
+    results.push_back(res);
+
+    if (!csv_prefix.empty()) {
+        export_csv(csv_prefix + ".csv", n, threads, results);
+    }
 
     std::free(A);
     std::free(result);

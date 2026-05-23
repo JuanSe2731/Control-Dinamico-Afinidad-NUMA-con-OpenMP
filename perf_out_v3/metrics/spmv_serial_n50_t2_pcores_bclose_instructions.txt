@@ -1,4 +1,0 @@
-  [VAL] PASSED
-  Rep  0: 0.0005 ms
-  Rep  1: 0.0003 ms
-3750707,,instructions,1671860,100,00,,

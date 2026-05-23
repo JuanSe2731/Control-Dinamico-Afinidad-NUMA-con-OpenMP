@@ -448,14 +448,23 @@ void export_csv(const std::string& filename,
 //  Main
 int main(int argc, char* argv[])
 {
-    // Modos soportados (retrocompatible):
-    //   1) Archivo MatrixMarket:
-    //        ./spmv_serial <archivo.mtx> [reps] [csv_prefix]
-    //   2) Sintético (recomendado para este repo):
-    //        ./spmv_serial <N> [avg_nnz] [reps] [csv_prefix]
-    //      donde N genera una matriz NxN con nnz promedio por fila.
+    // Modos soportados:
+    //   1) Sintético (recomendado):
+    //        ./spmv_serial <N> [threads] [reps] [avg_nnz] [csv_prefix]
+    //   2) Archivo MatrixMarket:
+    //        ./spmv_serial <archivo.mtx> [threads] [reps] [csv_prefix]
+    //
+    // Nota: en modo serial el parámetro threads se acepta por consistencia,
+    //       pero la ejecución sigue siendo monohilo.
 
-    std::string arg1       = (argc >= 2) ? argv[1] : "";
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0]
+                  << " <N|archivo.mtx> [threads] [reps] [avg_nnz] [csv_prefix]\n";
+        return 1;
+    }
+
+    std::string arg1       = argv[1];
+    int         threads    = 1;
     int         reps       = 30;
     int         avg_nnz    = 32;
     std::string csv_prefix = "";
@@ -469,13 +478,14 @@ int main(int argc, char* argv[])
     bool synthetic_mode = is_integer(arg1);
 
     if (synthetic_mode) {
-        // ./spmv_serial N [avg_nnz] [reps] [csv_prefix]
+        // ./spmv_serial N [threads] [reps] [avg_nnz] [csv_prefix]
         const int N = std::stoi(arg1);
-        if (argc >= 3) avg_nnz    = std::stoi(argv[2]);
+        if (argc >= 3) threads    = std::stoi(argv[2]);
         if (argc >= 4) reps       = std::stoi(argv[3]);
-        if (argc >= 5) csv_prefix = argv[4];
+        if (argc >= 5) avg_nnz    = std::stoi(argv[4]);
+        if (argc >= 6) csv_prefix = argv[5];
 
-        if (N <= 0) return 1;
+        if (N <= 0 || threads <= 0 || reps <= 0 || avg_nnz <= 0) return 1;
 
         CsrMatrix A = generate_random_matrix(N, N, avg_nnz);
 
@@ -496,10 +506,12 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    // ./spmv_serial <archivo.mtx> [reps] [csv_prefix]
+    // ./spmv_serial <archivo.mtx> [threads] [reps] [csv_prefix]
     std::string mtx_file = arg1;
-    if (argc >= 3) reps       = std::stoi(argv[2]);
-    if (argc >= 4) csv_prefix = argv[3];
+    if (argc >= 3) threads    = std::stoi(argv[2]);
+    if (argc >= 4) reps       = std::stoi(argv[3]);
+    if (argc >= 5) csv_prefix = argv[4];
+    if (threads <= 0 || reps <= 0) return 1;
 
  if (false)     std::cout << "=======================================================\n"
               << "  SpMV CSR Benchmark  (monohilo)\n"

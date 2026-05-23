@@ -4,103 +4,58 @@ set -euo pipefail
 ########################
 # run_perf_metricsV4.sh
 #
-# Ejecuta TODO en una sola corrida:
-#  1) Seriales + baseline/first-touch con perf stat (y OMP_PLACES/PROC_BIND)
-#  2) Baseline/first-touch con OMPT (sin perf stat, sin OMP_PLACES/PROC_BIND)
+# Ejecuta benchmarks en 3 fases:
+#  1) Seriales
+#  2) OMP + numactl con 3 configuraciones
+#  3) OMP + numactl + OMPT (mismas 3 configuraciones)
 #
-# Nota: los kernels ahora deshabilitan perf events durante warm-up, por lo que
-#       perf stat y likwid no cuentan warm-ups.
-#
-# Uso recomendado (con LIKWID):
-#   srun --partition=amd --nodes=0,1 --ntasks=1 --cpus-per-task=256 --mem=100G \
-#     --export=ALL,OMP_THREADS=64,SPMV_AVG_NNZ=20 likwid-perfctr -g NUMA -f -- \
-#     ./run_perf_metricsV4.sh 5000
+# Todas las fases usan hilos: 8,16,32,64,128
+# Métricas por ventana (100ms): d_rm, d_instr, d_cyc, IPC, ratio_rm
+# Métricas kernel: stddev_ms, GiB/s, GFlops
 ########################
 
-########################
-# INPUTS & DEFAULTS
-########################
-if [[ $# -ne 1 ]]; then
-  echo "Usage: $0 <N>" >&2
-  echo "Recomendado: N=5000 para Stencil2D, N=10000-50000 para SpMV" >&2
-  exit 1
-fi
+N=11000000
+SPMV_MTX="stokes.mtx"
+SPMV_AVG_NNZ=360
+REPS=150
+THREAD_LIST=(8 16 32 64 128)
 
-N="$1"
-if ! [[ "$N" =~ ^[0-9]+$ ]] || [[ "$N" -le 0 ]]; then
-  echo "ERROR: N debe ser un entero positivo. Recibido: $N" >&2
-  exit 1
-fi
-
-# Environment defaults (allow override via srun --export)
-# Para 2 nodos NUMA con 64 cores c/u (128 cores total):
-#   - Un hilo por core (sin SMT): OMP_THREADS=128
-#   - Con SMT (2 hilos/core):     OMP_THREADS=256
-OMP_THREADS="${OMP_THREADS:-128}"
-SPMV_AVG_NNZ="${SPMV_AVG_NNZ:-20}"
-SPMV_REPS="${SPMV_REPS:-30}"
 OUTDIR="${OUTDIR:-perf_out_v4}"
-SKIP_MODULES="${SKIP_MODULES:-0}"
+METRICSDIR="${OUTDIR}/metrics"
+OMPT_LOGDIR="${OUTDIR}/ompt_logs"
 
-########################
-# COMPILATION CONFIG
-########################
+WINDOW_CSV="${OUTDIR}/window_metrics.csv"
+KERNEL_CSV="${OUTDIR}/kernel_metrics.csv"
+OMPT_SUMMARY_CSV="${OUTDIR}/ompt_summary.csv"
+
 CXX=clang++
 CXXFLAGS=(-std=c++17 -O3 -fopenmp -ffast-math)
 
-########################
-# OMPT TOOL SETUP
-########################
-OMPT_TOOL_SRC="ompt_tool3.cpp"
-OMPT_TOOL_BIN="libnuma_sched_ompt3.so"
+OMPT_TOOL_SRC="final_sched_NUMAratio.cpp"
+OMPT_TOOL_BIN="numa_sched_finalratiov4.so"
 OMPT_TOOL_FLAGS=(-std=c++17 -fPIC -shared -fopenmp -pthread -O2)
+HWLOC_INCLUDE="${HWLOC_INCLUDE:-/opt/ohpc/pub/libs/hwloc/include}"
+HWLOC_LIB="${HWLOC_LIB:-/opt/ohpc/pub/libs/hwloc/lib}"
 
-########################
-# OUTPUT DIRECTORIES
-########################
-METRICSDIR="${OUTDIR}/metrics"
-REPORTDIR="${OUTDIR}/reports"
-OMPT_LOGDIR="${OUTDIR}/ompt_logs"
-CSV="${OUTDIR}/metrics_v4.csv"
-LIKWID_CSV="${OUTDIR}/likwid_metrics_v4.csv"
+REMOTE_EVENT="rD044"
+ALL_FILLS_EVENT="rFF44"
 
-########################
-# Kernel Sources & Binaries
-########################
-declare -a ALL_KERNELS=(
-  "stencil_serial:Stencil_serial.cpp:stencil_serial:STENCIL"
-  "spmv_serial:spmv_serial.cpp:spmv_serial:SPMV"
-  "stencil:Stencil.cpp:stencil:STENCIL"
-  "spmv_dynamic:spmv_dynamic.cpp:spmv_dynamic:SPMV"
-  "stencil_first_touch:Stencil_first_touch.cpp:stencil_first_touch:STENCIL"
-  "spmv_dynamic_first_touch:spmv_dynamic_first_touch.cpp:spmv_dynamic_first_touch:SPMV"
-)
-
-# Seriales
 declare -a SERIAL_KERNELS=(
   "stencil_serial:Stencil_serial.cpp:stencil_serial:STENCIL"
   "spmv_serial:spmv_serial.cpp:spmv_serial:SPMV"
 )
 
-# Baseline + first-touch con perf stat + OMP_PLACES/PROC_BIND
-declare -a PERF_KERNELS=(
+declare -a PAR_KERNELS=(
   "stencil:Stencil.cpp:stencil:STENCIL"
-  "spmv_dynamic:spmv_dynamic.cpp:spmv_dynamic:SPMV"
-  "stencil_first_touch:Stencil_first_touch.cpp:stencil_first_touch:STENCIL"
-  "spmv_dynamic_first_touch:spmv_dynamic_first_touch.cpp:spmv_dynamic_first_touch:SPMV"
+  "spmv_static:spmv_staticSeed.cpp:spmv_static:SPMV"
 )
 
-# OMPT (sin perf stat, sin OMP_PLACES/PROC_BIND)
-declare -a OMPT_KERNELS=(
-  "stencil:Stencil.cpp:stencil:STENCIL"
-  "stencil_first_touch:Stencil_first_touch.cpp:stencil_first_touch:STENCIL"
-  "spmv_dynamic:spmv_dynamic.cpp:spmv_dynamic:SPMV"
-  "spmv_dynamic_first_touch:spmv_dynamic_first_touch.cpp:spmv_dynamic_first_touch:SPMV"
+declare -a OMP_CONFIGS=(
+  "cores:spread:interleave:cores_spread_interleave"
+  "cores:close:interleave:cores_close_interleave"
+  "cores:close:interleave:cores_close_interleave_rep2"
 )
 
-########################
-# FUNCTIONS
-########################
 need_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
     echo "ERROR: Falta comando requerido: $1" >&2
@@ -109,60 +64,9 @@ need_cmd() {
 }
 
 mkdirs() {
-  mkdir -p "${OUTDIR}" "${METRICSDIR}" "${REPORTDIR}" "${OMPT_LOGDIR}"
+  mkdir -p "${OUTDIR}" "${METRICSDIR}" "${OMPT_LOGDIR}"
 }
 
-# Load HPC modules if available
-load_modules() {
-  if [[ "$SKIP_MODULES" == "1" ]]; then
-    echo "[*] Skipping module loading (SKIP_MODULES=1)"
-    return
-  fi
-
-  if ! command -v module >/dev/null 2>&1; then
-    if [[ -f /etc/profile.d/modules.sh ]]; then
-      # shellcheck disable=SC1091
-      source /etc/profile.d/modules.sh
-    elif [[ -f /usr/share/Modules/init/bash ]]; then
-      # shellcheck disable=SC1091
-      source /usr/share/Modules/init/bash
-    fi
-  fi
-
-  if command -v module >/dev/null 2>&1; then
-    echo "[*] Loading modules..."
-    module purge 2>/dev/null || true
-    if module avail 2>&1 | grep -q "likwid"; then
-      module load likwid >/dev/null 2>&1 || true
-    fi
-    if module avail 2>&1 | grep -q "gnu15"; then
-      module load gnu15/15.2.0 >/dev/null 2>&1 || true
-    fi
-    echo "[*] Modules loaded"
-  else
-    echo "[*] WARNING: 'module' command not available; continuing without module setup"
-  fi
-}
-
-# Compile OMPT tool
-compile_ompt_tool() {
-  if [[ ! -f "$OMPT_TOOL_SRC" ]]; then
-    echo "[!] ERROR: OMPT tool source $OMPT_TOOL_SRC not found" >&2
-    return 1
-  fi
-
-  echo "[*] Compiling OMPT tool: $OMPT_TOOL_SRC -> $OMPT_TOOL_BIN"
-  "${CXX}" "${OMPT_TOOL_FLAGS[@]}" "$OMPT_TOOL_SRC" -o "$OMPT_TOOL_BIN"
-
-  if [[ ! -f "$OMPT_TOOL_BIN" ]]; then
-    echo "[!] ERROR: OMPT tool compilation failed" >&2
-    return 1
-  fi
-
-  echo "[✓] OMPT tool compiled: $(realpath "$OMPT_TOOL_BIN")"
-}
-
-# Compile a single kernel
 compile_kernel() {
   local label="$1"
   local src="$2"
@@ -182,9 +86,26 @@ compile_kernel() {
   fi
 }
 
+compile_ompt_tool() {
+  if [[ ! -f "$OMPT_TOOL_SRC" ]]; then
+    echo "[!] ERROR: OMPT tool source not found: $OMPT_TOOL_SRC" >&2
+    exit 1
+  fi
+
+  echo "[*] Compiling OMPT tool: $OMPT_TOOL_SRC -> $OMPT_TOOL_BIN"
+  "${CXX}" "${OMPT_TOOL_FLAGS[@]}" "$OMPT_TOOL_SRC" \
+    -o "$OMPT_TOOL_BIN" \
+    -I"${HWLOC_INCLUDE}" -L"${HWLOC_LIB}" -lhwloc
+
+  if [[ ! -f "$OMPT_TOOL_BIN" ]]; then
+    echo "[!] ERROR: OMPT tool compilation failed: $OMPT_TOOL_BIN" >&2
+    exit 1
+  fi
+}
+
 compile_all() {
   compile_ompt_tool
-  for kernel_spec in "${ALL_KERNELS[@]}"; do
+  for kernel_spec in "${SERIAL_KERNELS[@]}" "${PAR_KERNELS[@]}"; do
     IFS=':' read -r label src bin _ktype <<< "$kernel_spec"
     compile_kernel "$label" "$src" "$bin" || {
       echo "[!] FATAL: Failed to compile $label" >&2
@@ -193,227 +114,184 @@ compile_all() {
   done
 }
 
-# Run perf stat for a single kernel (one event at a time, no multiplex)
-run_kernel_with_perf() {
-  local kernel_label="$1"
-  local kernel_bin="$2"
-  local kernel_type="$3"
-  local threads="$4"
-  local omp_places="${5:-}"
-  local omp_proc_bind="${6:-}"
+append_perf_windows() {
+  local tag="$1"
+  local perf_out="$2"
+  awk -F',' -v tag="$tag" '
+    $3 ~ /^(rD044|rFF44|instructions|cycles)$/ {
+      t=$1; gsub(/^[ \t]+|[ \t]+$/, "", t);
+      c=$2; gsub(/^[ \t]+|[ \t]+$/, "", c);
+      e=$3; gsub(/^[ \t]+|[ \t]+$/, "", e);
+      key=t;
+      if (e=="rD044") rm[key]=c;
+      else if (e=="rFF44") all[key]=c;
+      else if (e=="instructions") ins[key]=c;
+      else if (e=="cycles") cyc[key]=c;
+      seen[key]=1;
+    }
+    END {
+      for (k in seen) {
+        rmv = (k in rm)?rm[k]:0;
+        inv = (k in ins)?ins[k]:0;
+        cyv = (k in cyc)?cyc[k]:0;
+        ipc = (cyv>0)? inv/cyv:0;
+        allv = (k in all)?all[k]:0;
+        ratio = (allv>0)? rmv/allv:0;
+        printf "%s,%s,%s,%s,%s,%.6f,%.6f\n", tag, k, rmv, inv, cyv, ipc, ratio;
+      }
+    }' "$perf_out" >> "$WINDOW_CSV"
+}
 
-  local tag="${kernel_label}_n${N}_t${threads}"
-  if [[ -n "$omp_places" && -n "$omp_proc_bind" ]]; then
-    tag="${tag}_p${omp_places}_b${omp_proc_bind}"
-  else
-    tag="${tag}_pna_bna"
-  fi
-  local csv_line="${tag}"
-
-  export OMP_NUM_THREADS="${threads}"
-  export OMP_DYNAMIC="FALSE"
-  if [[ -n "$omp_places" && -n "$omp_proc_bind" ]]; then
-    export OMP_PLACES="${omp_places}"
-    export OMP_PROC_BIND="${omp_proc_bind}"
-  else
-    unset OMP_PLACES
-    unset OMP_PROC_BIND
-  fi
-
-  local cmd=()
-  if [[ "$kernel_type" == "STENCIL" ]]; then
-    cmd=( "./${kernel_bin}" "${N}" )
-  elif [[ "$kernel_type" == "SPMV" ]] && [[ "${kernel_label}" == "spmv_serial" ]]; then
-    cmd=( "./${kernel_bin}" "${N}" "${SPMV_AVG_NNZ}" "${SPMV_REPS}" )
-  elif [[ "$kernel_type" == "SPMV" ]]; then
-    cmd=( "./${kernel_bin}" "" "${threads}" "${SPMV_REPS}" "" )
-  fi
-
-  echo "  [RUN] ${kernel_label} places=${omp_places:-na} bind=${omp_proc_bind:-na}"
-
-  local events=(
-    "cycles"
-    "instructions"
-    "cache-references"
-    "cache-misses"
-    "cpu-migrations"
-  )
-
-  for event in "${events[@]}"; do
-    local out_ref="${METRICSDIR}/${tag}_${event}.txt"
-    perf stat --no-big-num -x, -e "${event}" -- "${cmd[@]}" 2>&1 | tee "$out_ref" >/dev/null || true
-
-    local count
-    count=$(awk -F',' '$3 ~ /^'"${event}"'$/ {
-      c=$1
-      gsub(/^[ \t]+|[ \t]+$/, "", c)
-      if (c !~ /<not/ && c != "") print c
+extract_kernel_metrics() {
+  local csv="$1"
+  awk -F',' '
+    NR==1 { for (i=1;i<=NF;i++) idx[$i]=i; next }
+    NR==2 {
+      printf "%s %s %s\n", $(idx["stddev_ms"]), $(idx["gflops"]), $(idx["bw_gibs"]);
       exit
-    }' "$out_ref" || echo "0")
-
-    csv_line="${csv_line},${count}"
-  done
-
-  echo "${csv_line}" >> "${CSV}"
+    }' "$csv"
 }
 
-# Run kernel with OMPT tool (no perf stat)
-run_kernel_with_ompt() {
-  local kernel_label="$1"
-  local kernel_bin="$2"
-  local kernel_type="$3"
-
-  local tag="${kernel_label}_n${N}_t${OMP_THREADS}_ompt"
-  local ompt_logfile="${OMPT_LOGDIR}/${tag}.log"
-
-  export OMP_NUM_THREADS="${OMP_THREADS}"
-  export OMP_DYNAMIC="FALSE"
-  unset OMP_PLACES
-  unset OMP_PROC_BIND
-
-  export OMP_TOOL="enabled"
-  export OMP_TOOL_LIBRARIES="$(realpath "$OMPT_TOOL_BIN")"
-  export OMPT_VERBOSE="0"
-  export OMPT_MONITOR="0"
-  export OMPT_CSV="${CSV}"
-  export OMPT_TAG="${tag}"
-
-  local cmd=()
-  if [[ "$kernel_type" == "STENCIL" ]]; then
-    cmd=( "./${kernel_bin}" "${N}" )
-  elif [[ "$kernel_type" == "SPMV" ]]; then
-    cmd=( "./${kernel_bin}" "" "${OMP_THREADS}" "${SPMV_REPS}" "" )
-  fi
-
-  echo "  [RUN] ${kernel_label} (OMPT, sin OMP_PLACES/PROC_BIND)"
-  "${cmd[@]}" >/dev/null 2> "${ompt_logfile}" || true
-}
-
-# Run kernel with likwid-perfctr to collect NUMA metrics
-run_kernel_with_likwid() {
-  local kernel_label="$1"
-  local kernel_bin="$2"
-  local kernel_type="$3"
-  local threads="$4"
-  local tag_suffix="${5:-}"
-
-  local tag="${kernel_label}_n${N}_t${threads}${tag_suffix}"
-
-  export OMP_NUM_THREADS="${threads}"
-  export OMP_DYNAMIC="FALSE"
-  unset OMP_PLACES
-  unset OMP_PROC_BIND
-
-  local cmd=()
-  if [[ "$kernel_type" == "STENCIL" ]]; then
-    cmd=( "./${kernel_bin}" "${N}" )
-  elif [[ "$kernel_type" == "SPMV" ]] && [[ "${kernel_label}" == "spmv_serial" ]]; then
-    cmd=( "./${kernel_bin}" "${N}" "${SPMV_AVG_NNZ}" "${SPMV_REPS}" )
-  elif [[ "$kernel_type" == "SPMV" ]]; then
-    cmd=( "./${kernel_bin}" "" "${threads}" "${SPMV_REPS}" "" )
-  fi
-
-  if ! command -v likwid-perfctr &> /dev/null; then
-    echo "  [SKIP] likwid-perfctr not found for ${kernel_label}"
+sum_migrations_for_tag() {
+  local tag="$1"
+  if [[ ! -f "$OMPT_SUMMARY_CSV" ]]; then
+    echo "0"
     return
   fi
-
-  echo "  [RUN LIKWID] ${kernel_label} (${threads} threads)"
-
-  # Run with NUMA group and extract metrics
-  local likwid_out
-  likwid_out=$(likwid-perfctr -g NUMA -- "${cmd[@]}" 2>&1 || true)
-
-  # Parse LIKWID output to extract metrics
-  # Expected output format:
-  # | Metric | Socket 0 | Socket 1 |  Sum  |
-  # where metrics include: Local BW [MByte/s], Remote BW, Local Data Volume, Remote Data Volume, etc.
-
-  local local_bw=0 remote_bw=0 local_vol=0 remote_vol=0
-
-  # Extract values (simplified parsing)
-  local_bw=$(echo "$likwid_out" | grep "Local BW" | awk '{print $(NF-1)}' | head -1 || echo "0")
-  remote_bw=$(echo "$likwid_out" | grep "Remote BW" | awk '{print $(NF-1)}' | head -1 || echo "0")
-  local_vol=$(echo "$likwid_out" | grep "Local Data Volume" | awk '{print $(NF-1)}' | head -1 || echo "0")
-  remote_vol=$(echo "$likwid_out" | grep "Remote Data Volume" | awk '{print $(NF-1)}' | head -1 || echo "0")
-
-  # Calculate totals and percentages
-  local total_bw=$(echo "${local_bw} + ${remote_bw}" | bc 2>/dev/null || echo "0")
-  local total_vol=$(echo "${local_vol} + ${remote_vol}" | bc 2>/dev/null || echo "0")
-  local remote_bw_pct=$(if (( $(echo "${total_bw} > 0" | bc -l) )); then echo "scale=2; ${remote_bw} * 100 / ${total_bw}" | bc; else echo "0"; fi)
-
-  echo "${tag},${local_bw},${remote_bw},${local_vol},${remote_vol},${total_bw},${remote_bw_pct}" >> "${LIKWID_CSV}"
+  awk -F',' -v tag="$tag" '
+    NR==1 { for (i=1;i<=NF;i++) idx[$i]=i; next }
+    $(idx["tag"])==tag { sum += $(idx["migrations"]) }
+    END { print (sum+0) }
+  ' "$OMPT_SUMMARY_CSV"
 }
 
-########################
-# MAIN
-########################
+append_kernel_summary() {
+  local tag="$1"
+  local config="$2"
+  local threads="$3"
+  local scheduler="$4"
+  local migrations="$5"
+  local kernel_csv="$6"
+
+  read -r stdev_ms gflops bw_gibs <<< "$(extract_kernel_metrics "$kernel_csv")"
+  echo "${config},${threads},${scheduler},${stdev_ms},${migrations},${bw_gibs},${gflops}" >> "$KERNEL_CSV"
+}
+
+run_kernel_cmd() {
+  local kernel_label="$1"
+  local kernel_bin="$2"
+  local kernel_type="$3"
+  local threads="$4"
+  local csv_prefix="$5"
+
+  if [[ "$kernel_type" == "STENCIL" ]]; then
+    echo "./${kernel_bin} ${N} ${threads} ${REPS} ${csv_prefix}"
+  else
+    echo "./${kernel_bin} ${SPMV_MTX} ${threads} ${REPS} ${csv_prefix}"
+  fi
+}
+
+run_with_perf_windows() {
+  local tag="$1"; shift
+  local perf_out="${METRICSDIR}/${tag}_perf_windows.txt"
+  perf stat -I 100 -x, -e "${REMOTE_EVENT},${ALL_FILLS_EVENT},instructions,cycles" -- "$@" \
+    2> "$perf_out" >/dev/null || true
+  append_perf_windows "$tag" "$perf_out"
+}
+
 need_cmd perf
 need_cmd "${CXX}"
+need_cmd numactl
 
 mkdirs
-load_modules
-
-echo "[*] Compiling all kernels and OMPT tool..."
 compile_all
 
-echo "tag,cycles,instructions,cache_references,cache_misses,cpu_migrations,tlb_misses,ipc,mpki" > "${CSV}"
-echo "tag,local_bw_mbs,remote_bw_mbs,local_data_vol_mb,remote_data_vol_mb,total_bw_mbs,remote_bw_pct" > "${LIKWID_CSV}"
+export SPMV_AVG_NNZ="${SPMV_AVG_NNZ}"
 
-echo "[*] Stage 1/3: Seriales (perf stat)"
-for kernel_spec in "${SERIAL_KERNELS[@]}"; do
-  IFS=':' read -r label _src bin ktype <<< "$kernel_spec"
-  run_kernel_with_perf "$label" "$bin" "$ktype" "1"
+rm -f "$WINDOW_CSV" "$KERNEL_CSV" "$OMPT_SUMMARY_CSV"
+echo "tag,window_ms,d_rm,d_instr,d_cyc,ipc,ratio_rm" > "$WINDOW_CSV"
+echo "config,threads,scheduler,stdev_ms,migrations,bw_gibs,gflops" > "$KERNEL_CSV"
+
+unset OMP_TOOL OMP_TOOL_LIBRARIES OMPT_WINDOW_CSV OMPT_SUMMARY_CSV OMPT_LOG_FILE OMPT_TAG
+
+echo "[*] Stage 1/3: Seriales"
+for threads in "${THREAD_LIST[@]}"; do
+  for kernel_spec in "${SERIAL_KERNELS[@]}"; do
+    IFS=':' read -r label _src bin ktype <<< "$kernel_spec"
+    tag="${label}_t${threads}_serial"
+    csv_prefix="${METRICSDIR}/${tag}"
+
+    export OMP_NUM_THREADS="${threads}"
+    export OMP_DYNAMIC="FALSE"
+    unset OMP_PLACES
+    unset OMP_PROC_BIND
+
+    cmd_str=$(run_kernel_cmd "$label" "$bin" "$ktype" "$threads" "$csv_prefix")
+    read -r -a cmd <<< "$cmd_str"
+    run_with_perf_windows "$tag" "${cmd[@]}"
+    append_kernel_summary "$tag" "${label}_serial" "$threads" "none" "0" "${csv_prefix}.csv"
+  done
 done
 
 echo ""
-echo "[*] Stage 2/3: Baseline + first-touch con OMP_PLACES/PROC_BIND (perf stat)"
-for kernel_spec in "${PERF_KERNELS[@]}"; do
-  IFS=':' read -r label _src bin ktype <<< "$kernel_spec"
-  echo ""
-  echo "[*] === Kernel: $label (type=$ktype) ==="
-  run_kernel_with_perf "$label" "$bin" "$ktype" "${OMP_THREADS}" "cores" "close"
-  run_kernel_with_perf "$label" "$bin" "$ktype" "${OMP_THREADS}" "cores" "spread"
-  run_kernel_with_perf "$label" "$bin" "$ktype" "${OMP_THREADS}" "threads" "spread"
+echo "[*] Stage 2/3: OMP + numactl (sin OMPT)"
+for threads in "${THREAD_LIST[@]}"; do
+  for cfg in "${OMP_CONFIGS[@]}"; do
+    IFS=':' read -r omp_places omp_bind numa_mode cfg_name <<< "$cfg"
+    for kernel_spec in "${PAR_KERNELS[@]}"; do
+      IFS=':' read -r label _src bin ktype <<< "$kernel_spec"
+      tag="${label}_t${threads}_${cfg_name}"
+      csv_prefix="${METRICSDIR}/${tag}"
+
+      export OMP_NUM_THREADS="${threads}"
+      export OMP_DYNAMIC="FALSE"
+      export OMP_PLACES="${omp_places}"
+      export OMP_PROC_BIND="${omp_bind}"
+
+      cmd_str=$(run_kernel_cmd "$label" "$bin" "$ktype" "$threads" "$csv_prefix")
+      read -r -a cmd <<< "$cmd_str"
+      run_with_perf_windows "$tag" numactl --interleave=all -- "${cmd[@]}"
+      append_kernel_summary "$tag" "${label}_${cfg_name}" "$threads" "none" "0" "${csv_prefix}.csv"
+    done
+  done
 done
 
 echo ""
-echo "[*] Stage 3/3: Baseline + first-touch con OMPT (sin perf stat)"
-for kernel_spec in "${OMPT_KERNELS[@]}"; do
-  IFS=':' read -r label _src bin ktype <<< "$kernel_spec"
-  run_kernel_with_ompt "$label" "$bin" "$ktype"
+echo "[*] Stage 3/3: OMP + numactl + OMPT"
+for threads in "${THREAD_LIST[@]}"; do
+  for cfg in "${OMP_CONFIGS[@]}"; do
+    IFS=':' read -r omp_places omp_bind numa_mode cfg_name <<< "$cfg"
+    for kernel_spec in "${PAR_KERNELS[@]}"; do
+      IFS=':' read -r label _src bin ktype <<< "$kernel_spec"
+      tag="${label}_t${threads}_${cfg_name}_ompt"
+      csv_prefix="${METRICSDIR}/${tag}"
+      ompt_log="${OMPT_LOGDIR}/${tag}.log"
+
+      export OMP_NUM_THREADS="${threads}"
+      export OMP_DYNAMIC="FALSE"
+      export OMP_PLACES="${omp_places}"
+      export OMP_PROC_BIND="${omp_bind}"
+
+      export OMP_TOOL="enabled"
+      export OMP_TOOL_LIBRARIES="$(realpath "$OMPT_TOOL_BIN")"
+      export OMPT_WINDOW_CSV="${WINDOW_CSV}"
+      export OMPT_SUMMARY_CSV="${OMPT_SUMMARY_CSV}"
+      export OMPT_LOG_FILE="${ompt_log}"
+      export OMPT_TAG="${tag}"
+
+      cmd_str=$(run_kernel_cmd "$label" "$bin" "$ktype" "$threads" "$csv_prefix")
+      read -r -a cmd <<< "$cmd_str"
+      numactl --interleave=all -- "${cmd[@]}" >/dev/null 2>/dev/null || true
+
+      migrations=$(sum_migrations_for_tag "$tag")
+      append_kernel_summary "$tag" "${label}_${cfg_name}" "$threads" "ompt" "$migrations" "${csv_prefix}.csv"
+    done
+  done
 done
 
 echo ""
 echo "[✓] Benchmark V4 completed."
-echo "    CSV: ${CSV}"
-echo "    LIKWID CSV: ${LIKWID_CSV}"
-echo "    Metrics directory: ${METRICSDIR}/"
-echo "    Reports directory: ${REPORTDIR}/"
-echo "    OMPT logs directory: ${OMPT_LOGDIR}/"
-echo ""
-echo "[*] Optional: Run 'collect_likwid_metrics' function to gather LIKWID NUMA metrics"
-echo "    (requires likwid-perfctr)"
-
-# Optional function to collect LIKWID metrics separately
-collect_likwid_metrics() {
-  if ! command -v likwid-perfctr &> /dev/null; then
-    echo "[!] likwid-perfctr not found. Install LIKWID to collect NUMA metrics." >&2
-    return 1
-  fi
-
-  echo "[*] Collecting LIKWID NUMA metrics..."
-  
-  # Run one representative set from each kernel type
-  for kernel_spec in "${PERF_KERNELS[@]}"; do
-    IFS=':' read -r label _src bin ktype <<< "$kernel_spec"
-    run_kernel_with_likwid "$label" "$bin" "$ktype" "${OMP_THREADS}" "_likwid"
-  done
-
-  for kernel_spec in "${OMPT_KERNELS[@]}"; do
-    IFS=':' read -r label _src bin ktype <<< "$kernel_spec"
-    run_kernel_with_likwid "$label" "$bin" "$ktype" "${OMP_THREADS}" "_likwid_ompt"
-  done
-
-  echo "[✓] LIKWID metrics collected: ${LIKWID_CSV}"
-}
+echo "    Kernel CSV: ${KERNEL_CSV}"
+echo "    Window CSV: ${WINDOW_CSV}"
+echo "    OMPT summary CSV: ${OMPT_SUMMARY_CSV}"
+echo "    Logs: ${OMPT_LOGDIR}/"

@@ -1,4 +1,0 @@
-  [VAL] PASSED
-  Rep  0: 0.0003 ms
-  Rep  1: 0.0002 ms
-49264,,cache-references,1660999,100,00,,
