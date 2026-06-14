@@ -15,6 +15,7 @@ set -euo pipefail
 ########################
 
 N=11000000
+STENCIL_N=8000
 SPMV_MTX="stokes.mtx"
 SPMV_AVG_NNZ=360
 REPS=150
@@ -27,6 +28,7 @@ OMPT_LOGDIR="${OUTDIR}/ompt_logs"
 WINDOW_CSV="${OUTDIR}/window_metrics.csv"
 KERNEL_CSV="${OUTDIR}/kernel_metrics.csv"
 OMPT_SUMMARY_CSV="${OUTDIR}/ompt_summary.csv"
+OMPT_WINDOW_CSV_FILE="${OUTDIR}/ompt_window_metrics.csv"
 
 CXX=clang++
 CXXFLAGS=(-std=c++17 -O3 -fopenmp -ffast-math)
@@ -118,10 +120,10 @@ append_perf_windows() {
   local tag="$1"
   local perf_out="$2"
   awk -F',' -v tag="$tag" '
-    $3 ~ /^(rD044|rFF44|instructions|cycles)$/ {
+    $4 ~ /^(rD044|rFF44|instructions|cycles)$/ {
       t=$1; gsub(/^[ \t]+|[ \t]+$/, "", t);
       c=$2; gsub(/^[ \t]+|[ \t]+$/, "", c);
-      e=$3; gsub(/^[ \t]+|[ \t]+$/, "", e);
+      e=$4; gsub(/^[ \t]+|[ \t]+$/, "", e);
       key=t;
       if (e=="rD044") rm[key]=c;
       else if (e=="rFF44") all[key]=c;
@@ -137,7 +139,7 @@ append_perf_windows() {
         ipc = (cyv>0)? inv/cyv:0;
         allv = (k in all)?all[k]:0;
         ratio = (allv>0)? rmv/allv:0;
-        printf "%s,%s,%s,%s,%s,%.6f,%.6f\n", tag, k, rmv, inv, cyv, ipc, ratio;
+        printf "%s,%.3f,%s,%s,%s,%.6f,%.6f\n", tag, k*1000, rmv, inv, cyv, ipc, ratio;
       }
     }' "$perf_out" >> "$WINDOW_CSV"
 }
@@ -185,7 +187,7 @@ run_kernel_cmd() {
   local csv_prefix="$5"
 
   if [[ "$kernel_type" == "STENCIL" ]]; then
-    echo "./${kernel_bin} ${N} ${threads} ${REPS} ${csv_prefix}"
+    echo "./${kernel_bin} ${STENCIL_N} ${threads} ${REPS} ${csv_prefix}"
   else
     echo "./${kernel_bin} ${SPMV_MTX} ${threads} ${REPS} ${csv_prefix}"
   fi
@@ -208,11 +210,11 @@ compile_all
 
 export SPMV_AVG_NNZ="${SPMV_AVG_NNZ}"
 
-rm -f "$WINDOW_CSV" "$KERNEL_CSV" "$OMPT_SUMMARY_CSV"
+rm -f "$WINDOW_CSV" "$KERNEL_CSV" "$OMPT_SUMMARY_CSV" "$OMPT_WINDOW_CSV_FILE"
 echo "tag,window_ms,d_rm,d_instr,d_cyc,ipc,ratio_rm" > "$WINDOW_CSV"
 echo "config,threads,scheduler,stdev_ms,migrations,bw_gibs,gflops" > "$KERNEL_CSV"
 
-unset OMP_TOOL OMP_TOOL_LIBRARIES OMPT_WINDOW_CSV OMPT_SUMMARY_CSV OMPT_LOG_FILE OMPT_TAG
+unset OMP_TOOL OMP_TOOL_LIBRARIES OMPT_LOG_FILE OMPT_TAG
 
 echo "[*] Stage 1/3: Seriales"
 for threads in "${THREAD_LIST[@]}"; do
@@ -269,12 +271,11 @@ for threads in "${THREAD_LIST[@]}"; do
 
       export OMP_NUM_THREADS="${threads}"
       export OMP_DYNAMIC="FALSE"
-      export OMP_PLACES="${omp_places}"
-      export OMP_PROC_BIND="${omp_bind}"
+      unset OMP_PLACES OMP_PROC_BIND
 
       export OMP_TOOL="enabled"
       export OMP_TOOL_LIBRARIES="$(realpath "$OMPT_TOOL_BIN")"
-      export OMPT_WINDOW_CSV="${WINDOW_CSV}"
+      export OMPT_WINDOW_CSV="${OMPT_WINDOW_CSV_FILE}"
       export OMPT_SUMMARY_CSV="${OMPT_SUMMARY_CSV}"
       export OMPT_LOG_FILE="${ompt_log}"
       export OMPT_TAG="${tag}"
@@ -292,6 +293,7 @@ done
 echo ""
 echo "[✓] Benchmark V4 completed."
 echo "    Kernel CSV: ${KERNEL_CSV}"
-echo "    Window CSV: ${WINDOW_CSV}"
+echo "    Perf window CSV: ${WINDOW_CSV}"
+echo "    OMPT window CSV: ${OMPT_WINDOW_CSV_FILE}"
 echo "    OMPT summary CSV: ${OMPT_SUMMARY_CSV}"
 echo "    Logs: ${OMPT_LOGDIR}/"
