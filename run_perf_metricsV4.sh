@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Forzar locale C: garantiza separador decimal "." en awk/printf y en los CSV,
+# independiente del locale de la maquina (p.ej. es_ES usa "," y corrompe el CSV).
+export LC_ALL=C
+
 ########################
 # run_perf_metricsV4.sh
 #
@@ -133,15 +137,22 @@ append_perf_windows() {
     }
     END {
       for (k in seen) {
-        rmv = (k in rm)?rm[k]:0;
-        inv = (k in ins)?ins[k]:0;
-        cyv = (k in cyc)?cyc[k]:0;
-        ipc = (cyv>0)? inv/cyv:0;
-        allv = (k in all)?all[k]:0;
-        ratio = (allv>0)? rmv/allv:0;
+        rmv  = (k in rm)?  rm[k]  : "0";
+        inv  = (k in ins)? ins[k] : "0";
+        cyv  = (k in cyc)? cyc[k] : "0";
+        allv = (k in all)? all[k] : "0";
+        # Saltar ventanas sin medida real (contadores apagados:
+        # "<not counted>"/"<not supported>" o 0 ciclos): no son datos del kernel.
+        if (cyv !~ /^[0-9]+$/ || cyv+0 == 0) continue;
+        cyv_n  = cyv+0;
+        inv_n  = (inv  ~ /^[0-9]+$/)? inv+0  : 0;
+        rmv_n  = (rmv  ~ /^[0-9]+$/)? rmv+0  : 0;
+        allv_n = (allv ~ /^[0-9]+$/)? allv+0 : 0;
+        ipc   = inv_n / cyv_n;
+        ratio = (allv_n > 0)? rmv_n / allv_n : 0;
         printf "%s,%.3f,%s,%s,%s,%.6f,%.6f\n", tag, k*1000, rmv, inv, cyv, ipc, ratio;
       }
-    }' "$perf_out" >> "$WINDOW_CSV"
+    }' "$perf_out" >> "$WINDOW_CSV" || echo "[!] WARN: append_perf_windows fallo en $tag (continuo)" >&2
 }
 
 extract_kernel_metrics() {
