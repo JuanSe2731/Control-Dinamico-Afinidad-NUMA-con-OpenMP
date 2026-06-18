@@ -1,0 +1,2 @@
+config,threads,scheduler,stdev_ms,migrations,bw_gibs,gflops
+stencil_serial_serial,8,none,0.039212,0,71.950297,16.095009
