@@ -1,0 +1,2 @@
+strategy,matrix,rows,cols,nnz,threads,min_ms,avg_ms,max_ms,stddev_ms,gflops,bw_gibs,bw_gbs
+Serial,stokes.mtx,11449533,11449533,349321980,1,204.295972,214.454037,254.371194,17.376500,3.419764,20.153317,20.966933
