@@ -1,20 +1,32 @@
 // =============================================================================
-// final_sched_NUMA.cpp
+// sched_NUMA_optC_leaky.cpp   (OPCIÓN C)
 //
 // Scheduler NUMA adaptativo via OMPT + perf_event_open + hwloc
-//   - Monitoreo cada 100ms: remote fills (0xD044), instrucciones, cache misses
-//   - Migración: si d_rm_misses > MIGRATION_THRESHOLD → mover al nodo contrario
-//   - Anti ping-pong: cooldown de COOLDOWN_WINDOWS ventanas tras cada migración
-//   - Rebinding: hwloc_set_thread_cpubind() — NUMA-aware, overhead mínimo
+//
+//   MECANISMO DE DISPARO: integrador con fugas + histéresis sobre una
+//                         REFERENCIA GLOBAL adaptativa
+//   --------------------------------------------------------------------------
+//   - Se evalúa CADA ventana de 100 ms.
+//   - g_ref = EWMA del ratio_rm de TODOS los hilos => referencia "típica" de la
+//     corrida (autoajustable; sin la constante mágica 0.11).
+//   - g_dev = EWMA de la desviación absoluta media (MAD) => dispersión robusta
+//     que escala el umbral automáticamente.
+//   - Umbral alto adaptativo:  T = g_ref + LEAK_MARGIN_SIG * dev.
+//   - "Balde con fugas" por hilo:
+//        si ratio > T  -> bucket += (ratio - T)      (se llena por exceso)
+//        si ratio <= T -> bucket  -= LEAK_RATE*dev   (se vacía lentamente)
+//     La histéresis (llenar rápido / vaciar lento + capacidad) evita disparos
+//     por picos aislados y exige elevación SOSTENIDA.
+//   - Cuando el balde supera su capacidad CAP => se marca para migrar UNA vez.
+//
+//   Migración: hwloc_set_thread_cpubind() — NUMA-aware, overhead mínimo.
+//   Requisito: cada hilo migra COMO MÁXIMO 1 vez (MAX_MIGRATIONS = 1).
+//   Compatible con numactl --interleave=all (no se cambia la política de páginas).
 //
 // Compilar:
-//   clang++ -std=c++17 -fPIC -shared -fopenmp -pthread \
-//           final_sched_NUMA.cpp -o final_sched.so \
-//           -I<path/to/hwloc/include> -lhwloc
-//
-// Usar:
-//   OMP_TOOL=enabled OMP_TOOL_LIBRARIES=$PWD/final_sched.so \
-//   ./spmv_dynamic2 Emilia_923.mtx 8 30 rta
+//   clang++ -std=c++17 -fPIC -shared -fopenmp -pthread -O2 \
+//           sched_NUMA_optC_leaky.cpp -o numa_sched_optC.so \
+//           -I<path/to/hwloc/include> -L<path/to/hwloc/lib> -lhwloc
 // =============================================================================
 
 #include <cstdio>
@@ -46,15 +58,20 @@ static constexpr int      MAX_THREADS         = 1024;
 static constexpr int      MONITOR_MS          = 100;
 static constexpr int      MAX_NUMA_NODES      = 2;
 
-// Umbral de migración: si d_rm_misses en una ventana de 100ms supera este
-// valor, el hilo se migra al nodo contrario.
-// Ajustar tras la primera ejecución mirando los valores d_rm_misses del log.
-static constexpr double MIGRATION_RATIO = 0.11;
-static constexpr int    CONSECUTIVE_THRESHOLD = 10;
+// ── Mecanismo C: integrador con fugas + histéresis (ref. global) ─────────────
+static constexpr uint64_t MIN_FILLS         = 10000; // gating anti-ruido (d_all)
+static constexpr int      WARMUP_WINDOWS    = 5;      // ventanas antes de poder migrar
+static constexpr double   REF_BETA          = 0.05;   // suavizado de la referencia global (lento)
+static constexpr double   DEV_FLOOR         = 0.005;  // piso de dispersión (evita disparos por ruido)
+static constexpr double   LEAK_MARGIN_SIG   = 1.0;    // umbral T = g_ref + LEAK_MARGIN_SIG*dev
+static constexpr double   LEAK_RATE_SIG     = 0.5;    // fuga por ventana (en MAD) cuando ratio<=T
+static constexpr double   LEAK_CAP_SIG      = 8.0;    // capacidad del balde (en MAD) -> dispara
 
-// Anti ping-pong: ventanas de cooldown tras cada migración.
-// 5 ventanas × 100ms = 500ms mínimo entre migraciones del mismo hilo.
-static constexpr int      COOLDOWN_WINDOWS    = 10;
+// Una sola migración por hilo (requisito).
+static constexpr uint64_t MAX_MIGRATIONS    = 1;
+
+// Cooldown (heredado; con migración única es básicamente informativo).
+static constexpr int      COOLDOWN_WINDOWS  = 10;
 
 // =============================================================================
 // Salida a archivos
@@ -73,6 +90,14 @@ static hwloc_topology_t g_topology;
 static bool             g_topology_valid = false;
 static int              g_num_numa_nodes = 0;
 static hwloc_cpuset_t   g_node_cpusets[MAX_NUMA_NODES];
+
+// =============================================================================
+// Referencia global adaptativa (compartida por todos los hilos)
+//   - Protegida por g_lock (se actualiza dentro del monitor_loop, ya con lock).
+// =============================================================================
+static double g_ref      = 0.0;   // EWMA del ratio_rm entre hilos
+static double g_dev      = 0.0;   // EWMA de |ratio - g_ref| (MAD)
+static bool   g_ref_init = false;
 
 // =============================================================================
 // Tabla de nombres de tipo de hilo (patrón LLVM callback.h)
@@ -122,8 +147,8 @@ static ompt_get_parallel_info_t g_ompt_get_parallel_info  = nullptr;
 struct PerfFDs {
     int rm_misses    {-1};   // ANY_DATA_CACHE_FILLS_REMOTE_ALL (raw 0xD044)
     int instr_fd     {-1};   // PERF_COUNT_HW_INSTRUCTIONS
-    int cycles_fd    {-1};   // PERF_COUNT_HW_CACHE_MISSES
-    int all_fills_fd {-1};
+    int cycles_fd    {-1};   // PERF_COUNT_HW_CPU_CYCLES
+    int all_fills_fd {-1};   // ALL DATA CACHE FILLS (raw 0xFF44)
     int opened       {0};
 };
 
@@ -137,13 +162,11 @@ struct ThreadInfo {
     int       seen            {0};
     int       measuring       {0};
     int       needs_migration {0};
-    int       consecutive_high{0};
 
+    // ── Estado del detector (Mecanismo C: integrador con fugas) ──────────
+    int       win_count       {0};     // ventanas válidas vistas (warmup)
+    double    bucket          {0.0};    // nivel del balde con fugas
 
-    int       epoch_win       {0};
-    double    ratio_sum       {0.0};
-    int       ratio_count     {0};
-    double    last_epoch_thr  {0.0};   
     // ── Handle pthread — necesario para hwloc_set_thread_cpubind ─────────
     pthread_t pthread_handle {0};
 
@@ -158,7 +181,7 @@ struct ThreadInfo {
     int       has_last       {0};
 
     // ── Estado del scheduler ─────────────────────────────────────────────
-    int       cooldown       {0};   // ventanas restantes antes de poder migrar
+    int       cooldown       {0};   // ventanas restantes (informativo)
     uint64_t  migrations     {0};   // total de migraciones realizadas
 };
 
@@ -198,16 +221,12 @@ static int cpu_to_numa_node_hwloc(int cpu) {
 
 // =============================================================================
 // Migración de hilo al nodo NUMA contrario via hwloc
-//
-// Overhead: una sola llamada a hwloc_set_thread_cpubind() que internamente
-// hace sched_setaffinity(). Solo se ejecuta cuando se supera el umbral
-// Y el cooldown es 0 → overhead amortizado sobre cientos de ventanas.
 // =============================================================================
 static void migrate_to_opposite_node(ThreadInfo& t) {
-    if (!g_topology_valid)       return;
-    if (t.pthread_handle == 0)   return;
-    if (t.numa_node < 0)         return;
-    if (t.migrations >= 2) return;
+    if (!g_topology_valid)              return;
+    if (t.pthread_handle == 0)          return;
+    if (t.numa_node < 0)               return;
+    if (t.migrations >= MAX_MIGRATIONS) return;   // ← máximo 1 migración
 
     int target = (t.numa_node == 0) ? 1 : 0;
     if (target >= g_num_numa_nodes) return;
@@ -232,9 +251,10 @@ static void migrate_to_opposite_node(ThreadInfo& t) {
     if (rc == 0) {
         int prev_node = t.numa_node;
         t.numa_node = target;
-        t.cooldown  = COOLDOWN_WINDOWS;   // anti ping-pong
+        t.cooldown  = COOLDOWN_WINDOWS;
         t.migrations++;
-        t.has_last  = 0;  // resetear baseline post-migración
+        t.has_last  = 0;  // resetear baseline de deltas post-migración
+        t.bucket    = 0.0;
 
         fprintf(stderr,
             "[SCHED] MIGRACIÓN tid=%-6d ompt_id=%-4" PRIu64
@@ -348,7 +368,7 @@ static void open_perf_for_thread(ThreadInfo& t) {
 }
 
 // =============================================================================
-// upsert_thread — ahora guarda también pthread_handle
+// upsert_thread — guarda también pthread_handle
 // =============================================================================
 static int upsert_thread(pid_t tid, int cpu,
                           uint64_t ompt_id, int ompt_type,
@@ -388,11 +408,10 @@ static bool              g_monitor_valid = false;
 
 static void* monitor_loop(void*) {
     fprintf(stderr,
-        "[OMPT][MON] Monitor iniciado  período=%dms"
-        "  umbral=%f  cooldown=%d ventanas\n",
-        MONITOR_MS,
-        MIGRATION_RATIO,
-        COOLDOWN_WINDOWS);
+        "[OMPT][MON] Monitor (C: integrador con fugas)  período=%dms"
+        "  warmup=%d  T=ref+%.2f*MAD  leak=%.2f*MAD  cap=%.2f*MAD  max_mig=%" PRIu64 "\n",
+        MONITOR_MS, WARMUP_WINDOWS,
+        LEAK_MARGIN_SIG, LEAK_RATE_SIG, LEAK_CAP_SIG, MAX_MIGRATIONS);
 
     while (g_monitor_running.load(std::memory_order_acquire)) {
         std::this_thread::sleep_for(std::chrono::milliseconds(MONITOR_MS));
@@ -459,70 +478,54 @@ static void* monitor_loop(void*) {
                 "  d_instr=%10" PRIu64
                 "  d_cyc=%10" PRIu64
                 "  d_all=%8" PRIu64
-                "  IPC=%.3f  ratio_rm=%.4f"
-                "  cooldown=%d\n",
+                "  IPC=%.3f  ratio_rm=%.4f\n",
                 MONITOR_MS,
                 t.ompt_id, (int)t.tid_linux,
                 thread_type_str((ompt_thread_t)t.ompt_type),
                 t.last_cpu, t.numa_node,
                 d_rm, d_ins, d_cyc, d_all,
-                ipc, ratio, t.cooldown);
-            
-            double thr;
-            t.epoch_win++;
-            if (t.epoch_win <= 9) {
-                t.ratio_sum += ratio;
-                t.ratio_count++;
-            }else if(t.epoch_win == 10) {
-                thr = (t.ratio_count > 0) ? (t.ratio_sum / t.ratio_count) : 0.0;
-                t.last_epoch_thr = thr;
-                fprintf(stderr,
-                    "[OMPT][WIN%dms] ompt_id=%-4" PRIu64
-                    " tid=%-6d tipo=%-22s cpu=%3d numa=%d"
-                    "  UMBRAL INICIAL CALCULADO: %.4f (basado en %d ventanas)\n",
-                    MONITOR_MS,
-                    t.ompt_id, (int)t.tid_linux,
-                    thread_type_str((ompt_thread_t)t.ompt_type),
-                    t.last_cpu, t.numa_node,
-                    t.last_epoch_thr, t.ratio_count);
+                ipc, ratio);
 
-                if (t.cooldown == 0 && t.migrations < 2 && ratio > thr){
-                    t.needs_migration = 1;
-                    t.cooldown = COOLDOWN_WINDOWS;   // activar cooldown ya para evitar marcados repetidos
+            // ── Mecanismo C: integrador con fugas + histéresis ────────────
+            // Solo ventanas con actividad real (gating anti-ruido).
+            if (d_all >= MIN_FILLS) {
+                t.win_count++;
 
-                    fprintf(stderr,
-                        "[SCHED][EPOCH] tid=%d ratio=%.4f thr(avg prev 9)=%.4f -> PENDIENTE (mig=%" PRIu64 ")\n",
-                        (int)t.tid_linux, ratio, thr, t.migrations);
+                if (!g_ref_init) {
+                    g_ref = ratio; g_dev = 0.0; g_ref_init = true;
+                }
+                double dev = (g_dev > DEV_FLOOR) ? g_dev : DEV_FLOOR;
+
+                double T    = g_ref + LEAK_MARGIN_SIG * dev;   // umbral alto adaptativo
+                double leak = LEAK_RATE_SIG  * dev;            // fuga por ventana
+                double cap  = LEAK_CAP_SIG   * dev;            // capacidad -> dispara
+
+                if (ratio > T) {
+                    t.bucket += (ratio - T);                   // llenar por exceso
+                } else {
+                    t.bucket -= leak;                          // fuga lenta
+                    if (t.bucket < 0.0) t.bucket = 0.0;
                 }
 
-                t.epoch_win = 0;
-                t.ratio_sum = 0.0;
-                t.ratio_count = 0;
-            }
+                if (t.win_count >= WARMUP_WINDOWS
+                    && t.migrations < MAX_MIGRATIONS
+                    && !t.needs_migration
+                    && t.bucket > cap) {
+                    t.needs_migration = 1;
+                    fprintf(stderr,
+                        "[SCHED][LEAKY] tid=%-6d ratio=%.4f T=%.4f"
+                        " bucket=%.4f > cap=%.4f -> PENDIENTE (mig=%" PRIu64 ")\n",
+                        (int)t.tid_linux, ratio, T,
+                        t.bucket, cap, t.migrations);
+                }
 
-            // ── Lógica del scheduler ─────────────────────────────────────
-            //
-            // Migrar si:
-            //   1. d_rm supera el umbral en esta ventana
-            //   2. cooldown == 0 (no está en período de espera anti ping-pong)
-            //
-            /*if (ratio > MIGRATION_RATIO && d_all > 10000) {
-                t.consecutive_high++;
-            } else {
-                t.consecutive_high = 0;  // reset si una ventana baja el ratio
+                // Actualizar la referencia global DESPUÉS de evaluar
+                // (g_ref = EWMA del ratio; g_dev = EWMA de |desviación|).
+                double e  = ratio - g_ref;
+                g_ref    += REF_BETA * e;
+                double ae = (e < 0.0) ? -e : e;
+                g_dev    += REF_BETA * (ae - g_dev);
             }
-            
-            
-            if (t.consecutive_high >= CONSECUTIVE_THRESHOLD && t.cooldown == 0) {
-                t.needs_migration = 1;
-                t.consecutive_high = 0;
-                t.cooldown = COOLDOWN_WINDOWS;   // activar cooldown ya para evitar marcados repetidos
-                fprintf(stderr,
-                "[SCHED] Migración PENDIENTE tid=%-6d  ratio sostenido %d ventanas\n",
-                (int)t.tid_linux, CONSECUTIVE_THRESHOLD);
-            } else if (t.cooldown > 0) {
-                t.cooldown--;
-            }*/
         }
         unlock();
     }
@@ -643,7 +646,7 @@ static void on_ompt_callback_implicit_task(
         pid_t     tid = linux_tid();
         int       cpu = sched_getcpu();
         pthread_t pt  = pthread_self();
-        
+
         int do_migrate = 0;
         int thread_idx = -1;
 
@@ -655,13 +658,11 @@ static void on_ompt_callback_implicit_task(
                 g_threads[i].last_cpu       = cpu;
                 g_threads[i].numa_node      = cpu_to_numa_node_hwloc(cpu);
                 g_threads[i].pthread_handle = pt;  // ← actualizar handle
-                
+
                 if (g_threads[i].needs_migration) {
-                g_threads[i].needs_migration = 0;
-                do_migrate = 1;
-                thread_idx = i;
-                //migrate_to_opposite_node(g_threads[i]);
-                // migrate_to_opposite_node ya pone has_last=0
+                    g_threads[i].needs_migration = 0;
+                    do_migrate = 1;
+                    thread_idx = i;
                 }
 
                 if (g_measuring.load(std::memory_order_acquire)
@@ -675,9 +676,9 @@ static void on_ompt_callback_implicit_task(
             }
         }
         unlock();
-        
+
         if (do_migrate && thread_idx >= 0) {
-          migrate_to_opposite_node(g_threads[thread_idx]);
+            migrate_to_opposite_node(g_threads[thread_idx]);
         }
 
         fprintf(stderr,
@@ -722,7 +723,7 @@ static int ompt_initialize(
                   "tag,tid,ompt_id,thread_type,last_cpu,numa_node,migrations,remote_fills,instructions,cycles,ipc",
                   &g_summary_csv);
 
-    fprintf(stderr, "[OMPT] ompt_initialize\n");
+    fprintf(stderr, "[OMPT] ompt_initialize (OPCIÓN C: integrador con fugas)\n");
 
     // ── 1. Function pointers del runtime ────────────────────────────────
     g_ompt_set_callback     = (ompt_set_callback_t)     lookup("ompt_set_callback");
@@ -790,15 +791,6 @@ static int ompt_initialize(
     }
     g_monitor_valid = true;
 
-    // ── 5. atexit de respaldo ────────────────────────────────────────────
-    /*atexit([]() {
-        if (g_finalizing.load(std::memory_order_acquire)) return;
-        g_monitor_running.store(false, std::memory_order_release);
-        if (g_monitor_valid)
-            pthread_join(g_monitor_pthread, nullptr);
-        g_finalizing.store(true, std::memory_order_release);
-    });*/
-
     if (g_ompt_get_num_procs)
         fprintf(stderr, "[OMPT] Sistema: %d procesadores lógicos\n",
                 g_ompt_get_num_procs());
@@ -836,23 +828,21 @@ static void ompt_finalize(ompt_data_t* tool_data) {
         if (t.perf.opened) {
             uint64_t rm = 0, ins = 0, cyc = 0, all = 0;
 
-            // Deshabilitar solo si los fds son válidos
             if (t.perf.rm_misses    >= 0)
                 ioctl(t.perf.rm_misses,    PERF_EVENT_IOC_DISABLE, 0);
             if (t.perf.instr_fd     >= 0)
                 ioctl(t.perf.instr_fd,     PERF_EVENT_IOC_DISABLE, 0);
             if (t.perf.cycles_fd >= 0)
                 ioctl(t.perf.cycles_fd, PERF_EVENT_IOC_DISABLE, 0);
-            if (t.perf.all_fills_fd >= 0) 
+            if (t.perf.all_fills_fd >= 0)
                 ioctl(t.perf.all_fills_fd, PERF_EVENT_IOC_DISABLE, 0);
-                
+
             read_counter(t.perf.rm_misses,    rm);
             read_counter(t.perf.instr_fd,     ins);
             read_counter(t.perf.cycles_fd, cyc);
             read_counter(t.perf.all_fills_fd, all);
 
             double ipc = (cyc > 0) ? (double)ins / (double)cyc : 0.0;
-            double ratio = (all > 0) ? (double)rm / (double)all : 0.0;
 
             if (g_summary_csv) {
                 fprintf(g_summary_csv,
@@ -870,14 +860,13 @@ static void ompt_finalize(ompt_data_t* tool_data) {
                     ipc);
                 fflush(g_summary_csv);
             }
-            
+
             fprintf(stderr,
                 "        remote_fills=%" PRIu64
                 "  instr=%" PRIu64
                 "  ipc=%.3f\n",
                 rm, ins, ipc);
 
-            // Cerrar fds uno por uno con verificación
             if (t.perf.rm_misses    >= 0) { close(t.perf.rm_misses);    t.perf.rm_misses    = -1; }
             if (t.perf.instr_fd     >= 0) { close(t.perf.instr_fd);     t.perf.instr_fd     = -1; }
             if (t.perf.cycles_fd >= 0) { close(t.perf.cycles_fd); t.perf.cycles_fd = -1; }
@@ -886,7 +875,6 @@ static void ompt_finalize(ompt_data_t* tool_data) {
         }
     }
 
-    // Liberar hwloc — verificar cada puntero antes de liberar
     if (g_topology_valid) {
         for (int n = 0; n < g_num_numa_nodes; ++n) {
             if (g_node_cpusets[n]) {

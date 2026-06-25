@@ -37,8 +37,8 @@ OMPT_WINDOW_CSV_FILE="${OUTDIR}/ompt_window_metrics.csv"
 CXX=clang++
 CXXFLAGS=(-std=c++17 -O3 -fopenmp -ffast-math)
 
-OMPT_TOOL_SRC="final_sched_NUMAratio.cpp"
-OMPT_TOOL_BIN="numa_sched_finalratiov4.so"
+OMPT_TOOL_SRC="sched_NUMA_optC_leaky.cpp"
+OMPT_TOOL_BIN="numa_sched_optC.so"
 OMPT_TOOL_FLAGS=(-std=c++17 -fPIC -shared -fopenmp -pthread -O2)
 HWLOC_INCLUDE="${HWLOC_INCLUDE:-/opt/ohpc/pub/libs/hwloc/include}"
 HWLOC_LIB="${HWLOC_LIB:-/opt/ohpc/pub/libs/hwloc/lib}"
