@@ -267,7 +267,9 @@ for threads in "${THREAD_LIST[@]}"; do
 
       cmd_str=$(run_kernel_cmd "$label" "$bin" "$ktype" "$threads" "$csv_prefix")
       read -r -a cmd <<< "$cmd_str"
-      run_with_perf_windows "$tag" numactl --interleave=all -- "${cmd[@]}"
+      # first-touch: Stencil SIN interleave; SpMV mantiene interleave
+      if [[ "$ktype" == "STENCIL" ]]; then NW=(); else NW=(numactl --interleave=all --); fi
+      run_with_perf_windows "$tag" "${NW[@]}" "${cmd[@]}"
       append_kernel_summary "$tag" "${label}_${cfg_name}" "$threads" "none" "0" "${csv_prefix}.csv"
     done
   done
@@ -298,7 +300,8 @@ for threads in "${THREAD_LIST[@]}"; do
 
     cmd_str=$(run_kernel_cmd "$label" "$bin" "$ktype" "$threads" "$csv_prefix")
     read -r -a cmd <<< "$cmd_str"
-    numactl --interleave=all -- "${cmd[@]}" >/dev/null 2>/dev/null || true
+    if [[ "$ktype" == "STENCIL" ]]; then NW=(); else NW=(numactl --interleave=all --); fi
+    "${NW[@]}" "${cmd[@]}" >/dev/null 2>/dev/null || true
 
     migrations=$(sum_migrations_for_tag "$tag")
     append_kernel_summary "$tag" "${label}_scheduler" "$threads" "ompt" "$migrations" "${csv_prefix}.csv"

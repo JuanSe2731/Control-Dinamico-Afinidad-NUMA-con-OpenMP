@@ -68,6 +68,19 @@ static void init_matrix_seq(float* A, int n) {
     }
 }
 
+// A1: inicializacion con FIRST-TOUCH PARALELO. Cada hilo escribe (y por tanto
+// aloja, bajo la politica first-touch de Linux) las filas que luego procesara.
+// REQUIERE correr SIN numactl --interleave=all para que el first-touch mande.
+static void init_matrix_firsttouch(float* A, float* result, int n) {
+#pragma omp parallel for schedule(static)
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            A[i * n + j]      = static_cast<float>(i * n + j);
+            result[i * n + j] = 0.0f;
+        }
+    }
+}
+
 static void stencil2D_omp_static(const float* A, float* result, int n) {
 #pragma omp parallel for collapse(2) schedule(static)
     for (int j = 1; j < n - 1; ++j) {
@@ -214,8 +227,8 @@ int main(int argc, char* argv[]) {
     //     }
     // }
 
-    init_matrix_seq(A, n);
-    std::memset(result, 0, static_cast<size_t>(n) * n * sizeof(float));
+    // A1/A2: first-touch paralelo (requiere NO usar numactl --interleave=all)
+    init_matrix_firsttouch(A, result, n);
 
     // Warm-up
     perf_events_disable_all_threads();

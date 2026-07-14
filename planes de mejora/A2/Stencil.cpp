@@ -16,6 +16,12 @@
 #include <sys/prctl.h>
 #endif
 
+// A2: migracion de paginas (move_pages) via syscall crudo (sin -lnuma)
+#include <cstdint>
+#include <unistd.h>
+#include <sched.h>
+#include <sys/syscall.h>
+
 static inline void ompt_measure_start() {
 #ifdef _OPENMP
     (void)omp_control_tool(omp_control_tool_start, 1, nullptr);
@@ -64,6 +70,19 @@ static void init_matrix_seq(float* A, int n) {
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
             A[i * n + j] = static_cast<float>(i * n + j);
+        }
+    }
+}
+
+// A1: inicializacion con FIRST-TOUCH PARALELO. Cada hilo escribe (y por tanto
+// aloja, bajo la politica first-touch de Linux) las filas que luego procesara.
+// REQUIERE correr SIN numactl --interleave=all para que el first-touch mande.
+static void init_matrix_firsttouch(float* A, float* result, int n) {
+#pragma omp parallel for schedule(static)
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            A[i * n + j]      = static_cast<float>(i * n + j);
+            result[i * n + j] = 0.0f;
         }
     }
 }
@@ -163,6 +182,49 @@ static void export_csv(const std::string& filename,
     std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
 }
 
+
+// =============================================================================
+// A2: re-alojar las paginas de las filas [r0,r1) al nodo NUMA donde corre AHORA
+// el hilo. Asi las paginas "viajan" con el hilo tras una migracion del scheduler.
+// Best-effort: si move_pages falla, se ignora (no afecta correctitud).
+// =============================================================================
+static void a2_rehome_rows(float* base, int n, long r0, long r1) {
+    static const long PAGE = sysconf(_SC_PAGESIZE);
+    unsigned cpu = 0, node = 0;
+    syscall(SYS_getcpu, &cpu, &node, nullptr);
+    char* start = reinterpret_cast<char*>(base + r0 * static_cast<long>(n));
+    char* end   = reinterpret_cast<char*>(base + r1 * static_cast<long>(n));
+    uintptr_t s = reinterpret_cast<uintptr_t>(start) & ~(static_cast<uintptr_t>(PAGE) - 1);
+    long npages = static_cast<long>((reinterpret_cast<uintptr_t>(end) - s + PAGE - 1) / PAGE);
+    if (npages <= 0) return;
+    std::vector<void*> pages(static_cast<size_t>(npages));
+    std::vector<int>   nodes(static_cast<size_t>(npages), static_cast<int>(node));
+    std::vector<int>   status(static_cast<size_t>(npages), 0);
+    for (long i = 0; i < npages; ++i)
+        pages[static_cast<size_t>(i)] = reinterpret_cast<void*>(s + static_cast<uintptr_t>(i) * PAGE);
+    // MPOL_MF_MOVE = 2
+    syscall(SYS_move_pages, 0, static_cast<unsigned long>(npages),
+            pages.data(), nodes.data(), status.data(), 2);
+}
+
+// Reparte las filas igual que el compute y re-aloja cada bloque al nodo del hilo.
+static void a2_rehome_all(float* A, float* result, int n) {
+#pragma omp parallel
+    {
+        int P   = omp_get_num_threads();
+        int tid = omp_get_thread_num();
+        long per = (static_cast<long>(n) + P - 1) / P;
+        long r0  = static_cast<long>(tid) * per;
+        long r1  = std::min(static_cast<long>(n), r0 + per);
+        if (r0 < r1) {
+            a2_rehome_rows(A, n, r0, r1);
+            a2_rehome_rows(result, n, r0, r1);
+        }
+    }
+}
+
+static constexpr int REHOME_EVERY = 25;  // A2: re-alojar paginas cada N reps
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " N [threads] [reps] [csv_prefix]\n";
@@ -214,8 +276,8 @@ int main(int argc, char* argv[]) {
     //     }
     // }
 
-    init_matrix_seq(A, n);
-    std::memset(result, 0, static_cast<size_t>(n) * n * sizeof(float));
+    // A1/A2: first-touch paralelo (requiere NO usar numactl --interleave=all)
+    init_matrix_firsttouch(A, result, n);
 
     // Warm-up
     perf_events_disable_all_threads();
@@ -231,6 +293,7 @@ int main(int argc, char* argv[]) {
     ompt_measure_start();
     for (int r = 0; r < reps; ++r) {
         const double t0 = now_sec();
+        if (r % REHOME_EVERY == 0) a2_rehome_all(A, result, n);  // A2: paginas siguen al hilo
         stencil2D_omp_static(A, result, n);
         const double t1 = now_sec();
         times.push_back(t1 - t0);
