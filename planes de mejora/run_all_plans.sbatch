@@ -26,7 +26,9 @@
 set -euo pipefail
 
 # Raiz del repo en el cluster (igual que run_perf_metricsV4.sbatch)
-cd "/scratch/CAGE/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
+# TEMPORAL: /scratch no disponible actualmente, se usa el directorio principal del proyecto
+# cd "/scratch/CAGE/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
+cd "$SLURM_SUBMIT_DIR"
 
 srun bash "planes de mejora/run_all_plans.sh"
 

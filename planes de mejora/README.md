@@ -31,7 +31,8 @@ comparación principal y ahorra tiempo. Así cada carpeta trae su **propio basel
 
 ### Dónde debe estar `stokes.mtx`
 El SpMV usa `stokes.mtx` en la **raíz del repo** (junto a `run_perf_metricsV4.sh`):
-`/scratch/CAGE/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/stokes.mtx`.
+`/home/juansebastian/Escritorio/Tesisprograms/Control-Dinamico-Afinidad-NUMA-con-OpenMP/stokes.mtx`
+(temporalmente, mientras `/scratch` no esté disponible).
 Cada carpeta de plan ya tiene un symlink `stokes.mtx -> ../../stokes.mtx` que apunta
 ahí, así que **solo debe existir esa única copia en la raíz** (la misma que ya usa el
 proyecto principal). No hay que copiarla a cada plan.
@@ -64,7 +65,9 @@ Notas de prototipo:
 ## Cómo correr (cluster, 1 solo envío)
 
 ```bash
-cd "/scratch/CAGE/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
+# TEMPORAL: /scratch no disponible actualmente, se usa el directorio principal del proyecto
+# cd "/scratch/CAGE/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
+cd "/home/juansebastian/Escritorio/Tesisprograms/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
 sbatch "planes de mejora/run_all_plans.sbatch"
 ```
 
