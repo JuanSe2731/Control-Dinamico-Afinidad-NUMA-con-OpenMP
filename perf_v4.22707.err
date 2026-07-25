@@ -1,2 +1,0 @@
-awk: cmd. line:18: (FILENAME=perf_out_v4/metrics/spmv_serial_t8_serial_perf_windows.txt FNR=15184) fatal: division by zero attempted
-srun: error: exadell: task 0: Exited with exit code 2
