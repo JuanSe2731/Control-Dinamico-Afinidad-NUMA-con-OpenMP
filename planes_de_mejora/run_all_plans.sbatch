@@ -31,7 +31,7 @@ set -euo pipefail
 for _f in /etc/profile.d/lmod.sh /etc/profile.d/z00_lmod.sh /etc/profile.d/modules.sh /usr/share/lmod/lmod/init/bash; do
   if [ -r "$_f" ]; then source "$_f"; break; fi
 done
-CLANG_MODULE="${CLANG_MODULE:-llvm}"   # si el nombre es otro: CLANG_MODULE=<nombre> sbatch ...
+CLANG_MODULE="${CLANG_MODULE:-clang/17.0.6}"   # modulo del cluster; override: CLANG_MODULE=<nombre> sbatch ...
 if command -v module >/dev/null 2>&1; then
   module load "${CLANG_MODULE}" 2>/dev/null || module load clang 2>/dev/null || true
 fi
