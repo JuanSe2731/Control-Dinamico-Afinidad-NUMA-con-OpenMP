@@ -204,6 +204,18 @@ run_kernel_cmd() {
   fi
 }
 
+build_cmd() {
+  # Construye el arreglo global 'cmd' de forma SEGURA para rutas con espacios
+  # (p.ej. "planes de mejora"). NO usar run_kernel_cmd + read -a: el word-splitting
+  # parte csv_prefix en el espacio y el kernel escribe su CSV en la ruta equivocada.
+  local ktype="$1" bin="$2" threads="$3" csv_prefix="$4"
+  if [[ "$ktype" == "STENCIL" ]]; then
+    cmd=("./${bin}" "${STENCIL_N}" "${threads}" "${REPS}" "${csv_prefix}")
+  else
+    cmd=("./${bin}" "${SPMV_MTX}" "${threads}" "${REPS}" "${csv_prefix}")
+  fi
+}
+
 run_with_perf_windows() {
   local tag="$1"; shift
   local perf_out="${METRICSDIR}/${tag}_perf_windows.txt"
@@ -240,8 +252,7 @@ for threads in "${THREAD_LIST[@]}"; do
     unset OMP_PLACES
     unset OMP_PROC_BIND
 
-    cmd_str=$(run_kernel_cmd "$label" "$bin" "$ktype" "$threads" "$csv_prefix")
-    read -r -a cmd <<< "$cmd_str"
+    build_cmd "$ktype" "$bin" "$threads" "$csv_prefix"
     run_with_perf_windows "$tag" "${cmd[@]}"
     append_kernel_summary "$tag" "${label}_serial" "$threads" "none" "0" "${csv_prefix}.csv"
   done
@@ -265,8 +276,7 @@ for threads in "${THREAD_LIST[@]}"; do
       export OMP_PLACES="${omp_places}"
       export OMP_PROC_BIND="${omp_bind}"
 
-      cmd_str=$(run_kernel_cmd "$label" "$bin" "$ktype" "$threads" "$csv_prefix")
-      read -r -a cmd <<< "$cmd_str"
+      build_cmd "$ktype" "$bin" "$threads" "$csv_prefix"
       run_with_perf_windows "$tag" numactl --interleave=all -- "${cmd[@]}"
       append_kernel_summary "$tag" "${label}_${cfg_name}" "$threads" "none" "0" "${csv_prefix}.csv"
     done
@@ -296,8 +306,7 @@ for threads in "${THREAD_LIST[@]}"; do
     export OMPT_LOG_FILE="${ompt_log}"
     export OMPT_TAG="${tag}"
 
-    cmd_str=$(run_kernel_cmd "$label" "$bin" "$ktype" "$threads" "$csv_prefix")
-    read -r -a cmd <<< "$cmd_str"
+    build_cmd "$ktype" "$bin" "$threads" "$csv_prefix"
     numactl --interleave=all -- "${cmd[@]}" >/dev/null 2>/dev/null || true
 
     migrations=$(sum_migrations_for_tag "$tag")
