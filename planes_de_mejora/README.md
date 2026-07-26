@@ -11,7 +11,7 @@ los resultados y dice cuál gana.
 ## Estructura
 
 ```
-planes de mejora/
+planes_de_mejora/
 ├── BASE/ B1/ C1/ B3/ C3/ B2/ C2/ A1/ A2/ D1/         # un experimento por carpeta
 │     ├── sched_NUMA_optC_leaky.cpp   # scheduler (modificado segun el plan)
 │     ├── Stencil.cpp, spmv_staticSeed.cpp, ...      # kernels (modif. en A1/A2)
@@ -68,7 +68,7 @@ Notas de prototipo:
 # TEMPORAL: /scratch no disponible actualmente, se usa el directorio principal del proyecto
 # cd "/scratch/CAGE/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
 cd "/home/juansebastian/Escritorio/Tesisprograms/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
-sbatch "planes de mejora/run_all_plans.sbatch"
+sbatch "planes_de_mejora/run_all_plans.sbatch"
 ```
 
 Es **reanudable**: las 10 corridas (sin serial, pero con Stencil ahora a
@@ -80,17 +80,17 @@ baja `REPS` en el `run_perf_metricsV4.sh` de cada plan.
 
 Correr solo algunos planes, o re-correr todo:
 ```bash
-PLANS="B1 C1 A1" sbatch "planes de mejora/run_all_plans.sbatch"   # subconjunto
-FORCE=1          sbatch "planes de mejora/run_all_plans.sbatch"   # ignora .done
+PLANS="B1 C1 A1" sbatch "planes_de_mejora/run_all_plans.sbatch"   # subconjunto
+FORCE=1          sbatch "planes_de_mejora/run_all_plans.sbatch"   # ignora .done
 ```
 
 ## Cómo analizar y comparar
 
 El sbatch ya lo intenta al final. Manual:
 ```bash
-python3 "planes de mejora/analyze_plans.py" --results "planes de mejora/results"
+python3 "planes_de_mejora/analyze_plans.py" --results "planes_de_mejora/results"
 ```
-Genera en `planes de mejora/comparison_figures/`, por métrica
+Genera en `planes_de_mejora/comparison_figures/`, por métrica
 (`mlups` [solo Stencil], `gflops`, `bw_gibs`, `stdev_ms`):
 - `cmp_<kernel>_<metrica>_abs.png/.eps` — la métrica del scheduler de cada plan vs. el baseline `spread`.
 - `cmp_<kernel>_<metrica>_rel.png/.eps` — **scheduler / su propio baseline spread**;
@@ -103,7 +103,7 @@ métrica principal; el de SpMV usa `bw_gibs`.
 ## Prueba local rápida (humo, sin cluster)
 
 ```bash
-cd "planes de mejora"
+cd "planes_de_mejora"
 PLANS="BASE B1" ./run_all_plans.sh    # requiere perf + numactl + hwloc + stokes.mtx
 ```
 En local sin `stokes.mtx`/`perf`/`numactl` la parte SpMV y las ventanas `perf`

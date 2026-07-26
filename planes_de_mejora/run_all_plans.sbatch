@@ -30,8 +30,8 @@ set -euo pipefail
 # cd "/scratch/CAGE/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP"
 cd "$SLURM_SUBMIT_DIR"
 
-srun bash "planes de mejora/run_all_plans.sh"
+srun bash "planes_de_mejora/run_all_plans.sh"
 
 # Al terminar, generar las graficas de comparacion (si hay python+matplotlib):
-srun python3 "planes de mejora/analyze_plans.py" --results "planes de mejora/results" || \
+srun python3 "planes_de_mejora/analyze_plans.py" --results "planes_de_mejora/results" || \
   echo "[i] Analisis diferido: corre analyze_plans.py en un nodo con matplotlib."

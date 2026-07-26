@@ -12,7 +12,7 @@
 # No usa pandas (solo csv + matplotlib) para minimizar dependencias.
 #
 # Uso:
-#   python3 analyze_plans.py --results "planes de mejora/results" [--figdir ...]
+#   python3 analyze_plans.py --results "planes_de_mejora/results" [--figdir ...]
 # =============================================================================
 import argparse, csv, os, sys
 from collections import defaultdict
@@ -224,7 +224,7 @@ def write_ranking(sched, spread, plans, outdir):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--results", default="planes de mejora/results")
+    ap.add_argument("--results", default="planes_de_mejora/results")
     ap.add_argument("--figdir", default=None)
     args = ap.parse_args()
     figdir = args.figdir or os.path.join(args.results, "..", "comparison_figures")
