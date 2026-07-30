@@ -1,0 +1,2 @@
+strategy,matrix,rows,cols,nnz,threads,min_ms,avg_ms,max_ms,stddev_ms,gflops,bw_gibs,bw_gbs
+Dynamic,stokes.mtx,11449533,11449533,349321980,16,27.596919,30.047394,47.081470,3.187263,25.316013,149.192072,155.215154

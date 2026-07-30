@@ -1,0 +1,254 @@
+============================================================
+ Orquestador de planes de mejora
+ Planes: BASE B1 C1 B3 C3 B2 C2 A1 A2 D1
+ Resultados en: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results
+ Inicio: Wed Jul 29 08:34:06 -05 2026
+============================================================
+
+------------------------------------------------------------
+[*] Plan BASE: iniciando  (Wed Jul 29 08:34:06 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/BASE/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/BASE/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/BASE/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/BASE/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/BASE/ompt_logs/
+[OK] Plan BASE: terminado en 1760 s
+
+------------------------------------------------------------
+[*] Plan B1: iniciando  (Wed Jul 29 09:03:26 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B1/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B1/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B1/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B1/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B1/ompt_logs/
+[OK] Plan B1: terminado en 1752 s
+
+------------------------------------------------------------
+[*] Plan C1: iniciando  (Wed Jul 29 09:32:38 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C1/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C1/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C1/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C1/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C1/ompt_logs/
+[OK] Plan C1: terminado en 1741 s
+
+------------------------------------------------------------
+[*] Plan B3: iniciando  (Wed Jul 29 10:01:39 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B3/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B3/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B3/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B3/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B3/ompt_logs/
+[OK] Plan B3: terminado en 1741 s
+
+------------------------------------------------------------
+[*] Plan C3: iniciando  (Wed Jul 29 10:30:40 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C3/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C3/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C3/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C3/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C3/ompt_logs/
+[OK] Plan C3: terminado en 1741 s
+
+------------------------------------------------------------
+[*] Plan B2: iniciando  (Wed Jul 29 10:59:41 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B2/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B2/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B2/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B2/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/B2/ompt_logs/
+[OK] Plan B2: terminado en 1749 s
+
+------------------------------------------------------------
+[*] Plan C2: iniciando  (Wed Jul 29 11:28:50 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C2/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C2/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C2/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C2/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/C2/ompt_logs/
+[OK] Plan C2: terminado en 1740 s
+
+------------------------------------------------------------
+[*] Plan A1: iniciando  (Wed Jul 29 11:57:50 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A1/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A1/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A1/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A1/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A1/ompt_logs/
+[OK] Plan A1: terminado en 1738 s
+
+------------------------------------------------------------
+[*] Plan A2: iniciando  (Wed Jul 29 12:26:48 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A2/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A2/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A2/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A2/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/A2/ompt_logs/
+[OK] Plan A2: terminado en 1754 s
+
+------------------------------------------------------------
+[*] Plan D1: iniciando  (Wed Jul 29 12:56:02 -05 2026)
+------------------------------------------------------------
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil_serial: Stencil_serial.cpp -> stencil_serial
+[*] Compiling spmv_serial: spmv_serial.cpp -> spmv_serial
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[i] Stage 1 (serial) OMITIDA (RUN_SERIAL=0)
+
+[*] Stage 2/3: OMP + numactl (sin OMPT)
+
+[*] Stage 3/3: OMPT scheduler (sin OMP_PLACES/OMP_PROC_BIND; el scheduler decide la afinidad)
+
+[✓] Benchmark V4 completed.
+    Kernel CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/D1/kernel_metrics.csv
+    Perf window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/D1/window_metrics.csv
+    OMPT window CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/D1/ompt_window_metrics.csv
+    OMPT summary CSV: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/D1/ompt_summary.csv
+    Logs: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results/D1/ompt_logs/
+[OK] Plan D1: terminado en 1756 s
+
+============================================================
+ Resumen
+   OK   : BASE B1 C1 B3 C3 B2 C2 A1 A2 D1
+   FALLO: (ninguno)
+   Tiempo total: 17472 s
+   Fin: Wed Jul 29 13:25:18 -05 2026
+============================================================
+
+Siguiente paso — analizar y comparar:
+   python3 "/home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/analyze_plans.py" --results "/home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/results"
+[i] Planes con resultados: A1, A2, B1, B2, B3, BASE, C1, C2, C3, D1
+[OK] /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/comparison_figures/combined_kernel_metrics.csv
+[OK] /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/comparison_figures/ranking.csv
+
+=================  RESUMEN  =================
+Veces que cada plan es el MEJOR (metrica principal por kernel):
+   A1    : gana  4  |  supera su baseline  1/10
+   B3    : gana  2  |  supera su baseline  3/10
+   BASE  : gana  1  |  supera su baseline  4/10
+   D1    : gana  1  |  supera su baseline  4/10
+   B2    : gana  1  |  supera su baseline  1/10
+   C2    : gana  1  |  supera su baseline  3/10
+
+>>> Plan que gana mas veces: A1
+=============================================
+
+[OK] Figuras y tablas en: /home/jsoterov01/Control-Dinamico-Afinidad-NUMA-con-OpenMP/planes_de_mejora/comparison_figures

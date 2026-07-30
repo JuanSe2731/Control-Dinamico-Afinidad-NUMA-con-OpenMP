@@ -1,0 +1,2832 @@
+[OMPT] ompt_initialize (OPCIÓN C: integrador con fugas)
+[HWLOC] Nodos NUMA detectados: 2
+[HWLOC] Nodo 0: 128 CPUs
+[HWLOC] Nodo 1: 128 CPUs
+[OMPT] callback 'ompt_callback_thread_begin' registrado (result=5)
+[OMPT] callback 'ompt_callback_thread_end' registrado (result=5)
+[OMPT] callback 'ompt_callback_parallel_begin' registrado (result=5)
+[OMPT] callback 'ompt_callback_parallel_end' registrado (result=5)
+[OMPT] callback 'ompt_callback_implicit_task' registrado (result=5)
+[OMPT] callback 'ompt_callback_control_tool' registrado (result=5)
+[OMPT] Callbacks registrados
+[OMPT] Sistema: 0 procesadores lógicos
+[OMPT][PERF] Contadores pausados (esperando start) tid=79808
+[OMPT] thread_begin: tipo=ompt_thread_initial    ompt_id=281474976710657 tid=79808 cpu=255 numa=1
+[OMPT][MON] Monitor (C: integrador con fugas)  período=100ms  warmup=5  T=ref+1.00*MAD  leak=0.50*MAD  cap=8.00*MAD  max_mig=1
+[OMPT] implicit_task_begin: parallel_id=0 thread_num=1 team_size=1
+[OMPT] parallel_begin: parallel_id=281474976710659 team_size=8
+[OMPT][PERF] Contadores pausados (esperando start) tid=79811
+[OMPT] thread_begin: tipo=ompt_thread_worker     ompt_id=562949953421313 tid=79811 cpu=206 numa=1
+[OMPT][PERF] Contadores pausados (esperando start) tid=79810
+[OMPT] thread_begin: tipo=ompt_thread_worker     ompt_id=844424930131969 tid=79810 cpu=199 numa=1
+[OMPT][PERF] Contadores pausados (esperando start) tid=79813
+[OMPT] thread_begin: tipo=ompt_thread_worker     ompt_id=1407374883553281 tid=79813 cpu=0 numa=0
+[OMPT][PERF] Contadores pausados (esperando start) tid=79812
+[OMPT] thread_begin: tipo=ompt_thread_worker     ompt_id=1125899906842625 tid=79812 cpu=215 numa=1
+[OMPT] implicit_task_begin: parallel_id=281474976710659 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710659 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710659 thread_num=0 team_size=8
+[OMPT][PERF] Contadores pausados (esperando start) tid=79815
+[OMPT] thread_begin: tipo=ompt_thread_worker     ompt_id=1688849860263937 tid=79815 cpu=9 numa=0
+[OMPT][PERF] Contadores pausados (esperando start) tid=79816
+[OMPT] thread_begin: tipo=ompt_thread_worker     ompt_id=2251799813685249 tid=79816 cpu=229 numa=1
+[OMPT][PERF] Contadores pausados (esperando start) tid=79814
+[OMPT] thread_begin: tipo=ompt_thread_worker     ompt_id=1970324836974593 tid=79814 cpu=220 numa=1
+[OMPT] implicit_task_begin: parallel_id=281474976710659 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710659 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710659 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710659 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710659 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710659
+[OMPT] parallel_begin: parallel_id=281474976710661 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710661 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710661 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710661 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710661 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710661 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710661 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710661 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710661 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710661
+[OMPT] parallel_begin: parallel_id=281474976710663 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710663 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710663 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710663 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710663 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710663 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710663 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710663 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710663 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710663
+[OMPT] parallel_begin: parallel_id=281474976710665 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710665 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710665 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710665 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710665 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710665 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710665 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710665 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710665 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710665
+[OMPT] control_tool: INICIANDO medicion
+[OMPT] parallel_begin: parallel_id=281474976710667 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710667 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710667 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710667 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710667 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710667 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710667 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710667 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710667 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710667
+[OMPT] parallel_begin: parallel_id=281474976710669 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710669 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710669 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710669 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710669 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710669 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710669 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710669 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710669 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710669
+[OMPT] parallel_begin: parallel_id=281474976710671 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710671 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710671 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710671 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710671 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710671 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710671 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710671 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710671 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710671
+[OMPT] parallel_begin: parallel_id=281474976710673 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710673 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710673 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710673 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710673 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710673 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710673 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710673 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710673 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710673
+[OMPT] parallel_begin: parallel_id=281474976710675 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710675 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710675 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710675 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710675 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710675 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710675 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710675 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710675 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710675
+[OMPT] parallel_begin: parallel_id=281474976710677 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710677 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710677 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710677 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710677 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710677 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710677 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710677 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710677 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710677
+[OMPT] parallel_begin: parallel_id=281474976710679 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710679 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710679 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710679 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710679 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710679 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710679 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710679 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710679 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710679
+[OMPT] parallel_begin: parallel_id=281474976710681 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710681 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710681 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710681 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710681 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710681 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710681 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710681 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710681 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710681
+[OMPT] parallel_begin: parallel_id=281474976710683 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710683 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710683 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710683 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710683 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710683 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710683 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710683 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710683 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710683
+[OMPT] parallel_begin: parallel_id=281474976710685 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710685 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710685 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710685 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710685 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710685 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710685 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710685 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710685 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710685
+[OMPT] parallel_begin: parallel_id=281474976710687 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710687 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710687 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710687 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710687 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710687 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710687 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710687 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710687 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710687
+[OMPT] parallel_begin: parallel_id=281474976710689 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710689 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710689 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710689 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710689 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710689 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710689 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710689 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710689 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710689
+[OMPT] parallel_begin: parallel_id=281474976710691 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710691 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710691 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710691 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710691 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710691 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710691 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710691 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710691 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710691
+[OMPT] parallel_begin: parallel_id=281474976710693 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710693 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710693 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710693 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710693 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710693 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710693 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710693 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710693 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710693
+[OMPT] parallel_begin: parallel_id=281474976710695 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710695 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710695 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710695 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710695 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710695 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710695 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710695 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710695 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710695
+[OMPT] parallel_begin: parallel_id=281474976710697 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710697 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710697 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710697 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710697 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710697 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710697 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710697 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710697 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710697
+[OMPT] parallel_begin: parallel_id=281474976710699 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710699 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710699 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710699 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710699 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710699 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710699 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710699 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710699 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710699
+[OMPT] parallel_begin: parallel_id=281474976710701 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710701 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710701 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710701 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710701 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710701 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710701 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710701 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710701 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710701
+[OMPT] parallel_begin: parallel_id=281474976710703 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710703 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710703 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710703 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710703 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710703 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710703 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710703 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710703 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710703
+[OMPT] parallel_begin: parallel_id=281474976710705 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710705 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710705 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710705 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710705 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710705 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710705 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710705 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710705 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710705
+[OMPT] parallel_begin: parallel_id=281474976710707 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710707 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710707 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710707 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710707 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710707 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710707 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710707 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710707 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710707
+[OMPT] parallel_begin: parallel_id=281474976710709 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710709 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710709 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710709 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710709 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710709 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710709 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710709 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710709 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710709
+[OMPT] parallel_begin: parallel_id=281474976710711 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710711 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710711 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710711 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710711 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710711 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710711 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710711 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710711 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710711
+[OMPT] parallel_begin: parallel_id=281474976710713 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710713 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710713 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710713 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710713 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710713 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710713 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710713 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710713 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710713
+[OMPT] parallel_begin: parallel_id=281474976710715 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710715 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710715 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710715 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710715 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710715 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710715 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710715 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710715 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710715
+[OMPT] parallel_begin: parallel_id=281474976710717 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710717 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710717 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710717 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710717 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710717 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710717 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710717 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710717 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710717
+[OMPT] parallel_begin: parallel_id=281474976710719 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710719 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710719 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710719 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710719 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710719 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710719 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710719 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710719 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710719
+[OMPT] parallel_begin: parallel_id=281474976710721 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710721 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710721 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710721 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710721 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710721 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710721 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710721 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710721 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710721
+[OMPT] parallel_begin: parallel_id=281474976710723 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710723 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710723 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710723 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710723 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710723 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710723 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710723 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710723 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710723
+[OMPT] parallel_begin: parallel_id=281474976710725 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710725 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710725 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710725 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710725 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710725 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710725 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710725 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710725 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710725
+[OMPT] parallel_begin: parallel_id=281474976710727 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710727 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710727 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710727 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710727 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710727 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710727 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710727 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710727 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710727
+[OMPT] parallel_begin: parallel_id=281474976710729 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710729 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710729 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710729 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710729 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710729 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710729 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710729 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710729 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710729
+[OMPT] parallel_begin: parallel_id=281474976710731 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710731 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710731 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710731 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710731 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710731 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710731 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710731 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710731 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710731
+[OMPT] parallel_begin: parallel_id=281474976710733 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710733 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710733 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710733 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710733 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710733 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710733 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710733 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710733 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710733
+[OMPT] parallel_begin: parallel_id=281474976710735 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710735 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710735 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710735 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710735 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710735 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710735 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710735 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710735 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710735
+[OMPT] parallel_begin: parallel_id=281474976710737 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710737 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710737 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710737 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710737 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710737 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710737 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710737 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710737 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710737
+[OMPT] parallel_begin: parallel_id=281474976710739 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710739 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710739 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710739 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710739 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710739 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710739 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710739 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710739 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710739
+[OMPT] parallel_begin: parallel_id=281474976710741 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710741 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710741 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710741 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710741 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710741 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710741 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710741 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710741 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710741
+[OMPT] parallel_begin: parallel_id=281474976710743 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710743 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710743 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710743 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710743 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710743 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710743 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710743 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710743 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710743
+[OMPT] parallel_begin: parallel_id=281474976710745 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710745 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710745 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710745 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710745 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710745 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710745 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710745 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710745 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710745
+[OMPT] parallel_begin: parallel_id=281474976710747 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710747 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710747 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710747 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710747 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710747 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710747 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710747 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710747 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710747
+[OMPT] parallel_begin: parallel_id=281474976710749 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710749 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710749 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710749 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710749 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710749 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710749 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710749 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710749 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710749
+[OMPT] parallel_begin: parallel_id=281474976710751 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710751 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710751 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710751 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710751 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710751 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710751 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710751 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710751 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710751
+[OMPT] parallel_begin: parallel_id=281474976710753 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710753 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710753 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710753 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710753 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710753 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710753 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710753 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710753 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710753
+[OMPT] parallel_begin: parallel_id=281474976710755 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710755 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710755 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710755 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710755 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710755 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710755 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710755 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710755 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710755
+[OMPT] parallel_begin: parallel_id=281474976710757 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710757 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710757 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710757 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710757 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710757 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710757 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710757 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710757 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710757
+[OMPT] parallel_begin: parallel_id=281474976710759 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710759 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710759 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710759 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710759 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710759 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710759 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710759 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710759 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710759
+[OMPT] parallel_begin: parallel_id=281474976710761 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710761 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710761 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710761 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710761 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710761 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710761 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710761 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710761 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710761
+[OMPT] parallel_begin: parallel_id=281474976710763 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710763 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710763 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710763 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710763 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710763 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710763 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710763 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710763 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710763
+[OMPT] parallel_begin: parallel_id=281474976710765 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710765 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710765 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710765 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710765 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710765 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710765 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710765 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710765 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710765
+[OMPT] parallel_begin: parallel_id=281474976710767 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710767 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710767 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710767 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710767 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710767 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710767 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710767 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710767 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710767
+[OMPT] parallel_begin: parallel_id=281474976710769 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710769 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710769 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710769 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710769 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710769 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710769 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710769 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710769 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710769
+[OMPT] parallel_begin: parallel_id=281474976710771 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710771 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710771 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710771 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710771 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710771 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710771 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710771 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710771 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710771
+[OMPT] parallel_begin: parallel_id=281474976710773 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710773 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710773 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710773 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710773 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710773 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710773 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710773 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710773 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710773
+[OMPT] parallel_begin: parallel_id=281474976710775 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710775 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710775 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710775 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710775 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710775 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710775 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710775 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710775 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710775
+[OMPT] parallel_begin: parallel_id=281474976710777 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710777 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710777 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710777 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710777 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710777 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710777 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710777 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710777 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710777
+[OMPT] parallel_begin: parallel_id=281474976710779 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710779 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710779 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710779 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710779 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710779 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710779 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710779 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710779 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710779
+[OMPT] parallel_begin: parallel_id=281474976710781 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710781 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710781 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710781 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710781 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710781 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710781 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710781 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710781 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710781
+[OMPT] parallel_begin: parallel_id=281474976710783 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710783 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710783 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710783 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710783 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710783 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710783 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710783 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710783 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710783
+[OMPT] parallel_begin: parallel_id=281474976710785 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710785 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710785 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710785 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710785 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710785 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710785 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710785 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710785 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710785
+[OMPT] parallel_begin: parallel_id=281474976710787 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710787 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710787 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710787 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710787 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710787 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710787 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710787 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710787 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710787
+[OMPT] parallel_begin: parallel_id=281474976710789 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710789 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710789 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710789 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710789 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710789 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710789 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710789 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710789 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710789
+[OMPT] parallel_begin: parallel_id=281474976710791 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710791 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710791 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710791 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710791 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710791 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710791 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710791 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710791 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710791
+[OMPT] parallel_begin: parallel_id=281474976710793 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710793 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710793 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710793 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710793 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710793 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710793 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710793 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710793 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710793
+[OMPT] parallel_begin: parallel_id=281474976710795 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710795 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710795 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710795 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710795 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710795 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710795 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710795 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710795 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710795
+[OMPT] parallel_begin: parallel_id=281474976710797 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710797 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710797 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710797 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710797 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710797 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710797 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710797 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710797 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710797
+[OMPT] parallel_begin: parallel_id=281474976710799 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710799 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710799 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710799 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710799 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710799 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710799 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710799 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710799 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710799
+[OMPT] parallel_begin: parallel_id=281474976710801 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710801 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710801 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710801 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710801 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710801 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710801 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710801 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710801 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710801
+[OMPT] parallel_begin: parallel_id=281474976710803 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710803 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710803 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710803 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710803 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710803 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710803 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710803 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710803 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710803
+[OMPT] parallel_begin: parallel_id=281474976710805 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710805 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710805 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710805 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710805 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710805 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710805 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710805 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710805 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710805
+[OMPT] parallel_begin: parallel_id=281474976710807 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710807 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710807 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710807 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710807 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710807 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710807 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710807 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710807 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710807
+[OMPT] parallel_begin: parallel_id=281474976710809 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710809 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710809 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710809 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710809 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710809 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710809 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710809 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710809 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710809
+[OMPT] parallel_begin: parallel_id=281474976710811 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710811 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710811 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710811 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710811 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710811 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710811 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710811 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710811 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710811
+[OMPT] parallel_begin: parallel_id=281474976710813 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710813 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710813 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710813 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710813 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710813 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710813 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710813 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710813 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710813
+[OMPT] parallel_begin: parallel_id=281474976710815 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710815 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710815 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710815 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710815 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710815 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710815 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710815 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710815 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710815
+[OMPT] parallel_begin: parallel_id=281474976710817 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710817 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710817 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710817 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710817 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710817 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710817 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710817 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710817 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710817
+[OMPT] parallel_begin: parallel_id=281474976710819 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710819 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710819 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710819 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710819 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710819 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710819 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710819 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710819 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710819
+[OMPT] parallel_begin: parallel_id=281474976710821 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710821 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710821 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710821 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710821 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710821 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710821 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710821 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710821 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710821
+[OMPT] parallel_begin: parallel_id=281474976710823 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710823 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710823 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710823 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710823 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710823 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710823 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710823 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710823 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710823
+[OMPT] parallel_begin: parallel_id=281474976710825 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710825 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710825 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710825 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710825 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710825 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710825 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710825 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710825 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710825
+[OMPT] parallel_begin: parallel_id=281474976710827 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710827 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710827 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710827 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710827 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710827 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710827 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710827 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710827 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710827
+[OMPT] parallel_begin: parallel_id=281474976710829 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710829 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710829 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710829 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710829 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710829 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710829 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710829 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710829 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710829
+[OMPT] parallel_begin: parallel_id=281474976710831 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710831 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710831 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710831 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710831 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710831 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710831 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710831 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710831 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710831
+[OMPT] parallel_begin: parallel_id=281474976710833 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710833 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710833 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710833 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710833 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710833 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710833 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710833 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710833 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710833
+[OMPT] parallel_begin: parallel_id=281474976710835 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710835 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710835 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710835 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710835 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710835 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710835 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710835 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710835 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710835
+[OMPT] parallel_begin: parallel_id=281474976710837 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710837 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710837 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710837 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710837 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710837 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710837 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710837 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710837 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710837
+[OMPT] parallel_begin: parallel_id=281474976710839 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710839 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710839 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710839 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710839 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710839 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710839 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710839 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710839 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710839
+[OMPT] parallel_begin: parallel_id=281474976710841 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710841 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710841 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710841 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710841 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710841 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710841 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710841 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710841 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710841
+[OMPT] parallel_begin: parallel_id=281474976710843 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710843 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710843 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710843 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710843 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710843 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710843 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710843 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710843 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710843
+[OMPT] parallel_begin: parallel_id=281474976710845 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710845 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710845 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710845 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710845 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710845 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710845 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710845 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710845 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710845
+[OMPT] parallel_begin: parallel_id=281474976710847 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710847 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710847 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710847 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710847 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710847 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710847 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710847 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710847 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710847
+[OMPT] parallel_begin: parallel_id=281474976710849 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710849 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710849 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710849 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710849 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710849 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710849 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710849 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710849 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710849
+[OMPT] parallel_begin: parallel_id=281474976710851 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710851 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710851 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710851 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710851 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710851 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710851 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710851 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710851 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710851
+[OMPT] parallel_begin: parallel_id=281474976710853 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710853 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710853 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710853 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710853 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710853 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710853 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710853 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710853 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710853
+[OMPT] parallel_begin: parallel_id=281474976710855 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710855 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710855 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710855 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710855 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710855 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710855 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710855 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710855 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710855
+[OMPT] parallel_begin: parallel_id=281474976710857 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710857 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710857 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710857 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710857 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710857 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710857 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710857 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710857 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710857
+[OMPT] parallel_begin: parallel_id=281474976710859 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710859 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710859 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710859 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710859 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710859 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710859 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710859 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710859 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710859
+[OMPT] parallel_begin: parallel_id=281474976710861 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710861 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710861 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710861 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710861 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710861 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710861 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710861 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710861 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710861
+[OMPT] parallel_begin: parallel_id=281474976710863 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710863 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710863 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710863 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710863 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710863 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710863 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710863 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710863 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710863
+[OMPT] parallel_begin: parallel_id=281474976710865 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710865 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710865 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710865 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710865 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710865 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710865 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710865 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710865 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710865
+[OMPT] parallel_begin: parallel_id=281474976710867 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710867 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710867 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710867 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710867 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710867 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710867 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710867 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710867 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710867
+[OMPT] parallel_begin: parallel_id=281474976710869 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710869 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710869 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710869 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710869 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710869 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710869 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710869 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710869 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710869
+[OMPT] parallel_begin: parallel_id=281474976710871 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710871 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710871 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710871 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710871 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710871 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710871 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710871 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710871 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710871
+[OMPT] parallel_begin: parallel_id=281474976710873 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710873 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710873 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710873 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710873 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710873 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710873 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710873 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710873 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710873
+[OMPT] parallel_begin: parallel_id=281474976710875 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710875 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710875 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710875 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710875 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710875 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710875 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710875 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710875 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710875
+[OMPT] parallel_begin: parallel_id=281474976710877 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710877 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710877 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710877 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710877 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710877 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710877 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710877 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710877 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710877
+[OMPT] parallel_begin: parallel_id=281474976710879 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710879 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710879 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710879 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710879 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710879 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710879 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710879 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710879 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710879
+[OMPT] parallel_begin: parallel_id=281474976710881 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710881 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710881 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710881 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710881 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710881 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710881 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710881 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710881 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710881
+[OMPT] parallel_begin: parallel_id=281474976710883 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710883 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710883 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710883 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710883 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710883 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710883 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710883 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710883 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710883
+[OMPT] parallel_begin: parallel_id=281474976710885 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710885 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710885 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710885 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710885 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710885 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710885 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710885 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710885 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710885
+[OMPT] parallel_begin: parallel_id=281474976710887 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710887 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710887 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710887 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710887 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710887 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710887 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710887 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710887 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710887
+[OMPT] parallel_begin: parallel_id=281474976710889 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710889 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710889 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710889 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710889 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710889 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710889 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710889 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710889 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710889
+[OMPT] parallel_begin: parallel_id=281474976710891 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710891 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710891 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710891 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710891 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710891 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710891 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710891 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710891 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710891
+[OMPT] parallel_begin: parallel_id=281474976710893 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710893 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710893 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710893 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710893 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710893 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710893 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710893 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710893 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710893
+[OMPT] parallel_begin: parallel_id=281474976710895 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710895 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710895 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710895 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710895 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710895 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710895 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710895 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710895 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710895
+[OMPT] parallel_begin: parallel_id=281474976710897 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710897 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710897 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710897 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710897 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710897 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710897 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710897 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710897 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710897
+[OMPT] parallel_begin: parallel_id=281474976710899 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710899 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710899 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710899 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710899 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710899 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710899 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710899 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710899 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710899
+[OMPT] parallel_begin: parallel_id=281474976710901 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710901 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710901 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710901 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710901 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710901 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710901 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710901 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710901 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710901
+[OMPT] parallel_begin: parallel_id=281474976710903 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710903 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710903 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710903 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710903 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710903 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710903 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710903 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710903 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710903
+[OMPT] parallel_begin: parallel_id=281474976710905 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710905 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710905 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710905 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710905 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710905 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710905 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710905 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710905 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710905
+[OMPT] parallel_begin: parallel_id=281474976710907 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710907 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710907 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710907 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710907 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710907 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710907 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710907 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710907 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710907
+[OMPT] parallel_begin: parallel_id=281474976710909 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710909 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710909 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710909 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710909 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710909 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710909 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710909 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710909 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710909
+[OMPT] parallel_begin: parallel_id=281474976710911 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710911 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710911 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710911 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710911 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710911 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710911 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710911 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710911 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710911
+[OMPT] parallel_begin: parallel_id=281474976710913 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710913 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710913 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710913 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710913 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710913 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710913 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710913 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710913 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710913
+[OMPT] parallel_begin: parallel_id=281474976710915 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710915 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710915 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710915 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710915 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710915 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710915 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710915 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710915 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710915
+[OMPT] parallel_begin: parallel_id=281474976710917 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710917 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710917 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710917 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710917 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710917 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710917 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710917 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710917 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710917
+[OMPT] parallel_begin: parallel_id=281474976710919 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710919 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710919 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710919 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710919 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710919 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710919 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710919 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710919 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710919
+[OMPT] parallel_begin: parallel_id=281474976710921 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710921 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710921 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710921 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710921 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710921 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710921 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710921 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710921 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710921
+[OMPT] parallel_begin: parallel_id=281474976710923 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710923 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710923 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710923 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710923 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710923 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710923 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710923 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710923 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710923
+[OMPT] parallel_begin: parallel_id=281474976710925 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710925 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710925 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710925 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710925 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710925 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710925 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710925 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710925 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710925
+[OMPT] parallel_begin: parallel_id=281474976710927 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710927 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710927 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710927 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710927 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710927 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710927 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710927 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710927 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710927
+[OMPT] parallel_begin: parallel_id=281474976710929 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710929 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710929 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710929 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710929 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710929 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710929 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710929 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710929 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710929
+[OMPT] parallel_begin: parallel_id=281474976710931 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710931 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710931 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710931 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710931 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710931 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710931 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710931 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710931 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710931
+[OMPT] parallel_begin: parallel_id=281474976710933 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710933 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710933 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710933 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710933 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710933 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710933 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710933 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710933 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710933
+[OMPT] parallel_begin: parallel_id=281474976710935 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710935 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710935 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710935 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710935 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710935 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710935 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710935 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710935 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710935
+[OMPT] parallel_begin: parallel_id=281474976710937 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710937 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710937 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710937 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710937 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710937 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710937 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710937 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710937 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710937
+[OMPT] parallel_begin: parallel_id=281474976710939 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710939 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710939 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710939 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710939 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710939 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710939 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710939 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710939 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710939
+[OMPT] parallel_begin: parallel_id=281474976710941 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710941 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710941 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710941 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710941 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710941 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710941 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710941 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710941 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710941
+[OMPT] parallel_begin: parallel_id=281474976710943 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710943 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710943 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710943 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710943 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710943 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710943 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710943 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710943 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710943
+[OMPT] parallel_begin: parallel_id=281474976710945 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710945 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710945 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710945 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710945 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710945 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710945 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710945 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710945 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710945
+[OMPT] parallel_begin: parallel_id=281474976710947 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_begin: parallel_id=281474976710947 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710947 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710947 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710947 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710947 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710947 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710947 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710947 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710947
+[OMPT] parallel_begin: parallel_id=281474976710949 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710949 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710949 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710949 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710949 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710949 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710949 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710949 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710949 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710949
+[OMPT] parallel_begin: parallel_id=281474976710951 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710951 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710951 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710951 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710951 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710951 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710951 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710951 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710951 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710951
+[OMPT] parallel_begin: parallel_id=281474976710953 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710953 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710953 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710953 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710953 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710953 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710953 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710953 thread_num=2 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710953 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710953
+[OMPT] parallel_begin: parallel_id=281474976710955 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710955 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710955 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710955 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710955 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710955 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710955 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710955 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710955 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710955
+[OMPT] parallel_begin: parallel_id=281474976710957 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710957 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710957 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710957 thread_num=3 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710957 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710957 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710957 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710957 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710957 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710957
+[OMPT] parallel_begin: parallel_id=281474976710959 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710959 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710959 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710959 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710959 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710959 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710959 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710959 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710959 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710959
+[OMPT] parallel_begin: parallel_id=281474976710961 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710961 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_begin: parallel_id=281474976710961 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710961 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710961 thread_num=1 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710961 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710961 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_begin: parallel_id=281474976710961 thread_num=4 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710961 thread_num=5 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710961
+[OMPT] parallel_begin: parallel_id=281474976710963 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_begin: parallel_id=281474976710963 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710963 thread_num=0 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710963 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710963 thread_num=6 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710963 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710963 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710963 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710963 thread_num=7 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710963
+[OMPT] parallel_begin: parallel_id=281474976710965 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] implicit_task_begin: parallel_id=281474976710965 thread_num=3 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710965 thread_num=4 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] implicit_task_begin: parallel_id=281474976710965 thread_num=1 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710965 thread_num=0 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] implicit_task_begin: parallel_id=281474976710965 thread_num=5 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710965 thread_num=6 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710965 thread_num=7 team_size=8
+[OMPT] implicit_task_begin: parallel_id=281474976710965 thread_num=2 team_size=8
+[OMPT] implicit_task_end: parallel_id=0 thread_num=0
+[OMPT] parallel_end: parallel_id=281474976710965
+[OMPT] control_tool: PAUSANDO medicion
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] thread_end: ompt_id=281474976710657 tid=79808 cpu=255
+[OMPT] implicit_task_end: parallel_id=0 thread_num=4
+[OMPT] thread_end: ompt_id=1407374883553281 tid=79813 cpu=24
+[OMPT] implicit_task_end: parallel_id=0 thread_num=7
+[OMPT] thread_end: ompt_id=2251799813685249 tid=79816 cpu=229
+[OMPT] implicit_task_end: parallel_id=0 thread_num=1
+[OMPT] thread_end: ompt_id=844424930131969 tid=79810 cpu=1
+[OMPT] implicit_task_end: parallel_id=0 thread_num=6
+[OMPT] thread_end: ompt_id=1688849860263937 tid=79815 cpu=9
+[OMPT] implicit_task_end: parallel_id=0 thread_num=3
+[OMPT] thread_end: ompt_id=1125899906842625 tid=79812 cpu=215
+[OMPT] implicit_task_end: parallel_id=0 thread_num=2
+[OMPT] thread_end: ompt_id=562949953421313 tid=79811 cpu=206
+[OMPT] implicit_task_end: parallel_id=0 thread_num=5
+[OMPT] thread_end: ompt_id=1970324836974593 tid=79814 cpu=220
+[OMPT] ompt_finalize
+[OMPT][MON] Monitor detenido
+[OMPT] ===== Tabla final: 8 hilos =====
+[OMPT] tid=79808  ompt_id=281474976710657 tipo=ompt_thread_initial    last_cpu=255 numa=1 migraciones=0 perf=abierto
+        remote_fills=1089771  instr=404140204495  ipc=3.878
+[OMPT] tid=79811  ompt_id=562949953421313 tipo=ompt_thread_worker     last_cpu=206 numa=1 migraciones=0 perf=abierto
+        remote_fills=919245  instr=404655849450  ipc=3.886
+[OMPT] tid=79810  ompt_id=844424930131969 tipo=ompt_thread_worker     last_cpu=  1 numa=0 migraciones=0 perf=abierto
+        remote_fills=893112  instr=404160051457  ipc=3.877
+[OMPT] tid=79813  ompt_id=1407374883553281 tipo=ompt_thread_worker     last_cpu= 24 numa=0 migraciones=0 perf=abierto
+        remote_fills=920308  instr=404518651932  ipc=3.882
+[OMPT] tid=79812  ompt_id=1125899906842625 tipo=ompt_thread_worker     last_cpu=215 numa=1 migraciones=0 perf=abierto
+        remote_fills=1005023  instr=404008730005  ipc=3.877
+[OMPT] tid=79815  ompt_id=1688849860263937 tipo=ompt_thread_worker     last_cpu=  9 numa=0 migraciones=0 perf=abierto
+        remote_fills=881570  instr=404437919784  ipc=3.880
+[OMPT] tid=79816  ompt_id=2251799813685249 tipo=ompt_thread_worker     last_cpu=229 numa=1 migraciones=0 perf=abierto
+        remote_fills=1417437  instr=404104429313  ipc=3.878
+[OMPT] tid=79814  ompt_id=1970324836974593 tipo=ompt_thread_worker     last_cpu=220 numa=1 migraciones=0 perf=abierto
+        remote_fills=1012050  instr=404736248005  ipc=3.887

@@ -1,0 +1,2 @@
+strategy,n,threads,min_ms,avg_ms,max_ms,stddev_ms,gflops,bw_gibs,bw_gbs,mlups
+OpenMP-SeqInit,23500,128,23.063040,27.221315,33.768960,2.294853,119.705816,535.126698,574.587916,23941.163177
