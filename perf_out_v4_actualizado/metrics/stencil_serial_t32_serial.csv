@@ -1,0 +1,2 @@
+strategy,n,threads,min_ms,avg_ms,max_ms,stddev_ms,gflops,bw_gibs,bw_gbs
+Serial,23500,32,174.600192,174.988401,175.673600,0.217639,15.812010,70.685194,75.897649
