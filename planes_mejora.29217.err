@@ -1,3 +1,0 @@
-ERROR: clang++ no esta en el PATH en smexa.sc3.uis.edu.co.
-  1) Busca el modulo:  module avail 2>&1 | grep -iE 'clang|llvm'
-  2) Reenvia con el nombre exacto:  CLANG_MODULE=<nombre> sbatch planes_de_mejora/run_all_plans.sbatch

@@ -374,9 +374,9 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
 
     ompt_measure_start();
     for (int r = 0; r < reps; ++r) {
-        auto t0 = std::chrono::high_resolution_clock::now();
+        auto t0 = std::chrono::steady_clock::now();
         spmv_func(A, x, y);
-        auto t1 = std::chrono::high_resolution_clock::now();
+        auto t1 = std::chrono::steady_clock::now();
         times.push_back(std::chrono::duration<double>(t1 - t0).count());
         if (false) printf("  Rep %2d: %.4f ms\n", r, times[r] * 1e3);
     }
@@ -388,7 +388,7 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
     double avg_t = std::accumulate(times.begin(), times.end(), 0.0) / reps;
     double var   = 0.0;
     for (double t : times) var += (t - avg_t) * (t - avg_t);
-    double stddev = std::sqrt(var / reps);
+    double stddev = std::sqrt(var / ((reps > 1) ? (reps - 1) : 1));  // muestral (N-1)
 
     // GFlops: SpMV hace exactamente 2*nnz operaciones (1 mul + 1 add por nnz)
     double gflops  = (2.0 * static_cast<double>(A.nnz)) / (min_t * 1e9);

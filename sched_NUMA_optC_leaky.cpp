@@ -7,10 +7,10 @@
 //                         REFERENCIA GLOBAL adaptativa
 //   --------------------------------------------------------------------------
 //   - Se evalúa CADA ventana de 100 ms.
-//   - g_ref = EWMA del ratio_rm de TODOS los hilos => referencia "típica" de la
-//     corrida (autoajustable; sin la constante mágica 0.11).
-//   - g_dev = EWMA de la desviación absoluta media (MAD) => dispersión robusta
-//     que escala el umbral automáticamente.
+//   - g_ref = EWMA del ratio_rm AGREGADO de la ventana => referencia "típica" de
+//     la corrida (autoajustable; sin la constante mágica 0.11).
+//   - g_dev = EWMA de la desviación absoluta media (MAD) entre hilos => dispersión
+//     robusta que escala el umbral automáticamente.
 //   - Umbral alto adaptativo:  T = g_ref + LEAK_MARGIN_SIG * dev.
 //   - "Balde con fugas" por hilo:
 //        si ratio > T  -> bucket += (ratio - T)      (se llena por exceso)
@@ -23,6 +23,24 @@
 //   Requisito: cada hilo migra COMO MÁXIMO 1 vez (MAX_MIGRATIONS = 1).
 //   Compatible con numactl --interleave=all (no se cambia la política de páginas).
 //
+//   PRINCIPIO DE DISEÑO: el instrumento no debe perturbar lo que mide.
+//     * Ninguna E/S ocurre con el spinlock global tomado.
+//     * Las filas del CSV de ventanas se acumulan en memoria y se vuelcan una
+//       sola vez en ompt_finalize.
+//     * Todo el trazo por ventana/región está detrás de OMPT_VERBOSE.
+//     * El syscall de rebinding (hwloc_set_thread_cpubind) se ejecuta SIN lock;
+//       solo las escrituras de estado, que son un puñado de stores, van dentro.
+//
+// Variables de entorno:
+//   OMPT_TAG                identificador de la corrida, va en cada fila de CSV
+//   OMPT_WINDOW_CSV         ruta del CSV por ventana (si falta, no se acumula)
+//   OMPT_SUMMARY_CSV        ruta del CSV de resumen por hilo
+//   OMPT_OVERHEAD_CSV       ruta del CSV de overhead intrínseco del tool
+//   OMPT_LOG_FILE           si está, stderr va ahí; si no, a /dev/null
+//   OMPT_VERBOSE=1          reactiva el trazo por ventana y por región
+//   OMPT_DISABLE_MIGRATION=1  monitorea y registra igual, pero nunca migra
+//                             (configuraciones de control para medir overhead)
+//
 // Compilar:
 //   clang++ -std=c++17 -fPIC -shared -fopenmp -pthread -O2 \
 //           sched_NUMA_optC_leaky.cpp -o numa_sched_optC.so \
@@ -33,6 +51,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <cerrno>
+#include <cmath>
 #include <inttypes.h>
 #include <omp-tools.h>
 #include <omp.h>
@@ -70,18 +90,39 @@ static constexpr double   LEAK_CAP_SIG      = 8.0;    // capacidad del balde (en
 // Una sola migración por hilo (requisito).
 static constexpr uint64_t MAX_MIGRATIONS    = 1;
 
-// Cooldown (heredado; con migración única es básicamente informativo).
-static constexpr int      COOLDOWN_WINDOWS  = 10;
+// Techo de filas del buffer en memoria del CSV de ventanas. A 128 hilos y 100 ms
+// una corrida típica genera ~5k filas; 262144 deja dos órdenes de magnitud de
+// margen y evita cualquier realloc con el lock tomado.
+static constexpr size_t   MAX_WINDOW_ROWS   = 262144;
+
+// Estado de los contadores de un hilo.
+enum PerfStatus { PERF_FAILED = 0, PERF_FULL = 1, PERF_IPC_ONLY = 2 };
+static const char* perf_status_str(int s) {
+    switch (s) {
+        case PERF_FULL:     return "full";
+        case PERF_IPC_ONLY: return "ipc_only";
+        default:            return "failed";
+    }
+}
 
 // =============================================================================
 // Salida a archivos
 // =============================================================================
-static FILE*       g_window_csv  = nullptr;
-static FILE*       g_summary_csv = nullptr;
+static FILE*       g_window_csv   = nullptr;
+static FILE*       g_summary_csv  = nullptr;
+static FILE*       g_overhead_csv = nullptr;
 // char[] en lugar de std::string: los atexit del runtime OpenMP pueden llamar a
 // ompt_finalize DESPUÉS de que los destructores de estáticos de C++ hayan corrido,
 // lo que deja std::string en estado inválido y corrompe el campo tag en el CSV.
-static char        g_tag[1024]   = {};
+static char        g_tag[1024]    = {};
+
+static bool        g_verbose            = false;
+static bool        g_disable_migration  = false;
+
+// Trazo condicional: sin OMPT_VERBOSE no se formatea ni se escribe nada. Antes
+// estos fprintf corrían siempre (aun con stderr en /dev/null) y a 128 hilos
+// suponían ~38k llamadas formateadas por corrida dentro de la región medida.
+#define VLOG(...)  do { if (g_verbose) fprintf(stderr, __VA_ARGS__); } while (0)
 
 // =============================================================================
 // hwloc — topología global
@@ -93,11 +134,41 @@ static hwloc_cpuset_t   g_node_cpusets[MAX_NUMA_NODES];
 
 // =============================================================================
 // Referencia global adaptativa (compartida por todos los hilos)
-//   - Protegida por g_lock (se actualiza dentro del monitor_loop, ya con lock).
+//   - Protegida por g_lock; se actualiza UNA vez por ventana en monitor_loop.
 // =============================================================================
-static double g_ref      = 0.0;   // EWMA del ratio_rm entre hilos
-static double g_dev      = 0.0;   // EWMA de |ratio - g_ref| (MAD)
+static double g_ref      = 0.0;   // EWMA del ratio_rm agregado de la ventana
+static double g_dev      = 0.0;   // EWMA de la MAD entre hilos
 static bool   g_ref_init = false;
+
+// =============================================================================
+// Contadores de diagnóstico y de overhead intrínseco
+// =============================================================================
+static uint64_t g_win_idx          = 0;   // índice de ventana del monitor
+static uint64_t g_monitor_ticks    = 0;
+static double   g_monitor_us_total = 0.0;
+static double   g_monitor_us_max   = 0.0;
+static std::atomic<uint64_t> g_callback_calls   {0};
+static std::atomic<uint64_t> g_callback_ns_total{0};
+static double   g_migration_us_total = 0.0;
+static uint64_t g_resyncs          = 0;   // ventanas descartadas por retroceso del contador
+static uint64_t g_mux_scaled_reads = 0;   // lecturas corregidas por multiplexado
+// Los eventos crudos 0xD044/0xFF44 son específicos de AMD Zen. En otra PMU el
+// perf_event_open SUELE TENER ÉXITO y devolver 0 para siempre: el tool creería
+// estar midiendo y simplemente no migraría nunca. Contrastar ventanas con ciclos
+// contra ventanas con fills permite detectar ese caso y gritarlo al final.
+static uint64_t g_win_with_cycles  = 0;   // muestras (hilo x ventana) con ciclos
+static uint64_t g_win_with_fills   = 0;   // muestras (hilo x ventana) con fills
+// Los 4 eventos se abren COMO GRUPO, y un grupo entra en la PMU entero o no
+// entra. Si no cabe, todas las lecturas devuelven time_running=0 y el monitor
+// descarta al hilo en cada ventana: CSV vacíos, cero migraciones y ni un solo
+// mensaje de error. Hay que contarlo para poder gritarlo al final.
+static uint64_t g_reads_never_scheduled = 0;
+static uint64_t g_reads_ok              = 0;
+static uint64_t g_window_rows_dropped = 0;
+static int      g_perf_failed_threads = 0;
+static int      g_perf_partial_threads = 0;
+
+static std::chrono::steady_clock::time_point g_mon_t0;
 
 // =============================================================================
 // Tabla de nombres de tipo de hilo (patrón LLVM callback.h)
@@ -135,11 +206,8 @@ static ompt_set_callback_t g_ompt_set_callback = nullptr;
 // =============================================================================
 // Function pointers del runtime OMPT
 // =============================================================================
-static ompt_get_thread_data_t   g_ompt_get_thread_data   = nullptr;
 static ompt_get_unique_id_t     g_ompt_get_unique_id      = nullptr;
-static ompt_get_proc_id_t       g_ompt_get_proc_id        = nullptr;
 static ompt_get_num_procs_t     g_ompt_get_num_procs      = nullptr;
-static ompt_get_parallel_info_t g_ompt_get_parallel_info  = nullptr;
 
 // =============================================================================
 // Estructuras de datos por hilo
@@ -150,6 +218,7 @@ struct PerfFDs {
     int cycles_fd    {-1};   // PERF_COUNT_HW_CPU_CYCLES
     int all_fills_fd {-1};   // ALL DATA CACHE FILLS (raw 0xFF44)
     int opened       {0};
+    int status       {PERF_FAILED};
 };
 
 struct ThreadInfo {
@@ -160,8 +229,10 @@ struct ThreadInfo {
     int       last_cpu        {-1};
     int       numa_node       {-1};
     int       seen            {0};
+    int       alive           {0};   // 0 tras thread_end: ya no se muestrea
     int       measuring       {0};
     int       needs_migration {0};
+    int       migrating       {0};   // rebinding en curso: el monitor lo salta
 
     // ── Estado del detector (Mecanismo C: integrador con fugas) ──────────
     int       win_count       {0};     // ventanas válidas vistas (warmup)
@@ -180,9 +251,14 @@ struct ThreadInfo {
     uint64_t  last_all_fills {0};
     int       has_last       {0};
 
+    // ── Totales finales (se congelan en thread_end o en finalize) ─────────
+    uint64_t  fin_rm  {0}, fin_all {0}, fin_ins {0}, fin_cyc {0};
+    int       fin_valid {0};
+
     // ── Estado del scheduler ─────────────────────────────────────────────
-    int       cooldown       {0};   // ventanas restantes (informativo)
-    uint64_t  migrations     {0};   // total de migraciones realizadas
+    uint64_t  migrations         {0};   // migraciones aplicadas con éxito
+    uint64_t  mig_failures       {0};   // rebindings que devolvieron error
+    int64_t   first_migration_win{-1};  // ventana de la primera migración
 };
 
 static ThreadInfo g_threads[MAX_THREADS];
@@ -193,6 +269,49 @@ static std::atomic<bool> g_measuring {false};
 static std::atomic_flag  g_lock = ATOMIC_FLAG_INIT;
 static inline void lock()   { while (g_lock.test_and_set(std::memory_order_acquire)); }
 static inline void unlock() { g_lock.clear(std::memory_order_release); }
+
+// =============================================================================
+// Buffer en memoria del CSV de ventanas
+//   Se vuelca entero en ompt_finalize. Contrapartida asumida: si el proceso
+//   muere de forma anormal se pierden las ventanas; a cambio, el camino caliente
+//   queda sin E/S. El resumen y el overhead sí se escriben al final igualmente.
+//
+//   MEMORIA CRUDA A PROPÓSITO, no std::vector: el runtime OpenMP llama a
+//   ompt_finalize desde un atexit que corre DESPUÉS de los destructores de los
+//   estáticos de C++, así que un contenedor global ya estaría destruido y
+//   recorrerlo aquí es un segfault (verificado). Es la misma razón por la que
+//   g_tag es char[] y no std::string. La memoria de malloc sobrevive a esos
+//   destructores; no se libera porque el proceso termina justo después.
+// =============================================================================
+struct WindowRow {
+    uint64_t win_idx;
+    double   t_ms;
+    uint64_t ompt_id;
+    int      tid;
+    int      ompt_type;
+    // cpu/numa son LO ULTIMO CONOCIDO, capturado al entrar el hilo en una region
+    // paralela (implicit_task). El monitor no puede consultar el cpu de otro hilo
+    // sin leer /proc/<tid>/stat, que seria carisimo cada 100 ms. La DECISION de
+    // migrar si usa un sched_getcpu() fresco; esta columna es solo informativa.
+    int      cpu;
+    int      numa;
+    uint64_t d_rm, d_all, d_ins, d_cyc;
+    double   ipc;
+    double   ratio;      // -1 => el hilo no tiene los eventos NUMA
+    double   bucket, thr_T, ref, dev;
+    int      flagged;    // 1 => en esta ventana el balde cruzó la capacidad
+};
+static WindowRow* g_window_rows = nullptr;
+static size_t     g_window_n    = 0;
+
+// Muestras de la ventana en curso: pase 1 las llena, pase 2 las evalúa.
+struct WinSample {
+    int      idx;
+    uint64_t d_rm, d_all, d_ins, d_cyc;
+    double   ipc, ratio;
+    bool     gated;      // pasó el filtro MIN_FILLS y tiene eventos NUMA
+};
+static WinSample g_samples[MAX_THREADS];
 
 // =============================================================================
 // Helpers Linux + hwloc
@@ -219,81 +338,71 @@ static int cpu_to_numa_node_hwloc(int cpu) {
     return -1;
 }
 
-// =============================================================================
-// Migración de hilo al nodo NUMA contrario via hwloc
-// =============================================================================
-static void migrate_to_opposite_node(ThreadInfo& t) {
-    if (!g_topology_valid)              return;
-    if (t.pthread_handle == 0)          return;
-    if (t.numa_node < 0)               return;
-    if (t.migrations >= MAX_MIGRATIONS) return;   // ← máximo 1 migración
-
-    int target = (t.numa_node == 0) ? 1 : 0;
-    if (target >= g_num_numa_nodes) return;
-
-    // HWLOC_CPUBIND_THREAD → solo este hilo, no el proceso
-    int rc = hwloc_set_thread_cpubind(
-        g_topology,
-        t.pthread_handle,
-        g_node_cpusets[target],
-        HWLOC_CPUBIND_THREAD | HWLOC_CPUBIND_STRICT
-    );
-
-    // Fallback sin STRICT si el kernel no lo soporta
-    if (rc != 0)
-        rc = hwloc_set_thread_cpubind(
-            g_topology,
-            t.pthread_handle,
-            g_node_cpusets[target],
-            HWLOC_CPUBIND_THREAD
-        );
-
-    if (rc == 0) {
-        int prev_node = t.numa_node;
-        t.numa_node = target;
-        t.cooldown  = COOLDOWN_WINDOWS;
-        t.migrations++;
-        t.has_last  = 0;  // resetear baseline de deltas post-migración
-        t.bucket    = 0.0;
-
-        fprintf(stderr,
-            "[SCHED] MIGRACIÓN tid=%-6d ompt_id=%-4" PRIu64
-            "  nodo %d → nodo %d  (total migraciones: %" PRIu64 ")\n",
-            (int)t.tid_linux, t.ompt_id,
-            prev_node, target, t.migrations);
-    } else {
-        fprintf(stderr,
-            "[SCHED] FALLO migración tid=%d (rc=%d)\n",
-            (int)t.tid_linux, rc);
-    }
+static inline double us_since(std::chrono::steady_clock::time_point t0) {
+    return std::chrono::duration<double, std::micro>(
+               std::chrono::steady_clock::now() - t0).count();
 }
 
 // =============================================================================
 // perf_event helpers
 // =============================================================================
-static int open_counter(pid_t tid, uint32_t type, uint64_t config) {
+//
+// read_format pide time_enabled/time_running para poder CORREGIR el multiplexado:
+// si se piden más eventos de los que hay registros contadores en la PMU, el
+// kernel los rota y cada uno solo mide una fracción del intervalo. Sin esta
+// corrección los conteos salen bajos y —lo que es peor para nosotros— cada
+// evento por un factor distinto, con lo que ratio_rm = d_rm/d_all e IPC pasan a
+// ser cocientes de números medidos en intervalos diferentes.
+//
+// Además los 4 eventos se abren COMO GRUPO (group_fd = líder): así entran y
+// salen del hardware juntos y cubren exactamente el mismo intervalo, que es
+// justo lo que un cociente necesita.
+struct PerfRead { uint64_t value, time_enabled, time_running; };
+
+static int open_counter(pid_t tid, uint32_t type, uint64_t config, int group_fd) {
     struct perf_event_attr pe;
     memset(&pe, 0, sizeof(pe));
     pe.type           = type;
     pe.size           = sizeof(pe);
     pe.config         = config;
-    pe.disabled       = 1;
+    pe.disabled       = (group_fd == -1) ? 1 : 0;  // solo el líder arranca parado
     pe.inherit        = 0;
     pe.exclude_kernel = 1;
     pe.exclude_hv     = 1;
-    return (int)perf_event_open_syscall(&pe, tid, -1, -1, 0);
+    pe.read_format    = PERF_FORMAT_TOTAL_TIME_ENABLED | PERF_FORMAT_TOTAL_TIME_RUNNING;
+    return (int)perf_event_open_syscall(&pe, tid, -1, group_fd, 0);
 }
 
 static bool read_counter(int fd, uint64_t& val) {
     val = 0;
     if (fd < 0) return false;
-    return read(fd, &val, sizeof(val)) == (ssize_t)sizeof(val);
+    PerfRead r {};
+    if (read(fd, &r, sizeof(r)) != (ssize_t)sizeof(r)) return false;
+    if (r.time_running == 0) {
+        // El evento nunca llegó a estar en el hardware en este intervalo. Con
+        // eventos agrupados esto suele significar que el grupo entero no cabe
+        // en la PMU, y entonces NO habrá ningún dato en toda la corrida.
+        val = 0;
+        ++g_reads_never_scheduled;
+        return false;
+    }
+    ++g_reads_ok;
+    if (r.time_running < r.time_enabled) {
+        // Escalado por multiplexado. Se hace en double a propósito: value *
+        // time_enabled desbordaría uint64 y aquí la precisión sobra.
+        val = (uint64_t)((double)r.value *
+                         ((double)r.time_enabled / (double)r.time_running));
+        ++g_mux_scaled_reads;
+    } else {
+        val = r.value;
+    }
+    return true;
 }
 
 static void close_perf(PerfFDs& p) {
     if (p.rm_misses    >= 0) { close(p.rm_misses);    p.rm_misses    = -1; }
     if (p.instr_fd     >= 0) { close(p.instr_fd);     p.instr_fd     = -1; }
-    if (p.cycles_fd >= 0) { close(p.cycles_fd); p.cycles_fd = -1; }
+    if (p.cycles_fd    >= 0) { close(p.cycles_fd);    p.cycles_fd    = -1; }
     if (p.all_fills_fd >= 0) { close(p.all_fills_fd); p.all_fills_fd = -1; }
     p.opened = 0;
 }
@@ -317,8 +426,8 @@ static void enable_perf(PerfFDs& p) {
                                 ioctl(p.rm_misses,    PERF_EVENT_IOC_ENABLE, 0); }
     if (p.instr_fd     >= 0) { ioctl(p.instr_fd,     PERF_EVENT_IOC_RESET,  0);
                                 ioctl(p.instr_fd,     PERF_EVENT_IOC_ENABLE, 0); }
-    if (p.cycles_fd >= 0) { ioctl(p.cycles_fd, PERF_EVENT_IOC_RESET,  0);
-                                ioctl(p.cycles_fd, PERF_EVENT_IOC_ENABLE, 0); }
+    if (p.cycles_fd    >= 0) { ioctl(p.cycles_fd,    PERF_EVENT_IOC_RESET,  0);
+                                ioctl(p.cycles_fd,    PERF_EVENT_IOC_ENABLE, 0); }
     if (p.all_fills_fd >= 0) { ioctl(p.all_fills_fd, PERF_EVENT_IOC_RESET,  0);
                                 ioctl(p.all_fills_fd, PERF_EVENT_IOC_ENABLE, 0); }
 }
@@ -327,30 +436,72 @@ static void disable_perf(PerfFDs& p) {
     if (!p.opened) return;
     if (p.rm_misses    >= 0) ioctl(p.rm_misses,    PERF_EVENT_IOC_DISABLE, 0);
     if (p.instr_fd     >= 0) ioctl(p.instr_fd,     PERF_EVENT_IOC_DISABLE, 0);
-    if (p.cycles_fd >= 0) ioctl(p.cycles_fd, PERF_EVENT_IOC_DISABLE, 0);
+    if (p.cycles_fd    >= 0) ioctl(p.cycles_fd,    PERF_EVENT_IOC_DISABLE, 0);
     if (p.all_fills_fd >= 0) ioctl(p.all_fills_fd, PERF_EVENT_IOC_DISABLE, 0);
 }
 
+// Degradación por-fd en vez de todo-o-nada: si fallan los eventos crudos de AMD
+// (0xD044/0xFF44) pero sí abren instrucciones y ciclos, el hilo sigue aportando
+// IPC y aparece en los CSV marcado como "ipc_only" — simplemente no puede
+// disparar migraciones. Antes, cualquier fallo cerraba los 4 fds y el hilo
+// desaparecía de ambos CSV sin dejar rastro, con lo que una corrida donde
+// fallaron 100 de 128 hilos se veía idéntica a una completa.
 static void open_perf_for_thread(ThreadInfo& t) {
     if (t.perf.opened) return;
 
-    // remote fills AMD EPYC: event=0x44 umask=0xD0 → raw 0xD044
-    t.perf.rm_misses    = open_counter(t.tid_linux, PERF_TYPE_RAW, 0xD044);
-    t.perf.instr_fd     = open_counter(t.tid_linux, PERF_TYPE_HARDWARE,
-                                        PERF_COUNT_HW_INSTRUCTIONS);
+    // Líder del grupo: ciclos (siempre disponible). El resto cuelga de él.
     t.perf.cycles_fd = open_counter(t.tid_linux, PERF_TYPE_HARDWARE,
-                                        PERF_COUNT_HW_CPU_CYCLES);
-    t.perf.all_fills_fd = open_counter(t.tid_linux, PERF_TYPE_RAW, 0xFF44);
+                                    PERF_COUNT_HW_CPU_CYCLES, -1);
+    const int leader = t.perf.cycles_fd;
+    int e_cyc = (leader < 0) ? errno : 0;
 
-    if (t.perf.rm_misses < 0 || t.perf.instr_fd < 0 || t.perf.cycles_fd < 0 || t.perf.all_fills_fd < 0) {
+    t.perf.instr_fd = open_counter(t.tid_linux, PERF_TYPE_HARDWARE,
+                                   PERF_COUNT_HW_INSTRUCTIONS, leader);
+    int e_ins = (t.perf.instr_fd < 0) ? errno : 0;
+
+    // remote fills AMD EPYC: event=0x44 umask=0xD0 → raw 0xD044
+    t.perf.rm_misses = open_counter(t.tid_linux, PERF_TYPE_RAW, 0xD044, leader);
+    int e_rm = (t.perf.rm_misses < 0) ? errno : 0;
+
+    t.perf.all_fills_fd = open_counter(t.tid_linux, PERF_TYPE_RAW, 0xFF44, leader);
+    int e_all = (t.perf.all_fills_fd < 0) ? errno : 0;
+
+    const bool have_ipc  = (t.perf.cycles_fd >= 0 && t.perf.instr_fd >= 0);
+    const bool have_numa = (t.perf.rm_misses >= 0 && t.perf.all_fills_fd >= 0);
+
+    if (!have_ipc) {
         fprintf(stderr,
-            "[OMPT][PERF] FALLO abriendo contadores tid=%d "
-            "(rm=%d ins=%d miss=%d)\n"
-            "  → cat /proc/sys/kernel/perf_event_paranoid debe ser <= 1\n",
+            "[OMPT][PERF] FALLO abriendo contadores tid=%d\n"
+            "    cycles(HW)      fd=%-3d %s\n"
+            "    instructions(HW)fd=%-3d %s\n"
+            "  → revisar /proc/sys/kernel/perf_event_paranoid (debe ser <= 2)\n",
             (int)t.tid_linux,
-            t.perf.rm_misses, t.perf.instr_fd, t.perf.cycles_fd);
+            t.perf.cycles_fd, e_cyc ? strerror(e_cyc) : "ok",
+            t.perf.instr_fd,  e_ins ? strerror(e_ins) : "ok");
         close_perf(t.perf);
+        t.perf.status = PERF_FAILED;
+        ++g_perf_failed_threads;
         return;
+    }
+
+    if (!have_numa) {
+        // Sin eventos NUMA no hay ratio_rm y por tanto no hay decisión posible,
+        // pero IPC y ciclos siguen siendo datos válidos.
+        fprintf(stderr,
+            "[OMPT][PERF] tid=%d SIN eventos NUMA (solo IPC). "
+            "Este hilo no podrá disparar migraciones.\n"
+            "    raw 0xD044 (remote fills) fd=%-3d %s\n"
+            "    raw 0xFF44 (all fills)    fd=%-3d %s\n"
+            "  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen\n",
+            (int)t.tid_linux,
+            t.perf.rm_misses,    e_rm  ? strerror(e_rm)  : "ok",
+            t.perf.all_fills_fd, e_all ? strerror(e_all) : "ok");
+        if (t.perf.rm_misses    >= 0) { close(t.perf.rm_misses);    t.perf.rm_misses    = -1; }
+        if (t.perf.all_fills_fd >= 0) { close(t.perf.all_fills_fd); t.perf.all_fills_fd = -1; }
+        t.perf.status = PERF_IPC_ONLY;
+        ++g_perf_partial_threads;
+    } else {
+        t.perf.status = PERF_FULL;
     }
 
     t.perf.opened = 1;
@@ -359,22 +510,26 @@ static void open_perf_for_thread(ThreadInfo& t) {
     if (g_measuring.load(std::memory_order_acquire)) {
         t.measuring = 1;
         enable_perf(t.perf);
-        fprintf(stderr, "[OMPT][PERF] Contadores ACTIVOS tid=%d\n",
-                (int)t.tid_linux);
+        VLOG("[OMPT][PERF] Contadores ACTIVOS tid=%d (%s)\n",
+             (int)t.tid_linux, perf_status_str(t.perf.status));
     } else {
-        fprintf(stderr, "[OMPT][PERF] Contadores pausados (esperando start) tid=%d\n",
-                (int)t.tid_linux);
+        VLOG("[OMPT][PERF] Contadores pausados (esperando start) tid=%d (%s)\n",
+             (int)t.tid_linux, perf_status_str(t.perf.status));
     }
 }
 
 // =============================================================================
 // upsert_thread — guarda también pthread_handle
+//   Solo empareja con entradas VIVAS: Linux recicla los tid, y sin este filtro
+//   un hilo nuevo heredaba el bucket y el contador de migraciones de un hilo
+//   muerto que tuvo el mismo tid.
 // =============================================================================
 static int upsert_thread(pid_t tid, int cpu,
                           uint64_t ompt_id, int ompt_type,
                           pthread_t pt) {
     for (int i = 0; i < g_count; ++i) {
-        if (g_threads[i].seen && g_threads[i].tid_linux == tid) {
+        if (g_threads[i].seen && g_threads[i].alive &&
+            g_threads[i].tid_linux == tid) {
             g_threads[i].last_cpu       = cpu;
             g_threads[i].numa_node      = cpu_to_numa_node_hwloc(cpu);
             g_threads[i].ompt_id        = ompt_id;
@@ -395,11 +550,12 @@ static int upsert_thread(pid_t tid, int cpu,
     t.ompt_type      = ompt_type;
     t.pthread_handle = pt;
     t.seen           = 1;
+    t.alive          = 1;
     return g_count++;
 }
 
 // =============================================================================
-// Hilo monitor — mide, decide y migra cada MONITOR_MS
+// Hilo monitor — mide, decide y marca cada MONITOR_MS
 // =============================================================================
 static std::atomic<bool> g_monitor_running {false};
 static std::atomic<bool> g_finalizing      {false};
@@ -409,25 +565,42 @@ static bool              g_monitor_valid = false;
 static void* monitor_loop(void*) {
     fprintf(stderr,
         "[OMPT][MON] Monitor (C: integrador con fugas)  período=%dms"
-        "  warmup=%d  T=ref+%.2f*MAD  leak=%.2f*MAD  cap=%.2f*MAD  max_mig=%" PRIu64 "\n",
+        "  warmup=%d  T=ref+%.2f*MAD  leak=%.2f*MAD  cap=%.2f*MAD  max_mig=%" PRIu64
+        "  migracion=%s\n",
         MONITOR_MS, WARMUP_WINDOWS,
-        LEAK_MARGIN_SIG, LEAK_RATE_SIG, LEAK_CAP_SIG, MAX_MIGRATIONS);
+        LEAK_MARGIN_SIG, LEAK_RATE_SIG, LEAK_CAP_SIG, MAX_MIGRATIONS,
+        g_disable_migration ? "DESACTIVADA" : "activa");
+
+    g_mon_t0 = std::chrono::steady_clock::now();
 
     while (g_monitor_running.load(std::memory_order_acquire)) {
         std::this_thread::sleep_for(std::chrono::milliseconds(MONITOR_MS));
 
+        const double t_ms = std::chrono::duration<double, std::milli>(
+                                std::chrono::steady_clock::now() - g_mon_t0).count();
+        const auto tick_t0 = std::chrono::steady_clock::now();
+
         lock();
+
+        // ── PASE 1: leer contadores y calcular deltas ───────────────────────
+        int      ns      = 0;
+        uint64_t sum_rm  = 0;
+        uint64_t sum_all = 0;
+
         for (int i = 0; i < g_count; ++i) {
             ThreadInfo& t = g_threads[i];
-            if (!t.seen || !t.perf.opened || !t.measuring) continue;
+            if (!t.seen || !t.alive || !t.perf.opened || !t.measuring) continue;
+            if (t.migrating) continue;   // rebinding en curso, no tocar su estado
 
-            // ── Leer contadores ──────────────────────────────────────────
+            const bool numa_ok = (t.perf.status == PERF_FULL);
+
             uint64_t remote = 0, ins = 0, cyc = 0, all = 0;
-            bool ok = read_counter(t.perf.rm_misses,    remote)
-                   && read_counter(t.perf.instr_fd,     ins)
-                   && read_counter(t.perf.cycles_fd, cyc)
-                   && read_counter(t.perf.all_fills_fd, all);
-            if (!ok) continue;
+            if (!read_counter(t.perf.instr_fd, ins))  continue;
+            if (!read_counter(t.perf.cycles_fd, cyc)) continue;
+            if (numa_ok) {
+                if (!read_counter(t.perf.rm_misses, remote))    continue;
+                if (!read_counter(t.perf.all_fills_fd, all))    continue;
+            }
 
             // ── Primera lectura: solo baseline ────────────────────────────
             if (!t.has_last) {
@@ -439,98 +612,147 @@ static void* monitor_loop(void*) {
                 continue;
             }
 
-            // ── Calcular deltas ──────────────────────────────────────────
-            uint64_t d_rm  = remote - t.last_rm_misses;
-            uint64_t d_ins = ins    - t.last_instr;
-            uint64_t d_cyc= cyc   - t.last_cycles;
-            uint64_t d_all = all - t.last_all_fills;
+            // Guarda de underflow: los deltas son uint64, así que un contador
+            // que retroceda (un PERF_EVENT_IOC_RESET intercalado, o el
+            // prctl(PR_TASK_PERF_EVENTS_ENABLE) que hacen los kernels y que el
+            // tool no ve) daría la vuelta a ~1.8e19 y envenenaría g_ref durante
+            // las ~20 ventanas siguientes. Se resincroniza y se descarta.
+            if (ins < t.last_instr || cyc < t.last_cycles ||
+                (numa_ok && (remote < t.last_rm_misses || all < t.last_all_fills))) {
+                t.last_rm_misses = remote;
+                t.last_instr     = ins;
+                t.last_cycles    = cyc;
+                t.last_all_fills = all;
+                ++g_resyncs;
+                continue;
+            }
+
+            const uint64_t d_rm  = numa_ok ? (remote - t.last_rm_misses) : 0;
+            const uint64_t d_ins = ins - t.last_instr;
+            const uint64_t d_cyc = cyc - t.last_cycles;
+            const uint64_t d_all = numa_ok ? (all - t.last_all_fills) : 0;
 
             t.last_rm_misses = remote;
             t.last_instr     = ins;
             t.last_cycles    = cyc;
             t.last_all_fills = all;
 
-            double ipc  = (d_ins  > 0) ? (double)d_ins  / (double)d_cyc  : 0.0;
-            double ratio = (d_all > 0) ? (double)d_rm / (double)d_all : 0.0;
+            WinSample& s = g_samples[ns++];
+            s.idx   = i;
+            s.d_rm  = d_rm;
+            s.d_all = d_all;
+            s.d_ins = d_ins;
+            s.d_cyc = d_cyc;
+            // La guarda va sobre el DENOMINADOR. Antes comprobaba d_ins y
+            // dividía por d_cyc, así que d_cyc==0 escribía "inf" en el CSV.
+            s.ipc   = (d_cyc > 0) ? (double)d_ins / (double)d_cyc : 0.0;
+            // -1 = NO MEDIBLE (sin eventos NUMA, o ventana sin fills). Se usa un
+            // centinela en vez de 0 porque un ratio de 0 es un valor legítimo:
+            // significa "todos los fills fueron locales", que es justo lo que se
+            // quiere poder distinguir de "no hay dato".
+            s.ratio = (numa_ok && d_all > 0) ? (double)d_rm / (double)d_all : -1.0;
+            s.gated = numa_ok && (d_all >= MIN_FILLS);
 
-            if (g_window_csv) {
-                fprintf(g_window_csv,
-                    "%s,%d,%" PRIu64 ",%d,%s,%d,%d,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%.6f,%.6f\n",
-                    g_tag,
-                    MONITOR_MS,
-                    t.ompt_id,
-                    (int)t.tid_linux,
-                    thread_type_str((ompt_thread_t)t.ompt_type),
-                    t.last_cpu,
-                    t.numa_node,
-                    d_rm,
-                    d_ins,
-                    d_cyc,
-                    ipc,
-                    ratio);
-                fflush(g_window_csv);
-            }
+            if (d_cyc > 0) ++g_win_with_cycles;
+            if (d_all > 0) ++g_win_with_fills;
 
-            fprintf(stderr,
-                "[OMPT][WIN%dms] ompt_id=%-4" PRIu64
-                " tid=%-6d tipo=%-22s cpu=%3d numa=%d"
-                "  d_rm=%8" PRIu64
-                "  d_instr=%10" PRIu64
-                "  d_cyc=%10" PRIu64
-                "  d_all=%8" PRIu64
-                "  IPC=%.3f  ratio_rm=%.4f\n",
-                MONITOR_MS,
-                t.ompt_id, (int)t.tid_linux,
-                thread_type_str((ompt_thread_t)t.ompt_type),
-                t.last_cpu, t.numa_node,
-                d_rm, d_ins, d_cyc, d_all,
-                ipc, ratio);
+            if (s.gated) { sum_rm += d_rm; sum_all += d_all; }
+        }
 
-            // ── Mecanismo C: integrador con fugas + histéresis ────────────
-            // Solo ventanas con actividad real (gating anti-ruido).
-            if (d_all >= MIN_FILLS) {
+        // ── Sembrar la referencia global si es la primera ventana con datos ─
+        // Se siembra con el AGREGADO de la ventana, no con la primera muestra
+        // de un hilo arbitrario: esa muestra podía ser atípica y la referencia
+        // tardaba ~1/REF_BETA = 20 ventanas en recuperarse.
+        if (!g_ref_init && sum_all > 0) {
+            g_ref = (double)sum_rm / (double)sum_all;
+            double acc = 0.0; int c = 0;
+            for (int k = 0; k < ns; ++k)
+                if (g_samples[k].gated) { acc += fabs(g_samples[k].ratio - g_ref); ++c; }
+            g_dev      = c ? acc / c : 0.0;
+            g_ref_init = true;
+        }
+
+        // Umbral ÚNICO para toda la ventana. Antes g_ref se actualizaba dentro
+        // del bucle por hilo, así que el hilo 0 se comparaba contra la
+        // referencia de la ventana anterior y el hilo 127 contra una ya
+        // desplazada 127 veces: el veredicto dependía del orden del arreglo.
+        const double dev  = (g_dev > DEV_FLOOR) ? g_dev : DEV_FLOOR;
+        const double thrT = g_ref + LEAK_MARGIN_SIG * dev;
+        const double leak = LEAK_RATE_SIG * dev;
+        const double cap  = LEAK_CAP_SIG  * dev;
+
+        // ── PASE 2: evaluar a todos contra el MISMO umbral ──────────────────
+        for (int k = 0; k < ns; ++k) {
+            WinSample&  s = g_samples[k];
+            ThreadInfo& t = g_threads[s.idx];
+            int flagged = 0;
+
+            if (s.gated) {
                 t.win_count++;
 
-                if (!g_ref_init) {
-                    g_ref = ratio; g_dev = 0.0; g_ref_init = true;
-                }
-                double dev = (g_dev > DEV_FLOOR) ? g_dev : DEV_FLOOR;
-
-                double T    = g_ref + LEAK_MARGIN_SIG * dev;   // umbral alto adaptativo
-                double leak = LEAK_RATE_SIG  * dev;            // fuga por ventana
-                double cap  = LEAK_CAP_SIG   * dev;            // capacidad -> dispara
-
-                if (ratio > T) {
-                    t.bucket += (ratio - T);                   // llenar por exceso
+                if (s.ratio > thrT) {
+                    t.bucket += (s.ratio - thrT);        // llenar por exceso
                 } else {
-                    t.bucket -= leak;                          // fuga lenta
+                    t.bucket -= leak;                    // fuga lenta
                     if (t.bucket < 0.0) t.bucket = 0.0;
                 }
 
-                if (t.win_count >= WARMUP_WINDOWS
+                if (!g_disable_migration
+                    && t.win_count >= WARMUP_WINDOWS
                     && t.migrations < MAX_MIGRATIONS
                     && !t.needs_migration
+                    && !t.migrating
                     && t.bucket > cap) {
                     t.needs_migration = 1;
-                    fprintf(stderr,
-                        "[SCHED][LEAKY] tid=%-6d ratio=%.4f T=%.4f"
-                        " bucket=%.4f > cap=%.4f -> PENDIENTE (mig=%" PRIu64 ")\n",
-                        (int)t.tid_linux, ratio, T,
-                        t.bucket, cap, t.migrations);
+                    flagged = 1;
+                    VLOG("[SCHED][LEAKY] tid=%-6d ratio=%.4f T=%.4f"
+                         " bucket=%.4f > cap=%.4f -> PENDIENTE (mig=%" PRIu64 ")\n",
+                         (int)t.tid_linux, s.ratio, thrT, t.bucket, cap, t.migrations);
                 }
-
-                // Actualizar la referencia global DESPUÉS de evaluar
-                // (g_ref = EWMA del ratio; g_dev = EWMA de |desviación|).
-                double e  = ratio - g_ref;
-                g_ref    += REF_BETA * e;
-                double ae = (e < 0.0) ? -e : e;
-                g_dev    += REF_BETA * (ae - g_dev);
             }
+
+            if (g_window_rows) {
+                if (g_window_n < MAX_WINDOW_ROWS) {
+                    g_window_rows[g_window_n++] = WindowRow{
+                        g_win_idx, t_ms, t.ompt_id, (int)t.tid_linux, t.ompt_type,
+                        t.last_cpu, t.numa_node,
+                        s.d_rm, s.d_all, s.d_ins, s.d_cyc,
+                        s.ipc, s.ratio,
+                        t.bucket, thrT, g_ref, g_dev, flagged};
+                } else {
+                    ++g_window_rows_dropped;
+                }
+            }
+
+            VLOG("[OMPT][WIN%dms] ompt_id=%-4" PRIu64
+                 " tid=%-6d cpu=%3d numa=%d  d_rm=%8" PRIu64
+                 "  d_all=%8" PRIu64 "  IPC=%.3f  ratio_rm=%.4f  bucket=%.4f/%.4f\n",
+                 MONITOR_MS, t.ompt_id, (int)t.tid_linux, t.last_cpu, t.numa_node,
+                 s.d_rm, s.d_all, s.ipc, s.ratio, t.bucket, cap);
         }
+
+        // ── Actualizar la referencia UNA vez, con el agregado de la ventana ─
+        if (sum_all > 0) {
+            const double win_ratio = (double)sum_rm / (double)sum_all;
+            double acc = 0.0; int c = 0;
+            for (int k = 0; k < ns; ++k)
+                if (g_samples[k].gated) { acc += fabs(g_samples[k].ratio - g_ref); ++c; }
+            const double win_mad = c ? acc / c : 0.0;
+
+            g_ref += REF_BETA * (win_ratio - g_ref);
+            g_dev += REF_BETA * (win_mad   - g_dev);
+        }
+
+        ++g_win_idx;
         unlock();
+
+        const double tick_us = us_since(tick_t0);
+        ++g_monitor_ticks;
+        g_monitor_us_total += tick_us;
+        if (tick_us > g_monitor_us_max) g_monitor_us_max = tick_us;
     }
 
-    fprintf(stderr, "[OMPT][MON] Monitor detenido\n");
+    fprintf(stderr, "[OMPT][MON] Monitor detenido tras %" PRIu64 " ventanas\n", g_win_idx);
     return nullptr;
 }
 
@@ -556,17 +778,44 @@ static void on_ompt_callback_thread_begin(
         open_perf_for_thread(g_threads[idx]);
     unlock();
 
-    fprintf(stderr,
-        "[OMPT] thread_begin: tipo=%-22s ompt_id=%" PRIu64
-        " tid=%d cpu=%d numa=%d\n",
-        thread_type_str(thread_type), uid, (int)tid, cpu,
-        cpu_to_numa_node_hwloc(cpu));
+    VLOG("[OMPT] thread_begin: tipo=%-22s ompt_id=%" PRIu64
+         " tid=%d cpu=%d numa=%d\n",
+         thread_type_str(thread_type), uid, (int)tid, cpu,
+         cpu_to_numa_node_hwloc(cpu));
 }
 
+// Antes este callback solo imprimía. Ahora congela los totales del hilo y CIERRA
+// sus fds. Sin esto: (a) se filtraban 4 fds por hilo (512 a 128 hilos, cerca del
+// RLIMIT_NOFILE por defecto de 1024); (b) el monitor seguía leyendo los fds de
+// hilos muertos y emitía ventanas con deltas 0, que desinflaban los promedios;
+// (c) un tid reciclado heredaba el estado del hilo difunto.
 static void on_ompt_callback_thread_end(ompt_data_t* thread_data) {
-    fprintf(stderr,
-        "[OMPT] thread_end: ompt_id=%" PRIu64 " tid=%d cpu=%d\n",
-        thread_data->value, (int)linux_tid(), sched_getcpu());
+    const pid_t tid = linux_tid();
+
+    lock();
+    for (int i = 0; i < g_count; ++i) {
+        ThreadInfo& t = g_threads[i];
+        if (!t.seen || !t.alive || t.tid_linux != tid) continue;
+
+        if (t.perf.opened) {
+            disable_perf(t.perf);
+            read_counter(t.perf.instr_fd,     t.fin_ins);
+            read_counter(t.perf.cycles_fd,    t.fin_cyc);
+            if (t.perf.status == PERF_FULL) {
+                read_counter(t.perf.rm_misses,    t.fin_rm);
+                read_counter(t.perf.all_fills_fd, t.fin_all);
+            }
+            t.fin_valid = 1;
+            close_perf(t.perf);
+        }
+        t.alive     = 0;   // seen se mantiene: el hilo debe salir en el resumen
+        t.measuring = 0;
+        break;
+    }
+    unlock();
+
+    VLOG("[OMPT] thread_end: ompt_id=%" PRIu64 " tid=%d cpu=%d\n",
+         thread_data->value, (int)tid, sched_getcpu());
 }
 
 static int on_ompt_callback_control_tool(
@@ -574,29 +823,31 @@ static int on_ompt_callback_control_tool(
     void* arg, const void* codeptr_ra)
 {
     (void)modifier; (void)arg; (void)codeptr_ra;
-    if (command == 1) {   // omp_control_tool_start
+    if (command == omp_control_tool_start) {
         fprintf(stderr, "[OMPT] control_tool: INICIANDO medicion\n");
         g_measuring.store(true, std::memory_order_release);
         lock();
         for (int i = 0; i < g_count; ++i) {
-            if (g_threads[i].seen && g_threads[i].perf.opened) {
+            if (g_threads[i].seen && g_threads[i].alive && g_threads[i].perf.opened) {
                 g_threads[i].measuring = 1;
                 g_threads[i].has_last  = 0;
                 enable_perf(g_threads[i].perf);
             }
         }
         unlock();
-    } else if (command == 2) {   // omp_control_tool_pause
+    } else if (command == omp_control_tool_pause) {
         fprintf(stderr, "[OMPT] control_tool: PAUSANDO medicion\n");
         g_measuring.store(false, std::memory_order_release);
         lock();
         for (int i = 0; i < g_count; ++i) {
-            if (g_threads[i].seen && g_threads[i].perf.opened) {
+            if (g_threads[i].seen && g_threads[i].alive && g_threads[i].perf.opened) {
                 g_threads[i].measuring = 0;
                 disable_perf(g_threads[i].perf);
             }
         }
         unlock();
+    } else {
+        VLOG("[OMPT] control_tool: comando %" PRIu64 " ignorado\n", command);
     }
     return 0;
 }
@@ -612,9 +863,8 @@ static void on_ompt_callback_parallel_begin(
     (void)flags; (void)codeptr_ra;
     if (g_ompt_get_unique_id)
         parallel_data->value = g_ompt_get_unique_id();
-    fprintf(stderr,
-        "[OMPT] parallel_begin: parallel_id=%" PRIu64 " team_size=%u\n",
-        parallel_data->value, requested_team_size);
+    VLOG("[OMPT] parallel_begin: parallel_id=%" PRIu64 " team_size=%u\n",
+         parallel_data->value, requested_team_size);
 }
 
 static void on_ompt_callback_parallel_end(
@@ -623,9 +873,7 @@ static void on_ompt_callback_parallel_end(
     int flags, const void* codeptr_ra)
 {
     (void)encountering_task_data; (void)flags; (void)codeptr_ra;
-    fprintf(stderr,
-        "[OMPT] parallel_end: parallel_id=%" PRIu64 "\n",
-        parallel_data->value);
+    VLOG("[OMPT] parallel_end: parallel_id=%" PRIu64 "\n", parallel_data->value);
 }
 
 static void on_ompt_callback_implicit_task(
@@ -636,73 +884,175 @@ static void on_ompt_callback_implicit_task(
     unsigned int          thread_num,
     int                   flags)
 {
-    (void)flags;
+    (void)flags; (void)team_size;
     if (g_finalizing.load(std::memory_order_acquire)) return;
 
-    if (endpoint == ompt_scope_begin) {
-        if (g_ompt_get_unique_id)
-            task_data->value = g_ompt_get_unique_id();
+    if (endpoint != ompt_scope_begin) {
+        VLOG("[OMPT] implicit_task_end: parallel_id=%" PRIu64 " thread_num=%u\n",
+             parallel_data ? parallel_data->value : 0, thread_num);
+        return;
+    }
 
-        pid_t     tid = linux_tid();
-        int       cpu = sched_getcpu();
-        pthread_t pt  = pthread_self();
+    const auto cb_t0 = std::chrono::steady_clock::now();
 
-        int do_migrate = 0;
-        int thread_idx = -1;
+    if (g_ompt_get_unique_id)
+        task_data->value = g_ompt_get_unique_id();
 
-        // Activar contadores si ya llegó control_tool_start,
-        // y actualizar pthread_handle (puede cambiar entre regiones)
-        lock();
-        for (int i = 0; i < g_count; ++i) {
-            if (g_threads[i].seen && g_threads[i].tid_linux == tid) {
-                g_threads[i].last_cpu       = cpu;
-                g_threads[i].numa_node      = cpu_to_numa_node_hwloc(cpu);
-                g_threads[i].pthread_handle = pt;  // ← actualizar handle
+    pid_t     tid = linux_tid();
+    int       cpu = sched_getcpu();
+    pthread_t pt  = pthread_self();
 
-                if (g_threads[i].needs_migration) {
-                    g_threads[i].needs_migration = 0;
-                    do_migrate = 1;
-                    thread_idx = i;
-                }
+    // ── Fase 1: bajo lock, solo stores. Se decide si toca migrar y se reserva
+    //            el hilo con la bandera 'migrating'. ─────────────────────────
+    int        thread_idx = -1;
+    int        mig_target = -1;
+    pthread_t  mig_handle = 0;
 
-                if (g_measuring.load(std::memory_order_acquire)
-                    && g_threads[i].perf.opened
-                    && !g_threads[i].measuring) {
-                    g_threads[i].measuring = 1;
-                    g_threads[i].has_last  = 0;
-                    enable_perf(g_threads[i].perf);
-                }
-                break;
+    lock();
+    for (int i = 0; i < g_count; ++i) {
+        ThreadInfo& t = g_threads[i];
+        if (!t.seen || !t.alive || t.tid_linux != tid) continue;
+
+        t.last_cpu       = cpu;
+        t.numa_node      = cpu_to_numa_node_hwloc(cpu);
+        t.pthread_handle = pt;   // ← el handle puede cambiar entre regiones
+
+        if (t.needs_migration) {
+            t.needs_migration = 0;
+            const int target = (t.numa_node == 0) ? 1 : 0;
+            if (g_topology_valid && !g_disable_migration &&
+                t.numa_node >= 0 && target < g_num_numa_nodes &&
+                t.migrations < MAX_MIGRATIONS && pt != 0) {
+                t.migrating = 1;          // el monitor saltará este hilo
+                thread_idx  = i;
+                mig_target  = target;
+                mig_handle  = pt;
             }
+        }
+
+        if (g_measuring.load(std::memory_order_acquire)
+            && t.perf.opened && !t.measuring) {
+            t.measuring = 1;
+            t.has_last  = 0;
+            enable_perf(t.perf);
+        }
+        break;
+    }
+    unlock();
+
+    // ── Fase 2: SIN lock. hwloc_set_thread_cpubind es en el fondo un
+    //            sched_setaffinity; sostener aquí el spinlock global dejaría a
+    //            todo el equipo girando sobre él en cada frontera de región. ──
+    if (thread_idx >= 0) {
+        const auto mig_t0 = std::chrono::steady_clock::now();
+
+        int rc = hwloc_set_thread_cpubind(
+            g_topology, mig_handle, g_node_cpusets[mig_target],
+            HWLOC_CPUBIND_THREAD | HWLOC_CPUBIND_STRICT);
+
+        // Fallback sin STRICT si el kernel no lo soporta
+        if (rc != 0)
+            rc = hwloc_set_thread_cpubind(
+                g_topology, mig_handle, g_node_cpusets[mig_target],
+                HWLOC_CPUBIND_THREAD);
+
+        const double mig_us = us_since(mig_t0);
+
+        // ── Fase 3: bajo lock otra vez, solo para confirmar el estado. ──────
+        int prev_node = -1;
+        uint64_t total_mig = 0;
+        lock();
+        {
+            ThreadInfo& t = g_threads[thread_idx];
+            if (rc == 0) {
+                prev_node = t.numa_node;
+                t.numa_node = mig_target;
+                t.migrations++;
+                t.has_last = 0;     // el baseline de deltas ya no vale
+                t.bucket   = 0.0;
+                if (t.first_migration_win < 0)
+                    t.first_migration_win = (int64_t)g_win_idx;
+                total_mig = t.migrations;
+            } else {
+                t.mig_failures++;   // los fallos antes no se contaban en ningún sitio
+            }
+            t.migrating = 0;
+            g_migration_us_total += mig_us;
         }
         unlock();
 
-        if (do_migrate && thread_idx >= 0) {
-            migrate_to_opposite_node(g_threads[thread_idx]);
-        }
-
-        fprintf(stderr,
-            "[OMPT] implicit_task_begin: parallel_id=%" PRIu64
-            " thread_num=%u team_size=%u\n",
-            parallel_data ? parallel_data->value : 0,
-            thread_num, team_size);
-    } else {
-        fprintf(stderr,
-            "[OMPT] implicit_task_end: parallel_id=%" PRIu64
-            " thread_num=%u\n",
-            parallel_data ? parallel_data->value : 0, thread_num);
+        if (rc == 0)
+            VLOG("[SCHED] MIGRACION tid=%-6d nodo %d -> nodo %d"
+                 " (total=%" PRIu64 ", %.1f us)\n",
+                 (int)tid, prev_node, mig_target, total_mig, mig_us);
+        else
+            VLOG("[SCHED] FALLO migracion tid=%d rc=%d (%.1f us)\n",
+                 (int)tid, rc, mig_us);
     }
+
+    g_callback_calls.fetch_add(1, std::memory_order_relaxed);
+    g_callback_ns_total.fetch_add(
+        (uint64_t)(us_since(cb_t0) * 1000.0), std::memory_order_relaxed);
+
+    VLOG("[OMPT] implicit_task_begin: parallel_id=%" PRIu64 " thread_num=%u\n",
+         parallel_data ? parallel_data->value : 0, thread_num);
+}
+
+// =============================================================================
+// Volcado de los CSV (solo en finalize; nunca en el camino caliente)
+// =============================================================================
+static void flush_window_csv() {
+    if (!g_window_csv || !g_window_rows) return;
+    for (size_t k = 0; k < g_window_n; ++k) {
+        const WindowRow& r = g_window_rows[k];
+        fprintf(g_window_csv,
+            "%s,%" PRIu64 ",%.3f,%" PRIu64 ",%d,%s,%d,%d,"
+            "%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ","
+            "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%d\n",
+            g_tag, r.win_idx, r.t_ms, r.ompt_id, r.tid,
+            thread_type_str((ompt_thread_t)r.ompt_type), r.cpu, r.numa,
+            r.d_rm, r.d_all, r.d_ins, r.d_cyc,
+            r.ipc, r.ratio, r.bucket, r.thr_T, r.ref, r.dev, r.flagged);
+    }
+    fflush(g_window_csv);
+    fprintf(stderr, "[OMPT] CSV de ventanas: %zu filas volcadas (%" PRIu64 " descartadas)\n",
+            g_window_n, g_window_rows_dropped);
+}
+
+static void write_overhead_csv() {
+    if (!g_overhead_csv) return;
+    const uint64_t calls = g_callback_calls.load(std::memory_order_relaxed);
+    const double   cb_us = g_callback_ns_total.load(std::memory_order_relaxed) / 1000.0;
+    fprintf(g_overhead_csv,
+        "%s,%" PRIu64 ",%.3f,%.3f,%" PRIu64 ",%.3f,%.3f,%d,%" PRIu64 ",%" PRIu64
+        ",%" PRIu64 ",%d,%d,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 "\n",
+        g_tag,
+        g_monitor_ticks, g_monitor_us_total, g_monitor_us_max,
+        calls, cb_us, g_migration_us_total,
+        g_count, g_resyncs, g_mux_scaled_reads, g_window_rows_dropped,
+        g_perf_failed_threads, g_perf_partial_threads,
+        g_win_with_cycles, g_win_with_fills,
+        g_reads_ok, g_reads_never_scheduled);
+    fflush(g_overhead_csv);
 }
 
 // =============================================================================
 // Initialize / Finalize
 // =============================================================================
+static bool env_flag(const char* name) {
+    const char* v = getenv(name);
+    return v && *v && strcmp(v, "0") != 0;
+}
+
 static int ompt_initialize(
     ompt_function_lookup_t lookup,
     int initial_device_num,
     ompt_data_t* tool_data)
 {
     (void)initial_device_num; (void)tool_data;
+
+    g_verbose           = env_flag("OMPT_VERBOSE");
+    g_disable_migration = env_flag("OMPT_DISABLE_MIGRATION");
 
     const char* log_path = getenv("OMPT_LOG_FILE");
     if (log_path && *log_path) {
@@ -717,21 +1067,38 @@ static int ompt_initialize(
     g_tag[sizeof(g_tag) - 1] = '\0';
 
     open_csv_file(getenv("OMPT_WINDOW_CSV"),
-                  "tag,window_ms,ompt_id,tid,thread_type,cpu,numa,d_rm,d_instr,d_cyc,ipc,ratio_rm",
+                  "tag,win_idx,t_ms,ompt_id,tid,thread_type,cpu,numa,"
+                  "d_rm,d_all,d_instr,d_cyc,ipc,ratio_rm,bucket,thr_T,g_ref,g_dev,flagged",
                   &g_window_csv);
     open_csv_file(getenv("OMPT_SUMMARY_CSV"),
-                  "tag,tid,ompt_id,thread_type,last_cpu,numa_node,migrations,remote_fills,instructions,cycles,ipc",
+                  "tag,tid,ompt_id,thread_type,last_cpu,numa_node,migrations,mig_failures,"
+                  "remote_fills,all_fills,instructions,cycles,ipc,ratio_rm,"
+                  "windows_counted,first_migration_win,perf_status",
                   &g_summary_csv);
+    open_csv_file(getenv("OMPT_OVERHEAD_CSV"),
+                  "tag,monitor_ticks,monitor_us_total,monitor_us_max,callback_calls,"
+                  "callback_us_total,migration_us_total,threads_tracked,resyncs,"
+                  "mux_scaled_reads,window_rows_dropped,perf_failed_threads,"
+                  "perf_partial_threads,win_with_cycles,win_with_fills,"
+                  "reads_ok,reads_never_scheduled",
+                  &g_overhead_csv);
 
-    fprintf(stderr, "[OMPT] ompt_initialize (OPCIÓN C: integrador con fugas)\n");
+    if (g_window_csv) {
+        g_window_rows = (WindowRow*)malloc(MAX_WINDOW_ROWS * sizeof(WindowRow));
+        if (!g_window_rows)
+            fprintf(stderr, "[OMPT] WARNING: sin memoria para el buffer de ventanas "
+                            "(%zu MB); no se registrarán ventanas\n",
+                    (MAX_WINDOW_ROWS * sizeof(WindowRow)) >> 20);
+    }
+
+    fprintf(stderr, "[OMPT] ompt_initialize (OPCIÓN C: integrador con fugas)"
+                    "  verbose=%d  migracion=%s\n",
+            (int)g_verbose, g_disable_migration ? "DESACTIVADA" : "activa");
 
     // ── 1. Function pointers del runtime ────────────────────────────────
-    g_ompt_set_callback     = (ompt_set_callback_t)     lookup("ompt_set_callback");
-    g_ompt_get_thread_data  = (ompt_get_thread_data_t)  lookup("ompt_get_thread_data");
-    g_ompt_get_unique_id    = (ompt_get_unique_id_t)    lookup("ompt_get_unique_id");
-    g_ompt_get_proc_id      = (ompt_get_proc_id_t)      lookup("ompt_get_proc_id");
-    g_ompt_get_num_procs    = (ompt_get_num_procs_t)    lookup("ompt_get_num_procs");
-    g_ompt_get_parallel_info= (ompt_get_parallel_info_t)lookup("ompt_get_parallel_info");
+    g_ompt_set_callback     = (ompt_set_callback_t)  lookup("ompt_set_callback");
+    g_ompt_get_unique_id    = (ompt_get_unique_id_t) lookup("ompt_get_unique_id");
+    g_ompt_get_num_procs    = (ompt_get_num_procs_t) lookup("ompt_get_num_procs");
 
     if (!g_ompt_set_callback) {
         fprintf(stderr, "[OMPT] ERROR: ompt_set_callback no encontrado\n");
@@ -746,6 +1113,19 @@ static int ompt_initialize(
         int nb = hwloc_get_nbobjs_by_type(g_topology, HWLOC_OBJ_NUMANODE);
         g_num_numa_nodes = (nb < MAX_NUMA_NODES) ? nb : MAX_NUMA_NODES;
 
+        // El mecanismo migra "al nodo contrario", lo que solo tiene sentido con
+        // 2 nodos. En una máquina con más, las CPU de los nodos 2..n-1 mapean a
+        // numa_node = -1 y las migraciones quedaban desactivadas EN SILENCIO.
+        if (nb > MAX_NUMA_NODES)
+            fprintf(stderr,
+                "[HWLOC] AVISO: la máquina tiene %d nodos NUMA y este scheduler "
+                "solo maneja %d (migra al nodo contrario). Los hilos fuera de los "
+                "nodos 0/1 no podrán migrar.\n", nb, MAX_NUMA_NODES);
+        if (nb < 2)
+            fprintf(stderr,
+                "[HWLOC] AVISO: solo %d nodo NUMA visible; no hay destino de "
+                "migración posible. El tool medirá pero nunca migrará.\n", nb);
+
         for (int n = 0; n < g_num_numa_nodes; ++n) {
             g_node_cpusets[n] = hwloc_bitmap_alloc();
             hwloc_bitmap_zero(g_node_cpusets[n]);
@@ -759,7 +1139,8 @@ static int ompt_initialize(
                 hwloc_bitmap_copy(g_node_cpusets[idx], numa->cpuset);
         }
 
-        fprintf(stderr, "[HWLOC] Nodos NUMA detectados: %d\n", g_num_numa_nodes);
+        fprintf(stderr, "[HWLOC] Nodos NUMA detectados: %d (usados: %d)\n",
+                nb, g_num_numa_nodes);
         for (int n = 0; n < g_num_numa_nodes; ++n)
             fprintf(stderr, "[HWLOC] Nodo %d: %d CPUs\n",
                     n, hwloc_bitmap_weight(g_node_cpusets[n]));
@@ -810,70 +1191,107 @@ static void ompt_finalize(ompt_data_t* tool_data) {
         g_monitor_valid = false;
     }
 
-    // Snapshot final con verificaciones defensivas
+    flush_window_csv();
+
     fprintf(stderr, "[OMPT] ===== Tabla final: %d hilos =====\n", g_count);
+    uint64_t total_migrations = 0;
+
+    // Con el lock tomado: un hilo trabajador que ya hubiera pasado el chequeo de
+    // g_finalizing puede seguir dentro de la fase 3 de una migración, escribiendo
+    // en g_threads[] mientras aquí se leen y se cierran sus fds. Aquí ya no hay
+    // nada que optimizar, así que sostenerlo durante el volcado sale gratis.
+    lock();
     for (int i = 0; i < g_count; ++i) {
         ThreadInfo& t = g_threads[i];
         if (!t.seen) continue;
 
+        // Los hilos que ya terminaron congelaron sus totales en thread_end.
+        if (!t.fin_valid && t.perf.opened) {
+            disable_perf(t.perf);
+            read_counter(t.perf.instr_fd,  t.fin_ins);
+            read_counter(t.perf.cycles_fd, t.fin_cyc);
+            if (t.perf.status == PERF_FULL) {
+                read_counter(t.perf.rm_misses,    t.fin_rm);
+                read_counter(t.perf.all_fills_fd, t.fin_all);
+            }
+            t.fin_valid = 1;
+            close_perf(t.perf);
+        }
+
+        const double ipc   = (t.fin_cyc > 0) ? (double)t.fin_ins / (double)t.fin_cyc : 0.0;
+        // El ratio agregado por hilo: antes all_fills se leía y se descartaba,
+        // así que esta métrica —central para el objetivo del proyecto— no era
+        // calculable desde el CSV de resumen.
+        const double ratio = (t.fin_all > 0) ? (double)t.fin_rm / (double)t.fin_all : -1.0;
+        total_migrations += t.migrations;
+
+        if (g_summary_csv) {
+            fprintf(g_summary_csv,
+                "%s,%d,%" PRIu64 ",%s,%d,%d,%" PRIu64 ",%" PRIu64 ","
+                "%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%.6f,%.6f,%d,%" PRId64 ",%s\n",
+                g_tag, (int)t.tid_linux, t.ompt_id,
+                thread_type_str((ompt_thread_t)t.ompt_type),
+                t.last_cpu, t.numa_node,
+                t.migrations, t.mig_failures,
+                t.fin_rm, t.fin_all, t.fin_ins, t.fin_cyc,
+                ipc, ratio,
+                t.win_count, t.first_migration_win,
+                perf_status_str(t.perf.status));
+        }
+
         fprintf(stderr,
-            "[OMPT] tid=%-6d ompt_id=%-4" PRIu64
-            " tipo=%-22s last_cpu=%3d numa=%d"
-            " migraciones=%" PRIu64 " perf=%s\n",
+            "[OMPT] tid=%-6d ompt_id=%-4" PRIu64 " tipo=%-22s last_cpu=%3d numa=%d"
+            " mig=%" PRIu64 " fallos=%" PRIu64 " perf=%s ipc=%.3f ratio_rm=%.4f\n",
             (int)t.tid_linux, t.ompt_id,
             thread_type_str((ompt_thread_t)t.ompt_type),
-            t.last_cpu, t.numa_node, t.migrations,
-            t.perf.opened ? "abierto" : "cerrado/fallido");
-
-        if (t.perf.opened) {
-            uint64_t rm = 0, ins = 0, cyc = 0, all = 0;
-
-            if (t.perf.rm_misses    >= 0)
-                ioctl(t.perf.rm_misses,    PERF_EVENT_IOC_DISABLE, 0);
-            if (t.perf.instr_fd     >= 0)
-                ioctl(t.perf.instr_fd,     PERF_EVENT_IOC_DISABLE, 0);
-            if (t.perf.cycles_fd >= 0)
-                ioctl(t.perf.cycles_fd, PERF_EVENT_IOC_DISABLE, 0);
-            if (t.perf.all_fills_fd >= 0)
-                ioctl(t.perf.all_fills_fd, PERF_EVENT_IOC_DISABLE, 0);
-
-            read_counter(t.perf.rm_misses,    rm);
-            read_counter(t.perf.instr_fd,     ins);
-            read_counter(t.perf.cycles_fd, cyc);
-            read_counter(t.perf.all_fills_fd, all);
-
-            double ipc = (cyc > 0) ? (double)ins / (double)cyc : 0.0;
-
-            if (g_summary_csv) {
-                fprintf(g_summary_csv,
-                    "%s,%d,%" PRIu64 ",%s,%d,%d,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%.6f\n",
-                    g_tag,
-                    (int)t.tid_linux,
-                    t.ompt_id,
-                    thread_type_str((ompt_thread_t)t.ompt_type),
-                    t.last_cpu,
-                    t.numa_node,
-                    t.migrations,
-                    rm,
-                    ins,
-                    cyc,
-                    ipc);
-                fflush(g_summary_csv);
-            }
-
-            fprintf(stderr,
-                "        remote_fills=%" PRIu64
-                "  instr=%" PRIu64
-                "  ipc=%.3f\n",
-                rm, ins, ipc);
-
-            if (t.perf.rm_misses    >= 0) { close(t.perf.rm_misses);    t.perf.rm_misses    = -1; }
-            if (t.perf.instr_fd     >= 0) { close(t.perf.instr_fd);     t.perf.instr_fd     = -1; }
-            if (t.perf.cycles_fd >= 0) { close(t.perf.cycles_fd); t.perf.cycles_fd = -1; }
-            if (t.perf.all_fills_fd >= 0) { close(t.perf.all_fills_fd); t.perf.all_fills_fd = -1; }
-            t.perf.opened = 0;
-        }
+            t.last_cpu, t.numa_node, t.migrations, t.mig_failures,
+            perf_status_str(t.perf.status), ipc, ratio);
     }
+    unlock();
+    if (g_summary_csv) fflush(g_summary_csv);
+
+    write_overhead_csv();
+
+    fprintf(stderr,
+        "[OMPT] ===== Overhead intrínseco =====\n"
+        "  monitor: %" PRIu64 " ticks, %.1f us total (max %.1f us/tick)\n"
+        "  callbacks implicit_task: %" PRIu64 ", %.1f us total\n"
+        "  migraciones: %" PRIu64 " (%.1f us total)\n"
+        "  resyncs=%" PRIu64 "  lecturas escaladas por multiplexado=%" PRIu64 "\n"
+        "  hilos con perf fallido=%d  parcial(ipc_only)=%d\n"
+        "  ventanas con ciclos=%" PRIu64 "  con fills=%" PRIu64 "\n",
+        g_monitor_ticks, g_monitor_us_total, g_monitor_us_max,
+        g_callback_calls.load(), g_callback_ns_total.load() / 1000.0,
+        total_migrations, g_migration_us_total,
+        g_resyncs, g_mux_scaled_reads,
+        g_perf_failed_threads, g_perf_partial_threads,
+        g_win_with_cycles, g_win_with_fills);
+
+    // El grupo de eventos nunca llegó a planificarse: sin esto la corrida sale
+    // completamente muda (CSV vacíos, cero migraciones, ningún error).
+    if (g_reads_never_scheduled > 0 && g_reads_ok == 0)
+        fprintf(stderr,
+            "\n[OMPT] *** AVISO GRAVE ***\n"
+            "  Las %" PRIu64 " lecturas de contadores devolvieron time_running=0:\n"
+            "  el GRUPO de 4 eventos nunca llegó a entrar en la PMU (no caben, o\n"
+            "  hay otro perf compitiendo por los registros). No se midió NADA en\n"
+            "  toda la corrida. Revisar que no haya un 'perf stat' simultáneo.\n\n",
+            g_reads_never_scheduled);
+    else if (g_reads_never_scheduled > 0)
+        fprintf(stderr,
+            "[OMPT] AVISO: %" PRIu64 " de %" PRIu64 " lecturas sin planificar "
+            "(la PMU está sobresuscrita en parte de la corrida)\n",
+            g_reads_never_scheduled, g_reads_never_scheduled + g_reads_ok);
+
+    // Fallo silencioso clásico: los eventos abrieron pero la PMU no los conoce.
+    if (g_win_with_cycles > 0 && g_win_with_fills == 0)
+        fprintf(stderr,
+            "\n[OMPT] *** AVISO GRAVE ***\n"
+            "  Se midieron %" PRIu64 " ventanas con ciclos pero NINGUNA con data cache fills.\n"
+            "  Los eventos crudos 0xD044/0xFF44 abrieron pero cuentan siempre 0:\n"
+            "  esta PMU no los implementa (son de AMD Zen). ratio_rm no existe y el\n"
+            "  scheduler NO PUEDE decidir migraciones. Los resultados de localidad de\n"
+            "  esta corrida no son válidos.\n\n", g_win_with_cycles);
 
     if (g_topology_valid) {
         for (int n = 0; n < g_num_numa_nodes; ++n) {
@@ -886,14 +1304,9 @@ static void ompt_finalize(ompt_data_t* tool_data) {
         g_topology_valid = false;
     }
 
-    if (g_window_csv) {
-        fclose(g_window_csv);
-        g_window_csv = nullptr;
-    }
-    if (g_summary_csv) {
-        fclose(g_summary_csv);
-        g_summary_csv = nullptr;
-    }
+    if (g_window_csv)   { fclose(g_window_csv);   g_window_csv   = nullptr; }
+    if (g_summary_csv)  { fclose(g_summary_csv);  g_summary_csv  = nullptr; }
+    if (g_overhead_csv) { fclose(g_overhead_csv); g_overhead_csv = nullptr; }
 }
 
 // =============================================================================

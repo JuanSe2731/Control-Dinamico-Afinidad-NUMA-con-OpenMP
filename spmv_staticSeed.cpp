@@ -22,6 +22,36 @@
 #include <omp.h>
 #endif
 
+#ifdef __linux__
+#include <sys/prctl.h>
+#endif
+
+// Compuerta de contadores hardware, igual que en Stencil.cpp. Sin esto las
+// ventanas de perf de SpMV incluían la carga de la matriz, init_vector, la
+// validación SERIAL y los 2 warmups, con lo que sus series no eran comparables
+// con las del stencil (que sí las excluía).
+static inline void perf_events_disable_all_threads() {
+#ifdef __linux__
+#ifdef _OPENMP
+#pragma omp parallel
+    { (void)prctl(PR_TASK_PERF_EVENTS_DISABLE); }
+#else
+    (void)prctl(PR_TASK_PERF_EVENTS_DISABLE);
+#endif
+#endif
+}
+
+static inline void perf_events_enable_all_threads() {
+#ifdef __linux__
+#ifdef _OPENMP
+#pragma omp parallel
+    { (void)prctl(PR_TASK_PERF_EVENTS_ENABLE); }
+#else
+    (void)prctl(PR_TASK_PERF_EVENTS_ENABLE);
+#endif
+#endif
+}
+
 // Ajusta estos typedefs a tu proyecto:
 using IndexType = int;      // o int64_t
 using ValueType = double;   // o float
@@ -324,10 +354,18 @@ void init_vector(std::vector<ValueType>& v, ValueType fill = -1.0)
     }
 }
 
-//  Kernel SpMV con schedule(dynamic) — ÚNICA variante para métricas
-void spmv_dynamic(const CsrMatrix& A,
-                  const std::vector<ValueType>& x,
-                        std::vector<ValueType>& y)
+//  Kernel SpMV con schedule(static, 256) — ÚNICA variante para métricas.
+//
+//  El nombre y las etiquetas decían "dynamic" mientras el pragma era static:
+//  todas las filas SpMV de los resultados anteriores están rotuladas como
+//  "Dynamic" pero se produjeron con reparto estático por bloques de 256 filas.
+//  Se corrige el ETIQUETADO (el reparto estático es intencional, por localidad:
+//  con first-touch/interleave un chunk fijo mantiene a cada hilo sobre las mismas
+//  filas entre repeticiones). El documento de metodología, que en su Fase 2 dice
+//  que SpMV usa schedule(dynamic), debe actualizarse para reflejar esto.
+void spmv_static_chunk(const CsrMatrix& A,
+                       const std::vector<ValueType>& x,
+                             std::vector<ValueType>& y)
 {
     const IndexType* rp  = A.row_ptrs.data();
     const IndexType* ci  = A.col_idxs.data();
@@ -389,13 +427,11 @@ double compute_bandwidth_gibs(const CsrMatrix& mat, double elapsed_s)
     return (bytes / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
 }
 
-double compute_bandwidth_gbs(const CsrMatrix& mat, double elapsed_s)
-{
-    double bytes =
-          static_cast<double>(mat.nnz) * (sizeof(IndexType) + sizeof(ValueType))
-        + static_cast<double>(mat.num_cols) * sizeof(ValueType);
-    return (bytes / 1e9) / elapsed_s;
-}
+// compute_bandwidth_gbs se eliminó: contaba un conjunto de bytes DISTINTO al de
+// compute_bandwidth_gibs (omitía row_ptrs y la escritura de y), así que las dos
+// columnas no eran la misma magnitud en dos bases de unidades y convertir una en
+// la otra no daba la otra. Queda solo bw_gibs, cuyo modelo de bytes es el de
+// arriba: values + col_idxs + row_ptrs + vector x + vector y.
 
 //  Framework de benchmark
 struct BenchmarkResult {
@@ -404,9 +440,7 @@ struct BenchmarkResult {
     double avg_time_s{0};
     double max_time_s{0};
     double stddev_s{0};
-    double gflops{0};
-    double bandwidth_gibs{0};
-    double bandwidth_gbs{0};
+    double bandwidth_gibs{0};   // derivado de min_time_s (convención HPC)
 };
 
 using SpMVFunc = void(*)(const CsrMatrix&,
@@ -418,41 +452,50 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
                                       std::vector<ValueType>& y,
                                 const char* strategy_name,
                                 SpMVFunc spmv_func,
+                                std::vector<double>& times_out,
                                 int reps   = 10,
                                 int warmup = 2)
 {
     std::cout << "\n[BENCH] Estrategia: " << strategy_name << "\n";
 
-    // Warm-up con la misma función (spmv_dynamic); no se mide
+    // Warm-up con la misma función; no se mide y se excluye de los contadores.
+    perf_events_disable_all_threads();
     for (int i = 0; i < warmup; ++i) spmv_func(A, x, y);
+    perf_events_enable_all_threads();
 
-    std::vector<double> times;
-    times.reserve(reps);
+    times_out.clear();
+    times_out.reserve(reps);
     omp_control_tool(omp_control_tool_start, 1, nullptr);
     for (int r = 0; r < reps; ++r) {
-        auto t0 = std::chrono::high_resolution_clock::now();
+        // steady_clock, no high_resolution_clock: éste último es alias de
+        // system_clock en libstdc++ y no es monótono.
+        auto t0 = std::chrono::steady_clock::now();
         spmv_func(A, x, y);
-        auto t1 = std::chrono::high_resolution_clock::now();
-        times.push_back(std::chrono::duration<double>(t1 - t0).count());
-        printf("  Rep %2d: %.4f ms\n", r, times[r] * 1e3);
+        auto t1 = std::chrono::steady_clock::now();
+        times_out.push_back(std::chrono::duration<double>(t1 - t0).count());
+        // El printf por repetición estaba DENTRO de la región medida: eran 150
+        // write() por corrida en la ventana que el tool OMPT está contando.
     }
     omp_control_tool(omp_control_tool_pause, 1, nullptr);
+    // Se vuelven a apagar para que la validación, los printf y el volcado de CSV
+    // no entren en el conteo agregado de perf.
+    perf_events_disable_all_threads();
+
+    std::vector<double> times = times_out;   // copia: el orden original se conserva
     std::sort(times.begin(), times.end());
     double min_t = times.front();
     double max_t = times.back();
     double avg_t = std::accumulate(times.begin(), times.end(), 0.0) / reps;
     double var   = 0.0;
     for (double t : times) var += (t - avg_t) * (t - avg_t);
-    double stddev = std::sqrt(var / reps);
+    double stddev = std::sqrt(var / ((reps > 1) ? (reps - 1) : 1));  // muestral (N-1)
 
-    double gflops  = (2.0 * static_cast<double>(A.nnz)) / (min_t * 1e9);
     double bw_gibs = compute_bandwidth_gibs(A, min_t);
-    double bw_gbs  = compute_bandwidth_gbs(A, min_t);
 
     printf("  Tiempo  : %.4f ms (min) | %.4f ms (avg) | %.4f ms (max) | stddev=%.4f ms\n",
            min_t*1e3, avg_t*1e3, max_t*1e3, stddev*1e3);
-    printf("  GFlops  : %.3f\n", gflops);
-    printf("  BW GiB/s: %.3f  |  BW GB/s: %.3f\n", bw_gibs, bw_gbs);
+    printf("  BW GiB/s: %.3f (min) | %.3f (avg)\n",
+           bw_gibs, compute_bandwidth_gibs(A, avg_t));
 
     BenchmarkResult res;
     res.strategy       = strategy_name;
@@ -460,9 +503,7 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
     res.avg_time_s     = avg_t;
     res.max_time_s     = max_t;
     res.stddev_s       = stddev;
-    res.gflops         = gflops;
     res.bandwidth_gibs = bw_gibs;
-    res.bandwidth_gbs  = bw_gbs;
     return res;
 }
 
@@ -483,7 +524,7 @@ void export_csv(const std::string& filename,
 #endif
 
     f << "strategy,matrix,rows,cols,nnz,threads,"
-         "min_ms,avg_ms,max_ms,stddev_ms,gflops,bw_gibs,bw_gbs\n";
+         "min_ms,avg_ms,max_ms,stddev_ms,bw_gibs\n";
 
     for (const auto& r : results) {
         f << r.strategy       << ","
@@ -497,11 +538,25 @@ void export_csv(const std::string& filename,
           << r.avg_time_s*1e3 << ","
           << r.max_time_s*1e3 << ","
           << r.stddev_s*1e3   << ","
-          << r.gflops         << ","
-          << r.bandwidth_gibs << ","
-          << r.bandwidth_gbs  << "\n";
+          << r.bandwidth_gibs << "\n";
     }
     std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
+}
+
+// Vuelca las repeticiones individuales EN ORDEN DE EJECUCIÓN. Es la muestra con
+// la que se hacen Welch/ANOVA y los boxplots.
+void export_times_csv(const std::string& filename,
+                      const std::vector<double>& times_s)
+{
+    std::ofstream f(filename);
+    if (!f.is_open()) {
+        std::cerr << "[CSV] No se pudo crear: " << filename << "\n";
+        return;
+    }
+    f << "rep,time_ms\n";
+    f << std::fixed << std::setprecision(6);
+    for (size_t i = 0; i < times_s.size(); ++i)
+        f << i << "," << times_s[i]*1e3 << "\n";
 }
 
 //  Main
@@ -530,8 +585,13 @@ int main(int argc, char* argv[])
 #endif
 
     std::cout << "=======================================================\n"
-              << "  SpMV CSR Benchmark  (schedule: dynamic)\n"
+              << "  SpMV CSR Benchmark  (schedule: static, chunk=256)\n"
               << "=======================================================\n";
+
+    // Contadores apagados desde el principio: carga de la matriz, construcción
+    // del CSR, init_vector y la validación SERIAL no deben entrar en el conteo.
+    // Se encienden justo antes del bucle medido, dentro de benchmark_spmv.
+    perf_events_disable_all_threads();
 
     // ── Cargar o generar matriz
     CsrMatrix A;
@@ -572,31 +632,31 @@ std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
     init_vector(y, 0.0);
 
     // ── Validación previa
-    std::cout << "\n[INFO] Validacion con spmv_dynamic...\n";
-    spmv_dynamic(A, x, y);
+    std::cout << "\n[INFO] Validacion con spmv_static_chunk...\n";
+    spmv_static_chunk(A, x, y);
     validate_result(A, x, y);
 
-    // ── Benchmark — ÚNICA estrategia medida: Dynamic
+    // ── Benchmark — ÚNICA estrategia medida
     std::vector<BenchmarkResult> results;
+    std::vector<double> times_s;
 
     init_vector(y, 0.0);
     results.push_back(
-        benchmark_spmv(A, x, y, "Dynamic", spmv_dynamic, reps));
+        benchmark_spmv(A, x, y, "Static-256", spmv_static_chunk, times_s, reps));
 
     // ── Tabla resumen
     std::cout << "\n"
-              << "+----------------------+----------+----------+----------+----------+\n"
-              << "| Estrategia           | min (ms) | avg (ms) | GFlops   | GiB/s    |\n"
-              << "+----------------------+----------+----------+----------+----------+\n";
+              << "+----------------------+----------+----------+----------+\n"
+              << "| Estrategia           | min (ms) | avg (ms) | GiB/s    |\n"
+              << "+----------------------+----------+----------+----------+\n";
     for (const auto& r : results) {
-        printf("| %-20s | %8.3f | %8.3f | %8.3f | %8.3f |\n",
+        printf("| %-20s | %8.3f | %8.3f | %8.3f |\n",
                r.strategy,
                r.min_time_s * 1e3,
                r.avg_time_s * 1e3,
-               r.gflops,
                r.bandwidth_gibs);
     }
-    std::cout << "+----------------------+----------+----------+----------+----------+\n";
+    std::cout << "+----------------------+----------+----------+----------+\n";
 
     // ── Primeras entradas del resultado
     std::cout << "\n=== Primeras entradas de y = A*x ===\n";
@@ -605,8 +665,10 @@ std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
         printf("  y[%4d] = %.6f\n", i, y[i]);
 
     // ── Exportar CSV
-    if (!csv_prefix.empty())
+    if (!csv_prefix.empty()) {
         export_csv(csv_prefix + ".csv", A, results);
+        export_times_csv(csv_prefix + "_times.csv", times_s);
+    }
 
     return 0;
 }

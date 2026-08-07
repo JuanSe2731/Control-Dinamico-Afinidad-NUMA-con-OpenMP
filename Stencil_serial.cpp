@@ -45,7 +45,7 @@ static constexpr int REPS = 30;
 static constexpr bool kPrint = false;
 
 static inline double now_sec() {
-    using clock = std::chrono::high_resolution_clock;
+    using clock = std::chrono::steady_clock;  // monotonico
     return std::chrono::duration<double>(clock::now().time_since_epoch()).count();
 }
 
@@ -81,9 +81,9 @@ struct BenchmarkResult {
     double avg_time_s{0};
     double max_time_s{0};
     double stddev_s{0};
-    double gflops{0};
     double bandwidth_gibs{0};
-    double bandwidth_gbs{0};
+    double mlups_min{0};
+    double mlups_avg{0};
 };
 
 static Stats compute_stats(std::vector<double>& times) {
@@ -93,26 +93,24 @@ static Stats compute_stats(std::vector<double>& times) {
     const double avg_t = std::accumulate(times.begin(), times.end(), 0.0) / times.size();
     double var = 0.0;
     for (double t : times) var += (t - avg_t) * (t - avg_t);
-    const double stddev = std::sqrt(var / times.size());
+    const double denom  = (times.size() > 1) ? (double)(times.size() - 1) : 1.0;
+    const double stddev = std::sqrt(var / denom);  // muestral (N-1)
     return Stats{min_t, avg_t, max_t, stddev};
 }
 
-static double compute_gflops(int n, double elapsed_s) {
-    const double points = static_cast<double>(n - 2) * (n - 2);
-    const double flops = 5.0 * points;
-    return flops / (elapsed_s * 1e9);
-}
-
+// Ver la nota del modelo de bytes en Stencil.cpp: cuenta 6 arreglos (traf.
+// compulsorio) e ignora la reutilizacion de cache, asi que sobreestima ~3x.
 static double compute_bandwidth_gibs(int n, double elapsed_s) {
     const double points = static_cast<double>(n - 2) * (n - 2);
     const double bytes = points * 6.0 * sizeof(float);
     return (bytes / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
 }
 
-static double compute_bandwidth_gbs(int n, double elapsed_s) {
+// Faltaba en este binario, asi que la linea base serial nunca emitia MLUPS y el
+// script rellenaba NA: era imposible comparar en la metrica primaria del stencil.
+static double compute_mlups(int n, double elapsed_s) {
     const double points = static_cast<double>(n - 2) * (n - 2);
-    const double bytes = points * 6.0 * sizeof(float);
-    return (bytes / 1e9) / elapsed_s;
+    return points / (elapsed_s * 1e6);
 }
 
 static void export_csv(const std::string& filename,
@@ -125,7 +123,7 @@ static void export_csv(const std::string& filename,
         return;
     }
 
-    f << "strategy,n,threads,min_ms,avg_ms,max_ms,stddev_ms,gflops,bw_gibs,bw_gbs\n";
+    f << "strategy,n,threads,min_ms,avg_ms,max_ms,stddev_ms,bw_gibs,mlups_min,mlups_avg\n";
     for (const auto& r : results) {
         f << r.strategy << ","
           << n << ","
@@ -135,11 +133,24 @@ static void export_csv(const std::string& filename,
           << r.avg_time_s * 1e3 << ","
           << r.max_time_s * 1e3 << ","
           << r.stddev_s * 1e3 << ","
-          << r.gflops << ","
           << r.bandwidth_gibs << ","
-          << r.bandwidth_gbs << "\n";
+          << r.mlups_min << ","
+          << r.mlups_avg << "\n";
     }
     std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
+}
+
+static void export_times_csv(const std::string& filename,
+                             const std::vector<double>& times_s) {
+    std::ofstream f(filename);
+    if (!f.is_open()) {
+        std::cerr << "[CSV] No se pudo crear: " << filename << "\n";
+        return;
+    }
+    f << "rep,time_ms\n";
+    f << std::fixed << std::setprecision(6);
+    for (size_t i = 0; i < times_s.size(); ++i)
+        f << i << "," << times_s[i] * 1e3 << "\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -205,10 +216,13 @@ int main(int argc, char* argv[]) {
         checksum += result[j * n + (j % (n - 2) + 1)];
     }
 
+    // compute_stats ORDENA in situ: volcar antes o 'rep' pierde el orden real.
+    if (!csv_prefix.empty()) export_times_csv(csv_prefix + "_times.csv", times);
+
     const Stats st = compute_stats(times);
-    const double gflops = compute_gflops(n, st.min_s);
-    const double bw_gibs = compute_bandwidth_gibs(n, st.min_s);
-    const double bw_gbs = compute_bandwidth_gbs(n, st.min_s);
+    const double bw_gibs   = compute_bandwidth_gibs(n, st.min_s);
+    const double mlups_min = compute_mlups(n, st.min_s);
+    const double mlups_avg = compute_mlups(n, st.avg_s);
 
     std::cout << "[Stencil2D] Variant: Serial\n";
     std::cout << "N=" << n << " warmup=" << WARMUP_ITERS << " reps=" << reps
@@ -219,8 +233,8 @@ int main(int argc, char* argv[]) {
               << (st.avg_s * 1e3) << " ms (avg), "
               << (st.max_s * 1e3) << " ms (max), stddev="
               << (st.stddev_s * 1e3) << " ms\n";
-    std::cout << "GFlops  : " << gflops << "\n";
-    std::cout << "BW GiB/s: " << bw_gibs << "  |  BW GB/s: " << bw_gbs << "\n";
+    std::cout << "MLUPS   : " << mlups_min << " (min) | " << mlups_avg << " (avg)\n";
+    std::cout << "BW GiB/s: " << bw_gibs << "\n";
     std::cout << "Checksum: " << checksum << "\n";
 
     std::vector<BenchmarkResult> results;
@@ -230,9 +244,9 @@ int main(int argc, char* argv[]) {
     res.avg_time_s = st.avg_s;
     res.max_time_s = st.max_s;
     res.stddev_s = st.stddev_s;
-    res.gflops = gflops;
     res.bandwidth_gibs = bw_gibs;
-    res.bandwidth_gbs = bw_gbs;
+    res.mlups_min = mlups_min;
+    res.mlups_avg = mlups_avg;
     results.push_back(res);
 
     if (!csv_prefix.empty()) {
