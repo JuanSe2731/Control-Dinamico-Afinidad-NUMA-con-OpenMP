@@ -1,0 +1,2 @@
+strategy,matrix,rows,cols,nnz,threads,min_ms,avg_ms,max_ms,stddev_ms,bw_gibs
+Static-256,stokes.mtx,11449533,11449533,349321980,32,22.663054,25.463758,28.646008,2.609232,181.671964

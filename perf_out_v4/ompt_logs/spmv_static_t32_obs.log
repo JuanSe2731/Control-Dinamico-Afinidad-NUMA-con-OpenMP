@@ -1,0 +1,58 @@
+[OMPT] ompt_initialize (OPCIÓN C: integrador con fugas)  verbose=0  migracion=DESACTIVADA
+[HWLOC] Nodos NUMA detectados: 2 (usados: 2)
+[HWLOC] Nodo 0: 128 CPUs
+[HWLOC] Nodo 1: 128 CPUs
+[OMPT] callback 'ompt_callback_thread_begin' registrado (result=5)
+[OMPT] callback 'ompt_callback_thread_end' registrado (result=5)
+[OMPT] callback 'ompt_callback_parallel_begin' registrado (result=5)
+[OMPT] callback 'ompt_callback_parallel_end' registrado (result=5)
+[OMPT] callback 'ompt_callback_implicit_task' registrado (result=5)
+[OMPT] callback 'ompt_callback_control_tool' registrado (result=5)
+[OMPT] Callbacks registrados
+[OMPT] Sistema: 0 procesadores lógicos
+[OMPT][MON] Monitor (C: integrador con fugas)  período=100ms  warmup=5  T=ref+1.00*MAD  leak=0.50*MAD  cap=8.00*MAD  max_mig=1  migracion=DESACTIVADA
+[OMPT] control_tool: INICIANDO medicion
+[OMPT] control_tool: PAUSANDO medicion
+[OMPT] ompt_finalize
+[OMPT][MON] Monitor detenido tras 1020 ventanas
+[OMPT] CSV de ventanas: 1184 filas volcadas (0 descartadas)
+[OMPT] ===== Tabla final: 32 hilos =====
+[OMPT] tid=183281 ompt_id=281474976710657 tipo=ompt_thread_initial    last_cpu=127 numa=1 mig=0 fallos=0 perf=full ipc=0.758 ratio_rm=0.1251
+[OMPT] tid=183283 ompt_id=562949953421313 tipo=ompt_thread_worker     last_cpu=114 numa=1 mig=0 fallos=0 perf=full ipc=0.750 ratio_rm=0.1258
+[OMPT] tid=183284 ompt_id=844424930131969 tipo=ompt_thread_worker     last_cpu= 97 numa=1 mig=0 fallos=0 perf=full ipc=0.761 ratio_rm=0.1256
+[OMPT] tid=183285 ompt_id=1125899906842625 tipo=ompt_thread_worker     last_cpu= 81 numa=1 mig=0 fallos=0 perf=full ipc=0.749 ratio_rm=0.1239
+[OMPT] tid=183286 ompt_id=1407374883553281 tipo=ompt_thread_worker     last_cpu= 75 numa=1 mig=0 fallos=0 perf=full ipc=0.667 ratio_rm=0.1240
+[OMPT] tid=183287 ompt_id=1688849860263937 tipo=ompt_thread_worker     last_cpu=126 numa=1 mig=0 fallos=0 perf=full ipc=0.777 ratio_rm=0.1293
+[OMPT] tid=183288 ompt_id=1970324836974593 tipo=ompt_thread_worker     last_cpu=125 numa=1 mig=0 fallos=0 perf=full ipc=0.780 ratio_rm=0.1300
+[OMPT] tid=183289 ompt_id=2251799813685249 tipo=ompt_thread_worker     last_cpu=105 numa=1 mig=0 fallos=0 perf=full ipc=0.753 ratio_rm=0.1256
+[OMPT] tid=183290 ompt_id=2533274790395905 tipo=ompt_thread_worker     last_cpu= 79 numa=1 mig=0 fallos=0 perf=full ipc=0.661 ratio_rm=0.1271
+[OMPT] tid=183292 ompt_id=2814749767106561 tipo=ompt_thread_worker     last_cpu= 89 numa=1 mig=0 fallos=0 perf=full ipc=0.766 ratio_rm=0.1301
+[OMPT] tid=183291 ompt_id=3096224743817217 tipo=ompt_thread_worker     last_cpu=215 numa=1 mig=0 fallos=0 perf=full ipc=0.755 ratio_rm=0.1257
+[OMPT] tid=183293 ompt_id=3377699720527873 tipo=ompt_thread_worker     last_cpu=223 numa=1 mig=0 fallos=0 perf=full ipc=0.771 ratio_rm=0.1279
+[OMPT] tid=183294 ompt_id=3659174697238529 tipo=ompt_thread_worker     last_cpu=  8 numa=0 mig=0 fallos=0 perf=full ipc=0.989 ratio_rm=0.0945
+[OMPT] tid=183295 ompt_id=3940649673949185 tipo=ompt_thread_worker     last_cpu= 96 numa=1 mig=0 fallos=0 perf=full ipc=0.743 ratio_rm=0.1267
+[OMPT] tid=183296 ompt_id=4222124650659841 tipo=ompt_thread_worker     last_cpu= 40 numa=0 mig=0 fallos=0 perf=full ipc=0.984 ratio_rm=0.0950
+[OMPT] tid=183297 ompt_id=4503599627370497 tipo=ompt_thread_worker     last_cpu=128 numa=0 mig=0 fallos=0 perf=full ipc=0.929 ratio_rm=0.1051
+[OMPT] tid=183298 ompt_id=4785074604081153 tipo=ompt_thread_worker     last_cpu=239 numa=1 mig=0 fallos=0 perf=full ipc=0.760 ratio_rm=0.1249
+[OMPT] tid=183299 ompt_id=5066549580791809 tipo=ompt_thread_worker     last_cpu=113 numa=1 mig=0 fallos=0 perf=full ipc=0.742 ratio_rm=0.1239
+[OMPT] tid=183300 ompt_id=5348024557502465 tipo=ompt_thread_worker     last_cpu=  1 numa=0 mig=0 fallos=0 perf=full ipc=0.699 ratio_rm=0.1227
+[OMPT] tid=183301 ompt_id=5629499534213121 tipo=ompt_thread_worker     last_cpu= 80 numa=1 mig=0 fallos=0 perf=full ipc=0.748 ratio_rm=0.1235
+[OMPT] tid=183302 ompt_id=5910974510923777 tipo=ompt_thread_worker     last_cpu= 24 numa=0 mig=0 fallos=0 perf=full ipc=0.986 ratio_rm=0.0985
+[OMPT] tid=183303 ompt_id=6192449487634433 tipo=ompt_thread_worker     last_cpu= 16 numa=0 mig=0 fallos=0 perf=full ipc=0.974 ratio_rm=0.1003
+[OMPT] tid=183304 ompt_id=6473924464345089 tipo=ompt_thread_worker     last_cpu= 32 numa=0 mig=0 fallos=0 perf=full ipc=0.988 ratio_rm=0.0969
+[OMPT] tid=183305 ompt_id=6755399441055745 tipo=ompt_thread_worker     last_cpu= 56 numa=0 mig=0 fallos=0 perf=full ipc=0.991 ratio_rm=0.0961
+[OMPT] tid=183306 ompt_id=7036874417766401 tipo=ompt_thread_worker     last_cpu=199 numa=1 mig=0 fallos=0 perf=full ipc=0.825 ratio_rm=0.1255
+[OMPT] tid=183307 ompt_id=7318349394477057 tipo=ompt_thread_worker     last_cpu= 66 numa=1 mig=0 fallos=0 perf=full ipc=0.825 ratio_rm=0.1258
+[OMPT] tid=183308 ompt_id=7599824371187713 tipo=ompt_thread_worker     last_cpu= 74 numa=1 mig=0 fallos=0 perf=full ipc=0.651 ratio_rm=0.1259
+[OMPT] tid=183309 ompt_id=7881299347898369 tipo=ompt_thread_worker     last_cpu= 48 numa=0 mig=0 fallos=0 perf=full ipc=0.897 ratio_rm=0.1080
+[OMPT] tid=183310 ompt_id=8162774324609025 tipo=ompt_thread_worker     last_cpu=247 numa=1 mig=0 fallos=0 perf=full ipc=0.749 ratio_rm=0.1242
+[OMPT] tid=183311 ompt_id=8444249301319681 tipo=ompt_thread_worker     last_cpu= 88 numa=1 mig=0 fallos=0 perf=full ipc=0.741 ratio_rm=0.1244
+[OMPT] tid=183312 ompt_id=8725724278030337 tipo=ompt_thread_worker     last_cpu=104 numa=1 mig=0 fallos=0 perf=full ipc=0.754 ratio_rm=0.1259
+[OMPT] tid=183313 ompt_id=9007199254740993 tipo=ompt_thread_worker     last_cpu=231 numa=1 mig=0 fallos=0 perf=full ipc=0.757 ratio_rm=0.1219
+[OMPT] ===== Overhead intrínseco =====
+  monitor: 1020 ticks, 32256.9 us total (max 1040.6 us/tick)
+  callbacks implicit_task: 5185, 1409400.9 us total
+  migraciones: 0 (0.0 us total)
+  resyncs=0  lecturas escaladas por multiplexado=0
+  hilos con perf fallido=0  parcial(ipc_only)=0
+  ventanas con ciclos=1184  con fills=1184

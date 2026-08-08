@@ -1,0 +1,34 @@
+[OMPT] ompt_initialize (OPCIÓN C: integrador con fugas)  verbose=0  migracion=DESACTIVADA
+[HWLOC] Nodos NUMA detectados: 2 (usados: 2)
+[HWLOC] Nodo 0: 128 CPUs
+[HWLOC] Nodo 1: 128 CPUs
+[OMPT] callback 'ompt_callback_thread_begin' registrado (result=5)
+[OMPT] callback 'ompt_callback_thread_end' registrado (result=5)
+[OMPT] callback 'ompt_callback_parallel_begin' registrado (result=5)
+[OMPT] callback 'ompt_callback_parallel_end' registrado (result=5)
+[OMPT] callback 'ompt_callback_implicit_task' registrado (result=5)
+[OMPT] callback 'ompt_callback_control_tool' registrado (result=5)
+[OMPT] Callbacks registrados
+[OMPT] Sistema: 0 procesadores lógicos
+[OMPT][MON] Monitor (C: integrador con fugas)  período=100ms  warmup=5  T=ref+1.00*MAD  leak=0.50*MAD  cap=8.00*MAD  max_mig=1  migracion=DESACTIVADA
+[OMPT] control_tool: INICIANDO medicion
+[OMPT] control_tool: PAUSANDO medicion
+[OMPT] ompt_finalize
+[OMPT][MON] Monitor detenido tras 56 ventanas
+[OMPT] CSV de ventanas: 376 filas volcadas (0 descartadas)
+[OMPT] ===== Tabla final: 8 hilos =====
+[OMPT] tid=182500 ompt_id=281474976710657 tipo=ompt_thread_initial    last_cpu=255 numa=1 mig=0 fallos=0 perf=full ipc=2.477 ratio_rm=0.1647
+[OMPT] tid=182502 ompt_id=562949953421313 tipo=ompt_thread_worker     last_cpu=239 numa=1 mig=0 fallos=0 perf=full ipc=2.474 ratio_rm=0.1621
+[OMPT] tid=182503 ompt_id=844424930131969 tipo=ompt_thread_worker     last_cpu=207 numa=1 mig=0 fallos=0 perf=full ipc=2.473 ratio_rm=0.1621
+[OMPT] tid=182504 ompt_id=1125899906842625 tipo=ompt_thread_worker     last_cpu=215 numa=1 mig=0 fallos=0 perf=full ipc=2.469 ratio_rm=0.1658
+[OMPT] tid=182505 ompt_id=1407374883553281 tipo=ompt_thread_worker     last_cpu= 24 numa=0 mig=0 fallos=0 perf=full ipc=2.439 ratio_rm=0.1656
+[OMPT] tid=182506 ompt_id=1688849860263937 tipo=ompt_thread_worker     last_cpu=223 numa=1 mig=0 fallos=0 perf=full ipc=2.472 ratio_rm=0.1654
+[OMPT] tid=182507 ompt_id=1970324836974593 tipo=ompt_thread_worker     last_cpu= 16 numa=0 mig=0 fallos=0 perf=full ipc=2.439 ratio_rm=0.1652
+[OMPT] tid=182508 ompt_id=2251799813685249 tipo=ompt_thread_worker     last_cpu=  8 numa=0 mig=0 fallos=0 perf=full ipc=2.473 ratio_rm=0.1621
+[OMPT] ===== Overhead intrínseco =====
+  monitor: 56 ticks, 7545.2 us total (max 198.5 us/tick)
+  callbacks implicit_task: 1241, 124053.1 us total
+  migraciones: 0 (0.0 us total)
+  resyncs=0  lecturas escaladas por multiplexado=0
+  hilos con perf fallido=0  parcial(ipc_only)=0
+  ventanas con ciclos=376  con fills=376

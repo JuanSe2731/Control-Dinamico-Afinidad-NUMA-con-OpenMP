@@ -1,0 +1,70 @@
+[*] Compiling OMPT tool: sched_NUMA_optC_leaky.cpp -> numa_sched_optC.so
+[*] Compiling stencil: Stencil.cpp -> stencil
+[*] Compiling spmv_static: spmv_staticSeed.cpp -> spmv_static
+[1/60] stencil_t8_spread
+[2/60] spmv_static_t8_spread
+[3/60] stencil_t8_close
+[4/60] spmv_static_t8_close
+[5/60] stencil_t8_nobind
+[6/60] spmv_static_t8_nobind
+[7/60] stencil_t8_obs
+[8/60] spmv_static_t8_obs
+[9/60] stencil_t8_ovh
+[10/60] spmv_static_t8_ovh
+[11/60] stencil_t8_scheduler
+[12/60] spmv_static_t8_scheduler
+[13/60] stencil_t16_spread
+[14/60] spmv_static_t16_spread
+[15/60] stencil_t16_close
+[16/60] spmv_static_t16_close
+[17/60] stencil_t16_nobind
+[18/60] spmv_static_t16_nobind
+[19/60] stencil_t16_obs
+[20/60] spmv_static_t16_obs
+[21/60] stencil_t16_ovh
+[22/60] spmv_static_t16_ovh
+[23/60] stencil_t16_scheduler
+[24/60] spmv_static_t16_scheduler
+[25/60] stencil_t32_spread
+[26/60] spmv_static_t32_spread
+[27/60] stencil_t32_close
+[28/60] spmv_static_t32_close
+[29/60] stencil_t32_nobind
+[30/60] spmv_static_t32_nobind
+[31/60] stencil_t32_obs
+[32/60] spmv_static_t32_obs
+[33/60] stencil_t32_ovh
+[34/60] spmv_static_t32_ovh
+[35/60] stencil_t32_scheduler
+[36/60] spmv_static_t32_scheduler
+[37/60] stencil_t64_spread
+[38/60] spmv_static_t64_spread
+[39/60] stencil_t64_close
+[40/60] spmv_static_t64_close
+[41/60] stencil_t64_nobind
+[42/60] spmv_static_t64_nobind
+[43/60] stencil_t64_obs
+[44/60] spmv_static_t64_obs
+[45/60] stencil_t64_ovh
+[46/60] spmv_static_t64_ovh
+[47/60] stencil_t64_scheduler
+[48/60] spmv_static_t64_scheduler
+[49/60] stencil_t128_spread
+[50/60] spmv_static_t128_spread
+[51/60] stencil_t128_close
+[52/60] spmv_static_t128_close
+[53/60] stencil_t128_nobind
+[54/60] spmv_static_t128_nobind
+[55/60] stencil_t128_obs
+[56/60] spmv_static_t128_obs
+[57/60] stencil_t128_ovh
+[58/60] spmv_static_t128_ovh
+[59/60] stencil_t128_scheduler
+[60/60] spmv_static_t128_scheduler
+
+[OK] Campana completada: 60 corridas (0 fallidas).
+     Resumen por corrida : perf_out_v4/kernel_metrics.csv
+     Ventanas OMPT       : perf_out_v4/ompt_window_metrics.csv
+     Resumen por hilo    : perf_out_v4/ompt_summary.csv
+     Overhead del tool   : perf_out_v4/ompt_overhead.csv
+     Tiempos por rep     : perf_out_v4/metrics/<tag>_times.csv
