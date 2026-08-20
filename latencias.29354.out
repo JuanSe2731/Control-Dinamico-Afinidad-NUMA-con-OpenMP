@@ -1,0 +1,276 @@
+=== Compilando latencias_numa ===
+
+=== Estado de las paginas enormes del sistema ===
+[always] madvise never
+
+=== Modos A (curva, con y sin THP), B (pares) y C (victima) ===
+
+=== Topologia descubierta (hwloc) ===
+Nucleos fisicos : 128
+Instancias L3   : 16  (un CCD por L3 en Zen 4)
+Nodos NUMA      : 2
+L1d por nucleo  : 32 KiB
+L2  por nucleo  : 1024 KiB
+L3  por CCD     : 32 MiB
+Nucleos por CCD : 8
+Hipotesis 'nucleo c esta en el CCD c/8': SE CUMPLE
+
+Mapa nucleo -> (PU, hermano SMT, CCD, nodo)  [primeros 16 y ultimos 4]
+  nucleo   0 -> PU   0  SMT 128  CCD  0  nodo 0
+  nucleo   1 -> PU   1  SMT 129  CCD  0  nodo 0
+  nucleo   2 -> PU   2  SMT 130  CCD  0  nodo 0
+  nucleo   3 -> PU   3  SMT 131  CCD  0  nodo 0
+  nucleo   4 -> PU   4  SMT 132  CCD  0  nodo 0
+  nucleo   5 -> PU   5  SMT 133  CCD  0  nodo 0
+  nucleo   6 -> PU   6  SMT 134  CCD  0  nodo 0
+  nucleo   7 -> PU   7  SMT 135  CCD  0  nodo 0
+  nucleo   8 -> PU   8  SMT 136  CCD  1  nodo 0
+  nucleo   9 -> PU   9  SMT 137  CCD  1  nodo 0
+  nucleo  10 -> PU  10  SMT 138  CCD  1  nodo 0
+  nucleo  11 -> PU  11  SMT 139  CCD  1  nodo 0
+  nucleo  12 -> PU  12  SMT 140  CCD  1  nodo 0
+  nucleo  13 -> PU  13  SMT 141  CCD  1  nodo 0
+  nucleo  14 -> PU  14  SMT 142  CCD  1  nodo 0
+  nucleo  15 -> PU  15  SMT 143  CCD  1  nodo 0
+  nucleo 124 -> PU 124  SMT 252  CCD 15  nodo 1
+  nucleo 125 -> PU 125  SMT 253  CCD 15  nodo 1
+  nucleo 126 -> PU 126  SMT 254  CCD 15  nodo 1
+  nucleo 127 -> PU 127  SMT 255  CCD 15  nodo 1
+
+=== MODO A: curva de latencia frente al tamano ===
+  [A/local /thp=1]        8 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=1]       12 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=1]       16 KiB  L1d        min    1.07 ns   media    1.08 ns
+  [A/local /thp=1]       24 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=1]       28 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=1]       32 KiB  L1d        min    1.18 ns   media    1.20 ns
+  [A/local /thp=1]       40 KiB  L2         min    3.74 ns   media    3.75 ns
+  [A/local /thp=1]       48 KiB  L2         min    3.74 ns   media    3.75 ns
+  [A/local /thp=1]       64 KiB  L2         min    3.76 ns   media    3.76 ns
+  [A/local /thp=1]       96 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/local /thp=1]      128 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/local /thp=1]      192 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/local /thp=1]      256 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/local /thp=1]      384 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/local /thp=1]      512 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/local /thp=1]      768 KiB  L2         min    3.76 ns   media    3.80 ns
+  [A/local /thp=1]     1024 KiB  L2         min    4.09 ns   media    4.16 ns
+  [A/local /thp=1]     1536 KiB  L3_propia  min    9.79 ns   media   10.01 ns
+  [A/local /thp=1]     2048 KiB  L3_propia  min   10.50 ns   media   10.85 ns
+  [A/local /thp=1]     3072 KiB  L3_propia  min   11.72 ns   media   11.89 ns
+  [A/local /thp=1]     4096 KiB  L3_propia  min   12.44 ns   media   12.53 ns
+  [A/local /thp=1]     6144 KiB  L3_propia  min   13.01 ns   media   13.30 ns
+  [A/local /thp=1]     8192 KiB  L3_propia  min   13.72 ns   media   13.84 ns
+  [A/local /thp=1]    12288 KiB  L3_propia  min   14.62 ns   media   14.78 ns
+  [A/local /thp=1]    16384 KiB  L3_propia  min   15.22 ns   media   15.75 ns
+  [A/local /thp=1]    24576 KiB  L3_propia  min   16.29 ns   media   17.44 ns
+  [A/local /thp=1]    28672 KiB  L3_propia  min   16.75 ns   media   18.46 ns
+  [A/local /thp=1]    32768 KiB  L3_propia  min   18.23 ns   media   21.21 ns
+  [A/local /thp=1]    40960 KiB  DRAM       min   44.75 ns   media   45.67 ns
+  [A/local /thp=1]    49152 KiB  DRAM       min   60.21 ns   media   60.68 ns
+  [A/local /thp=1]    65536 KiB  DRAM       min   76.29 ns   media   76.87 ns
+  [A/local /thp=1]    98304 KiB  DRAM       min   87.10 ns   media   90.94 ns
+  [A/local /thp=1]   131072 KiB  DRAM       min   93.05 ns   media   93.52 ns
+  [A/local /thp=1]   196608 KiB  DRAM       min   99.69 ns   media  100.89 ns
+  [A/local /thp=1]   262144 KiB  DRAM       min  103.16 ns   media  104.10 ns
+  [A/local /thp=1]   393216 KiB  DRAM       min  105.72 ns   media  106.37 ns
+  [A/local /thp=1]   524288 KiB  DRAM       min  107.98 ns   media  108.26 ns
+  [A/local /thp=1]   786432 KiB  DRAM       min  109.74 ns   media  110.56 ns
+  [A/local /thp=1]  1048576 KiB  DRAM       min  110.57 ns   media  110.80 ns
+  [A/local /thp=1]  1572864 KiB  DRAM       min  111.68 ns   media  111.92 ns
+  [A/local /thp=1]  2097152 KiB  DRAM       min  105.80 ns   media  111.11 ns
+  [A/remoto/thp=1]        8 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=1]       12 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=1]       16 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=1]       24 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=1]       28 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=1]       32 KiB  L1d        min    1.20 ns   media    1.21 ns
+  [A/remoto/thp=1]       40 KiB  L2         min    3.75 ns   media    3.75 ns
+  [A/remoto/thp=1]       48 KiB  L2         min    3.74 ns   media    3.75 ns
+  [A/remoto/thp=1]       64 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/remoto/thp=1]       96 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/remoto/thp=1]      128 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/remoto/thp=1]      192 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/remoto/thp=1]      256 KiB  L2         min    3.76 ns   media    3.79 ns
+  [A/remoto/thp=1]      384 KiB  L2         min    3.76 ns   media    3.79 ns
+  [A/remoto/thp=1]      512 KiB  L2         min    3.76 ns   media    3.79 ns
+  [A/remoto/thp=1]      768 KiB  L2         min    3.76 ns   media    3.83 ns
+  [A/remoto/thp=1]     1024 KiB  L2         min    4.12 ns   media    4.22 ns
+  [A/remoto/thp=1]     1536 KiB  L3_propia  min    9.98 ns   media   10.31 ns
+  [A/remoto/thp=1]     2048 KiB  L3_propia  min   11.20 ns   media   11.64 ns
+  [A/remoto/thp=1]     3072 KiB  L3_propia  min   12.58 ns   media   12.86 ns
+  [A/remoto/thp=1]     4096 KiB  L3_propia  min   13.18 ns   media   13.70 ns
+  [A/remoto/thp=1]     6144 KiB  L3_propia  min   13.66 ns   media   14.23 ns
+  [A/remoto/thp=1]     8192 KiB  L3_propia  min   14.40 ns   media   15.20 ns
+  [A/remoto/thp=1]    12288 KiB  L3_propia  min   15.91 ns   media   16.97 ns
+  [A/remoto/thp=1]    16384 KiB  L3_propia  min   17.11 ns   media   18.88 ns
+  [A/remoto/thp=1]    24576 KiB  L3_propia  min   23.86 ns   media   24.48 ns
+  [A/remoto/thp=1]    28672 KiB  L3_propia  min   27.18 ns   media   28.55 ns
+  [A/remoto/thp=1]    32768 KiB  L3_propia  min   33.44 ns   media   38.11 ns
+  [A/remoto/thp=1]    40960 KiB  DRAM       min   82.55 ns   media   87.53 ns
+  [A/remoto/thp=1]    49152 KiB  DRAM       min  119.22 ns   media  123.08 ns
+  [A/remoto/thp=1]    65536 KiB  DRAM       min  150.27 ns   media  152.38 ns
+  [A/remoto/thp=1]    98304 KiB  DRAM       min  171.52 ns   media  172.17 ns
+  [A/remoto/thp=1]   131072 KiB  DRAM       min  176.35 ns   media  177.03 ns
+  [A/remoto/thp=1]   196608 KiB  DRAM       min  181.40 ns   media  183.76 ns
+  [A/remoto/thp=1]   262144 KiB  DRAM       min  186.13 ns   media  188.04 ns
+  [A/remoto/thp=1]   393216 KiB  DRAM       min  193.88 ns   media  196.36 ns
+  [A/remoto/thp=1]   524288 KiB  DRAM       min  193.30 ns   media  194.04 ns
+  [A/remoto/thp=1]   786432 KiB  DRAM       min  196.21 ns   media  197.33 ns
+  [A/remoto/thp=1]  1048576 KiB  DRAM       min  197.53 ns   media  197.70 ns
+  [A/remoto/thp=1]  1572864 KiB  DRAM       min  198.42 ns   media  199.13 ns
+  [A/remoto/thp=1]  2097152 KiB  DRAM       min  198.98 ns   media  199.69 ns
+  [A/local /thp=0]        8 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=0]       12 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=0]       16 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=0]       24 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=0]       28 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/local /thp=0]       32 KiB  L1d        min    1.20 ns   media    1.21 ns
+  [A/local /thp=0]       40 KiB  L2         min    3.75 ns   media    3.75 ns
+  [A/local /thp=0]       48 KiB  L2         min    3.75 ns   media    3.75 ns
+  [A/local /thp=0]       64 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/local /thp=0]       96 KiB  L2         min    3.77 ns   media    3.77 ns
+  [A/local /thp=0]      128 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/local /thp=0]      192 KiB  L2         min    3.77 ns   media    3.77 ns
+  [A/local /thp=0]      256 KiB  L2         min    3.77 ns   media    3.78 ns
+  [A/local /thp=0]      384 KiB  L2         min    4.93 ns   media    4.94 ns
+  [A/local /thp=0]      512 KiB  L2         min    5.32 ns   media    5.33 ns
+  [A/local /thp=0]      768 KiB  L2         min    6.67 ns   media    6.71 ns
+  [A/local /thp=0]     1024 KiB  L2         min    7.99 ns   media    8.01 ns
+  [A/local /thp=0]     1536 KiB  L3_propia  min   11.42 ns   media   11.51 ns
+  [A/local /thp=0]     2048 KiB  L3_propia  min   13.00 ns   media   13.12 ns
+  [A/local /thp=0]     3072 KiB  L3_propia  min   13.82 ns   media   13.95 ns
+  [A/local /thp=0]     4096 KiB  L3_propia  min   14.62 ns   media   14.72 ns
+  [A/local /thp=0]     6144 KiB  L3_propia  min   15.40 ns   media   15.45 ns
+  [A/local /thp=0]     8192 KiB  L3_propia  min   16.04 ns   media   16.16 ns
+  [A/local /thp=0]    12288 KiB  L3_propia  min   17.24 ns   media   17.37 ns
+  [A/local /thp=0]    16384 KiB  L3_propia  min   20.03 ns   media   20.23 ns
+  [A/local /thp=0]    24576 KiB  L3_propia  min   27.22 ns   media   27.64 ns
+  [A/local /thp=0]    28672 KiB  L3_propia  min   34.43 ns   media   34.81 ns
+  [A/local /thp=0]    32768 KiB  L3_propia  min   42.06 ns   media   42.28 ns
+  [A/local /thp=0]    40960 KiB  DRAM       min   57.04 ns   media   57.67 ns
+  [A/local /thp=0]    49152 KiB  DRAM       min   70.39 ns   media   70.64 ns
+  [A/local /thp=0]    65536 KiB  DRAM       min   85.27 ns   media   85.69 ns
+  [A/local /thp=0]    98304 KiB  DRAM       min   98.25 ns   media  100.08 ns
+  [A/local /thp=0]   131072 KiB  DRAM       min  105.15 ns   media  105.33 ns
+  [A/local /thp=0]   196608 KiB  DRAM       min  109.58 ns   media  112.08 ns
+  [A/local /thp=0]   262144 KiB  DRAM       min  116.43 ns   media  117.03 ns
+  [A/local /thp=0]   393216 KiB  DRAM       min  120.14 ns   media  120.79 ns
+  [A/local /thp=0]   524288 KiB  DRAM       min  123.14 ns   media  123.40 ns
+  [A/local /thp=0]   786432 KiB  DRAM       min  126.19 ns   media  127.32 ns
+  [A/local /thp=0]  1048576 KiB  DRAM       min  128.41 ns   media  128.90 ns
+  [A/local /thp=0]  1572864 KiB  DRAM       min  131.06 ns   media  131.20 ns
+  [A/local /thp=0]  2097152 KiB  DRAM       min  133.41 ns   media  135.98 ns
+  [A/remoto/thp=0]        8 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=0]       12 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=0]       16 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=0]       24 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=0]       28 KiB  L1d        min    1.07 ns   media    1.07 ns
+  [A/remoto/thp=0]       32 KiB  L1d        min    1.20 ns   media    1.21 ns
+  [A/remoto/thp=0]       40 KiB  L2         min    3.75 ns   media    3.75 ns
+  [A/remoto/thp=0]       48 KiB  L2         min    3.75 ns   media    3.75 ns
+  [A/remoto/thp=0]       64 KiB  L2         min    3.76 ns   media    3.77 ns
+  [A/remoto/thp=0]       96 KiB  L2         min    3.77 ns   media    3.77 ns
+  [A/remoto/thp=0]      128 KiB  L2         min    3.77 ns   media    3.77 ns
+  [A/remoto/thp=0]      192 KiB  L2         min    3.78 ns   media    3.78 ns
+  [A/remoto/thp=0]      256 KiB  L2         min    3.78 ns   media    3.79 ns
+  [A/remoto/thp=0]      384 KiB  L2         min    4.35 ns   media    4.35 ns
+  [A/remoto/thp=0]      512 KiB  L2         min    4.76 ns   media    4.76 ns
+  [A/remoto/thp=0]      768 KiB  L2         min    6.74 ns   media    6.77 ns
+  [A/remoto/thp=0]     1024 KiB  L2         min    8.65 ns   media    8.71 ns
+  [A/remoto/thp=0]     1536 KiB  L3_propia  min   11.83 ns   media   11.92 ns
+  [A/remoto/thp=0]     2048 KiB  L3_propia  min   13.23 ns   media   13.30 ns
+  [A/remoto/thp=0]     3072 KiB  L3_propia  min   14.30 ns   media   14.40 ns
+  [A/remoto/thp=0]     4096 KiB  L3_propia  min   15.15 ns   media   15.33 ns
+  [A/remoto/thp=0]     6144 KiB  L3_propia  min   16.40 ns   media   16.54 ns
+  [A/remoto/thp=0]     8192 KiB  L3_propia  min   17.25 ns   media   17.66 ns
+  [A/remoto/thp=0]    12288 KiB  L3_propia  min   19.28 ns   media   19.95 ns
+  [A/remoto/thp=0]    16384 KiB  L3_propia  min   23.95 ns   media   24.94 ns
+  [A/remoto/thp=0]    24576 KiB  L3_propia  min   39.52 ns   media   42.74 ns
+  [A/remoto/thp=0]    28672 KiB  L3_propia  min   61.13 ns   media   63.62 ns
+  [A/remoto/thp=0]    32768 KiB  L3_propia  min   83.84 ns   media   86.22 ns
+  [A/remoto/thp=0]    40960 KiB  DRAM       min  120.64 ns   media  124.03 ns
+  [A/remoto/thp=0]    49152 KiB  DRAM       min  138.18 ns   media  143.17 ns
+  [A/remoto/thp=0]    65536 KiB  DRAM       min  163.88 ns   media  164.88 ns
+  [A/remoto/thp=0]    98304 KiB  DRAM       min  184.14 ns   media  185.48 ns
+  [A/remoto/thp=0]   131072 KiB  DRAM       min  192.43 ns   media  193.42 ns
+  [A/remoto/thp=0]   196608 KiB  DRAM       min  201.12 ns   media  201.52 ns
+  [A/remoto/thp=0]   262144 KiB  DRAM       min  203.95 ns   media  204.99 ns
+  [A/remoto/thp=0]   393216 KiB  DRAM       min  209.54 ns   media  211.88 ns
+  [A/remoto/thp=0]   524288 KiB  DRAM       min  213.80 ns   media  214.24 ns
+  [A/remoto/thp=0]   786432 KiB  DRAM       min  218.77 ns   media  220.03 ns
+  [A/remoto/thp=0]  1048576 KiB  DRAM       min  221.17 ns   media  221.59 ns
+  [A/remoto/thp=0]  1572864 KiB  DRAM       min  225.35 ns   media  225.75 ns
+  [A/remoto/thp=0]  2097152 KiB  DRAM       min  228.93 ns   media  229.47 ns
+
+=== MODO B: latencia nucleo a nucleo (ping-pong) ===
+  [B] smt              CPU   0 <-> 128   min   17.88 ns   media   17.95 ns
+  [B] mismo_ccd        CPU   0 <->   1   min   27.02 ns   media   27.18 ns
+  [B] otro_ccd         CPU   0 <->   8   min  148.41 ns   media  166.94 ns
+  [B] otro_ccd_lejano  CPU   0 <->  63   min  182.84 ns   media  189.21 ns
+  [B] otro_nodo        CPU   0 <->  64   min  297.66 ns   media  319.75 ns
+
+=== MODO C: lectura desde la cache de otro nucleo ===
+  [C] mismo_ccd    productor CPU   1 -> consumidor CPU   0  min   13.33 ns   media   14.39 ns
+  [C] otro_ccd     productor CPU   8 -> consumidor CPU   0  min   63.23 ns   media   67.00 ns
+  [C] otro_nodo    productor CPU  64 -> consumidor CPU   0  min  107.12 ns   media  111.80 ns
+
+Resultados en: caracterizacion/latencias_exadell.csv
+
+=== Modo B sobre la matriz completa 128x128 (mapa de calor) ===
+
+=== Topologia descubierta (hwloc) ===
+Nucleos fisicos : 128
+Instancias L3   : 16  (un CCD por L3 en Zen 4)
+Nodos NUMA      : 2
+L1d por nucleo  : 32 KiB
+L2  por nucleo  : 1024 KiB
+L3  por CCD     : 32 MiB
+Nucleos por CCD : 8
+Hipotesis 'nucleo c esta en el CCD c/8': SE CUMPLE
+
+Mapa nucleo -> (PU, hermano SMT, CCD, nodo)  [primeros 16 y ultimos 4]
+  nucleo   0 -> PU   0  SMT 128  CCD  0  nodo 0
+  nucleo   1 -> PU   1  SMT 129  CCD  0  nodo 0
+  nucleo   2 -> PU   2  SMT 130  CCD  0  nodo 0
+  nucleo   3 -> PU   3  SMT 131  CCD  0  nodo 0
+  nucleo   4 -> PU   4  SMT 132  CCD  0  nodo 0
+  nucleo   5 -> PU   5  SMT 133  CCD  0  nodo 0
+  nucleo   6 -> PU   6  SMT 134  CCD  0  nodo 0
+  nucleo   7 -> PU   7  SMT 135  CCD  0  nodo 0
+  nucleo   8 -> PU   8  SMT 136  CCD  1  nodo 0
+  nucleo   9 -> PU   9  SMT 137  CCD  1  nodo 0
+  nucleo  10 -> PU  10  SMT 138  CCD  1  nodo 0
+  nucleo  11 -> PU  11  SMT 139  CCD  1  nodo 0
+  nucleo  12 -> PU  12  SMT 140  CCD  1  nodo 0
+  nucleo  13 -> PU  13  SMT 141  CCD  1  nodo 0
+  nucleo  14 -> PU  14  SMT 142  CCD  1  nodo 0
+  nucleo  15 -> PU  15  SMT 143  CCD  1  nodo 0
+  nucleo 124 -> PU 124  SMT 252  CCD 15  nodo 1
+  nucleo 125 -> PU 125  SMT 253  CCD 15  nodo 1
+  nucleo 126 -> PU 126  SMT 254  CCD 15  nodo 1
+  nucleo 127 -> PU 127  SMT 255  CCD 15  nodo 1
+
+=== MODO B: latencia nucleo a nucleo (ping-pong) ===
+  Recorriendo la matriz completa de 128 x 128 nucleos fisicos...
+    nucleo 0/128
+    nucleo 8/128
+    nucleo 16/128
+    nucleo 24/128
+    nucleo 32/128
+    nucleo 40/128
+    nucleo 48/128
+    nucleo 56/128
+    nucleo 64/128
+    nucleo 72/128
+    nucleo 80/128
+    nucleo 88/128
+    nucleo 96/128
+    nucleo 104/128
+    nucleo 112/128
+    nucleo 120/128
+
+Resultados en: caracterizacion/latencias_exadell.csv
+
+=== Terminado. Resultados en caracterizacion/latencias_exadell.csv ===
+8301 caracterizacion/latencias_exadell.csv
