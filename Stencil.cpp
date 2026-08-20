@@ -16,6 +16,12 @@
 #include <sys/prctl.h>
 #endif
 
+// Auto-instrumentación acotada a la región medida. Sustituye al `perf stat`
+// externo, que contaba también la inicialización y hacía inutilizables el IPC y el
+// ratio_rm de las configuraciones sin tool OMPT. Se desactiva sola si el tool está
+// cargado, para no medir lo mismo dos veces.
+#include "perf_region.hpp"
+
 static inline void ompt_measure_start() {
 #ifdef _OPENMP
     (void)omp_control_tool(omp_control_tool_start, 1, nullptr);
@@ -50,9 +56,20 @@ static inline void perf_events_enable_all_threads() {
 #endif
 }
 
-static constexpr int WARMUP_ITERS = 2; // igual que spmv.cpp / spmv_dynamic.cpp
+// Warm-up subido de 2 a 5: con dos iteraciones el primer punto medido todavía
+// arrastraba efectos de página fría y de escalado de frecuencia. Configurable por
+// entorno para que quede en el registro experimental qué valor se usó.
+static constexpr int WARMUP_ITERS_DEFECTO = 5;
 static constexpr int REPS = 30;
 static constexpr bool kPrint = false;
+
+static int warmup_iters() {
+    if (const char* e = std::getenv("WARMUP_ITERS")) {
+        int v = std::atoi(e);
+        if (v >= 0) return v;
+    }
+    return WARMUP_ITERS_DEFECTO;
+}
 
 // steady_clock, NO high_resolution_clock: en libstdc++ este último es un alias de
 // system_clock y por tanto NO es monótono — un ajuste de NTP a mitad de una tanda
@@ -100,15 +117,21 @@ struct Stats {
     double min_s{0}, avg_s{0}, max_s{0}, stddev_s{0};
 };
 
+// TODAS las métricas derivadas se calculan sobre el tiempo MEDIO, no sobre el
+// mínimo. El mínimo es la repetición más afortunada de 150: favorece a cualquier
+// configuración, y favorece MÁS a las de mayor varianza, que son justamente las
+// que no fijan afinidad (base, obs, scheduler). Es decir, la convención anterior
+// sesgaba a favor de la propuesta de este trabajo. min_ms y max_ms se siguen
+// publicando, pero como descriptores de dispersión, no como base de nada.
 struct BenchmarkResult {
     const char* strategy{nullptr};
     double min_time_s{0};
     double avg_time_s{0};
     double max_time_s{0};
     double stddev_s{0};
-    double bandwidth_gibs{0};   // derivado de min_time_s (convención HPC)
-    double mlups_min{0};        // mejor caso, convención
-    double mlups_avg{0};        // derivado de la media: es el que admite barra de error
+    double caudal_util_gibs{0};  // derivado de avg_time_s
+    double mlups{0};             // derivado de avg_time_s
+    double gflops{0};            // derivado de avg_time_s
 };
 
 static Stats compute_stats(std::vector<double>& times) {
@@ -126,19 +149,21 @@ static Stats compute_stats(std::vector<double>& times) {
     return Stats{min_t, avg_t, max_t, stddev};
 }
 
-// Ancho de banda bajo el MODELO DE TRÁFICO COMPULSORIO: 5 lecturas + 1 escritura
-// por punto, como si cada acceso fuera a DRAM.
+// CAUDAL ÚTIL, no "ancho de banda". Es bytes_del_modelo / tiempo, con los bytes
+// FIJADOS por N, así que es 1/t reescalado y nada más: para un tamaño dado,
+// caudal_util_gibs * avg_ms es una constante exacta. Más alto = más rápido.
 //
-// ATENCIÓN al interpretarlo: un stencil de 5 puntos que barre fila por fila tiene
-// enorme reutilización de caché (A[j][k-1], A[j][k] y A[j][k+1] caen en la misma
-// línea; A[j-1][*] y A[j+1][*] ya se cargaron o se cargarán en filas contiguas).
-// El tráfico REAL a DRAM son ~2 flujos (leer A una vez, escribir result una vez)
-// = 8 B/punto, no 24. Es decir, esta cifra SOBREESTIMA el ancho de banda real
-// por un factor ~3, y por eso el baseline serial de un solo hilo da ~70 GiB/s,
-// que es físicamente imposible. Es una convención admisible mientras se declare,
-// y no afecta a las comparaciones RELATIVAS, que es lo que usa el análisis.
-// La métrica primaria del stencil es MLUPS, no ésta.
-static double compute_bandwidth_gibs(int n, double elapsed_s) {
+// NO CONFUNDIR con el tráfico real de memoria. Los bytes que de verdad cruzan el
+// controlador y el enlace inter-nodo se miden con los contadores de rellenos por
+// origen (perf_region.hpp), y ahí MENOS ES MEJOR: significa que el procesador dejó
+// de esperar datos. Son dos magnitudes distintas y el proyecto las confundió.
+//
+// Además el modelo de bytes es de TRÁFICO COMPULSORIO (5 lecturas + 1 escritura
+// por punto, como si cada acceso fuera a DRAM). Un stencil de 5 puntos que barre
+// fila por fila tiene enorme reutilización de caché, así que el tráfico real son
+// ~2 flujos (8 B/punto, no 24): esta cifra sobreestima ~3x, y por eso un solo hilo
+// llegaba a dar ~70 GiB/s, que es físicamente imposible.
+static double compute_caudal_util_gibs(int n, double elapsed_s) {
     const double points = static_cast<double>(n - 2) * (n - 2);
     const double bytes = points * 6.0 * sizeof(float);
     return (bytes / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
@@ -151,9 +176,26 @@ static double compute_mlups(int n, double elapsed_s) {
     return points / (elapsed_s * 1e6);
 }
 
+// GFLOPS. El cuerpo del kernel es
+//     result[j][k] = 0.2f * (A[j][k] + A[j-1][k] + A[j+1][k] + A[j][k-1] + A[j][k+1])
+// es decir 4 sumas + 1 multiplicación = 5 flop por punto.
+//
+// Se declara sin rodeos: para el stencil GFLOPS = MLUPS / 200 EXACTAMENTE, así que
+// no es evidencia independiente de MLUPS. Se reinstaura porque con el barrido de
+// tamaños es la única unidad que permite poner los seis peldaños y los dos kernels
+// en el mismo eje y contrastarlos contra el techo de la máquina.
+static constexpr double FLOP_POR_PUNTO = 5.0;
+
+static double compute_gflops(int n, double elapsed_s) {
+    const double points = static_cast<double>(n - 2) * (n - 2);
+    return (points * FLOP_POR_PUNTO) / (elapsed_s * 1e9);
+}
+
 static void export_csv(const std::string& filename,
                        int n,
                        int threads,
+                       int warmup,
+                       int reps,
                        const std::vector<BenchmarkResult>& results) {
     std::ofstream f(filename);
     if (!f.is_open()) {
@@ -161,21 +203,27 @@ static void export_csv(const std::string& filename,
         return;
     }
 
-    // GFlops y bw_gbs eliminados a propósito: para este kernel MLUPS = GFlops*200
-    // y bw_gibs es proporcional a ambos, así que eran la misma curva por triplicado.
-    f << "strategy,n,threads,min_ms,avg_ms,max_ms,stddev_ms,bw_gibs,mlups_min,mlups_avg\n";
+    // ws_bytes: los dos arreglos float N*N. Es lo que sitúa cada ejecución en el
+    // peldaño de la escalera de tamaños (L1 / L2 / L3-CCD / L3-nodo / DRAM).
+    const double ws_bytes = 2.0 * static_cast<double>(n) * n * sizeof(float);
+
+    f << "strategy,n,ws_bytes,threads,warmup,reps,"
+         "min_ms,avg_ms,max_ms,stddev_ms,caudal_util_gibs,mlups,gflops\n";
     for (const auto& r : results) {
         f << r.strategy << ","
           << n << ","
+          << std::fixed << std::setprecision(0) << ws_bytes << ","
           << threads << ","
-          << std::fixed << std::setprecision(6)
+          << warmup << ","
+          << reps << ","
+          << std::setprecision(6)
           << r.min_time_s * 1e3 << ","
           << r.avg_time_s * 1e3 << ","
           << r.max_time_s * 1e3 << ","
           << r.stddev_s * 1e3 << ","
-          << r.bandwidth_gibs << ","
-          << r.mlups_min << ","
-          << r.mlups_avg << "\n";
+          << r.caudal_util_gibs << ","
+          << r.mlups << ","
+          << r.gflops << "\n";
     }
     std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
 }
@@ -255,8 +303,14 @@ int main(int argc, char* argv[]) {
     init_matrix_seq(A, n);
     std::memset(result, 0, static_cast<size_t>(n) * n * sizeof(float));
 
+    // Los contadores propios se abren aquí, antes del warm-up, para que el coste de
+    // abrirlos no caiga dentro de la región medida. Queda inerte si el tool OMPT
+    // está cargado: en ese caso el propietario de los contadores es él.
+    perf_region::init();
+
     // Warm-up
-    for (int i = 0; i < WARMUP_ITERS; ++i) {
+    const int warmup = warmup_iters();
+    for (int i = 0; i < warmup; ++i) {
         stencil2D_omp_static(A, result, n);
     }
     perf_events_enable_all_threads();
@@ -266,12 +320,14 @@ int main(int argc, char* argv[]) {
     times.reserve(reps);
 
     ompt_measure_start();
+    perf_region::begin();
     for (int r = 0; r < reps; ++r) {
         const double t0 = now_sec();
         stencil2D_omp_static(A, result, n);
         const double t1 = now_sec();
         times.push_back(t1 - t0);
     }
+    perf_region::end();
     ompt_measure_pause();
     // Fuera del conteo el checksum y el volcado de CSV.
     perf_events_disable_all_threads();
@@ -290,12 +346,13 @@ int main(int argc, char* argv[]) {
     }
 
     const Stats st = compute_stats(times);
-    const double bw_gibs   = compute_bandwidth_gibs(n, st.min_s);
-    const double mlups_min = compute_mlups(n, st.min_s);
-    const double mlups_avg = compute_mlups(n, st.avg_s);
+    // Todo sobre la MEDIA, no sobre el mínimo (ver el comentario de BenchmarkResult).
+    const double caudal = compute_caudal_util_gibs(n, st.avg_s);
+    const double mlups  = compute_mlups(n, st.avg_s);
+    const double gflops = compute_gflops(n, st.avg_s);
 
     std::cout << "[Stencil2D] Variant: OpenMP (static, por filas) + SeqInit\n";
-    std::cout << "N=" << n << " warmup=" << WARMUP_ITERS << " reps=" << reps
+    std::cout << "N=" << n << " warmup=" << warmup << " reps=" << reps
               << " threads=" << threads << "\n";
     std::cout << std::fixed << std::setprecision(6);
     std::cout << "Time: "
@@ -303,8 +360,9 @@ int main(int argc, char* argv[]) {
               << (st.avg_s * 1e3) << " ms (avg), "
               << (st.max_s * 1e3) << " ms (max), stddev="
               << (st.stddev_s * 1e3) << " ms\n";
-    std::cout << "MLUPS   : " << mlups_min << " (min) | " << mlups_avg << " (avg)\n";
-    std::cout << "BW GiB/s: " << bw_gibs << "\n";
+    std::cout << "MLUPS        : " << mlups << "  (sobre la media)\n";
+    std::cout << "GFLOPS       : " << gflops << "  (= MLUPS/200, exacto)\n";
+    std::cout << "Caudal GiB/s : " << caudal << "  (caudal util, NO trafico real)\n";
     std::cout << "Checksum: " << checksum << "\n";
 
     std::vector<BenchmarkResult> results;
@@ -314,14 +372,19 @@ int main(int argc, char* argv[]) {
     res.avg_time_s = st.avg_s;
     res.max_time_s = st.max_s;
     res.stddev_s = st.stddev_s;
-    res.bandwidth_gibs = bw_gibs;
-    res.mlups_min = mlups_min;
-    res.mlups_avg = mlups_avg;
+    res.caudal_util_gibs = caudal;
+    res.mlups = mlups;
+    res.gflops = gflops;
     results.push_back(res);
 
     if (!csv_prefix.empty()) {
-        export_csv(csv_prefix + ".csv", n, threads, results);
+        export_csv(csv_prefix + ".csv", n, threads, warmup, reps, results);
+        // Contadores por hilo, acotados a la región medida. Vacío si el tool OMPT
+        // era el propietario: entonces los datos salen de ompt_summary.csv.
+        perf_region::escribir_csv((csv_prefix + "_counters.csv").c_str(),
+                                  csv_prefix.c_str());
     }
+    perf_region::shutdown();
 
     std::free(A);
     std::free(result);

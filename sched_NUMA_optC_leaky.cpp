@@ -212,11 +212,83 @@ static ompt_get_num_procs_t     g_ompt_get_num_procs      = nullptr;
 // =============================================================================
 // Estructuras de datos por hilo
 // =============================================================================
+// Rellenos DESGLOSADOS POR ORIGEN. PMCx044 (`ls_any_fills_from_sys`) tiene una
+// máscara por procedencia de la línea, y eso es lo que permite separar el tráfico
+// por distancia topológica — que es la magnitud que de verdad importa, no el
+// "ancho de banda" analítico de los kernels.
+//
+// Estos contadores son SOLO PARA INFORMAR: el mecanismo de decisión sigue usando
+// ratio_rm exactamente igual que antes. Lo único que cambia es de dónde salen sus
+// dos números: en vez de abrir 0xFF44 y 0xD044 aparte (que sumarían 10 eventos
+// sobre 6 PMC programables y forzarían un multiplexado agresivo justo sobre la
+// variable de decisión), se derivan de las seis máscaras:
+//     all    = suma de las seis
+//     remoto = far_cache + far_dram
+// La única diferencia con el antiguo 0xD044 es el bit 0x80 (memoria alternativa,
+// CXL), que en esta máquina es cero.
+//
+// Con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044 exacto, para poder reproducir
+// las campañas anteriores bit a bit.
+enum FillOrigen {
+    FO_L2 = 0,          // umask 0x01  L2 propia
+    FO_L3_CCD,          // umask 0x02  L3 del propio chiplet
+    FO_CCD_VECINO,      // umask 0x04  L3 de otro chiplet, mismo socket
+    FO_DRAM_LOCAL,      // umask 0x08  DRAM local
+    FO_FAR_CACHE,       // umask 0x10  caché del otro socket
+    FO_FAR_DRAM,        // umask 0x40  DRAM remota
+    FO_N
+};
+
+// Mascaras de origen (byte alto). CODIGOS VERIFICADOS en exadell el 2026-08-19
+// con `perf stat -e ls_any_fills_from_sys.<nombre> -vv -- true`, que imprime el
+// config ya resuelto. No estan en sysfs: en AMD vienen de las tablas JSON que
+// perf lleva compiladas para la familia 19h, por eso van cableados.
+//
+// Comprobado de paso que `remote_cache` = mascara 0x14 = 0x10|0x04, o sea la SUMA
+// de far_cache y near_cache, no un septimo origen.
+static const uint64_t FILL_UMASK[FO_N] = {
+    0x01, 0x02, 0x04, 0x08, 0x10, 0x40
+};
+
+// Dos familias del mismo evento:
+//   0x44  ls_any_fills_from_sys   demanda + prefetch hardware + prefetch software
+//   0x43  ls_dmnd_fills_from_sys  SOLO demanda
+//
+// El TRAFICO se mide con `any` (un prefetch consume enlace igual que una demanda);
+// el TIEMPO MUERTO con `dmnd` (un prefetch que llega a tiempo no para al nucleo).
+// No caben las dos a la vez sobre 6 PMC, asi que se conmuta con PERF_FAMILIA.
+//
+// El scheduler usa SIEMPRE la que le digan, pero la campana lo deja en `any`: es
+// la variable de decision del mecanismo y cambiarla invalidaria la comparacion
+// con las campanas 29223 y 29311.
+static constexpr uint64_t EVENTO_ANY  = 0x44;
+static constexpr uint64_t EVENTO_DMND = 0x43;
+
+static uint64_t evento_familia() {
+    static uint64_t cache = 0;
+    if (cache == 0) {
+        const char* f = getenv("PERF_FAMILIA");
+        cache = (f && strcmp(f, "dmnd") == 0) ? EVENTO_DMND : EVENTO_ANY;
+    }
+    return cache;
+}
+
+static bool familia_es_demanda() { return evento_familia() == EVENTO_DMND; }
+
+static uint64_t fill_config(int i) {
+    return (FILL_UMASK[i] << 8) | evento_familia();
+}
+
+// Los nombres de columna correspondientes viven en la cabecera de
+// OMPT_SUMMARY_CSV y deben coincidir con los de perf_region.hpp, para que el
+// script de campaña agregue por igual los dos caminos de medida.
+
 struct PerfFDs {
     int rm_misses    {-1};   // ANY_DATA_CACHE_FILLS_REMOTE_ALL (raw 0xD044)
     int instr_fd     {-1};   // PERF_COUNT_HW_INSTRUCTIONS
     int cycles_fd    {-1};   // PERF_COUNT_HW_CPU_CYCLES
     int all_fills_fd {-1};   // ALL DATA CACHE FILLS (raw 0xFF44)
+    int origen_fd[FO_N] {-1, -1, -1, -1, -1, -1};   // desglose por procedencia
     int opened       {0};
     int status       {PERF_FAILED};
 };
@@ -253,6 +325,7 @@ struct ThreadInfo {
 
     // ── Totales finales (se congelan en thread_end o en finalize) ─────────
     uint64_t  fin_rm  {0}, fin_all {0}, fin_ins {0}, fin_cyc {0};
+    uint64_t  fin_origen[FO_N] {0, 0, 0, 0, 0, 0};
     int       fin_valid {0};
 
     // ── Estado del scheduler ─────────────────────────────────────────────
@@ -404,6 +477,11 @@ static void close_perf(PerfFDs& p) {
     if (p.instr_fd     >= 0) { close(p.instr_fd);     p.instr_fd     = -1; }
     if (p.cycles_fd    >= 0) { close(p.cycles_fd);    p.cycles_fd    = -1; }
     if (p.all_fills_fd >= 0) { close(p.all_fills_fd); p.all_fills_fd = -1; }
+    // Los seis del desglose por origen TAMBIÉN. Sin esto se filtrarían 6 fd por
+    // hilo: a 128 hilos son 768, muy por encima del RLIMIT_NOFILE habitual de
+    // 1024, y es exactamente la fuga que ya obligó a reescribir thread_end.
+    for (int i = 0; i < FO_N; ++i)
+        if (p.origen_fd[i] >= 0) { close(p.origen_fd[i]); p.origen_fd[i] = -1; }
     p.opened = 0;
 }
 
@@ -430,6 +508,9 @@ static void enable_perf(PerfFDs& p) {
                                 ioctl(p.cycles_fd,    PERF_EVENT_IOC_ENABLE, 0); }
     if (p.all_fills_fd >= 0) { ioctl(p.all_fills_fd, PERF_EVENT_IOC_RESET,  0);
                                 ioctl(p.all_fills_fd, PERF_EVENT_IOC_ENABLE, 0); }
+    for (int i = 0; i < FO_N; ++i)
+        if (p.origen_fd[i] >= 0) { ioctl(p.origen_fd[i], PERF_EVENT_IOC_RESET,  0);
+                                   ioctl(p.origen_fd[i], PERF_EVENT_IOC_ENABLE, 0); }
 }
 
 static void disable_perf(PerfFDs& p) {
@@ -438,6 +519,46 @@ static void disable_perf(PerfFDs& p) {
     if (p.instr_fd     >= 0) ioctl(p.instr_fd,     PERF_EVENT_IOC_DISABLE, 0);
     if (p.cycles_fd    >= 0) ioctl(p.cycles_fd,    PERF_EVENT_IOC_DISABLE, 0);
     if (p.all_fills_fd >= 0) ioctl(p.all_fills_fd, PERF_EVENT_IOC_DISABLE, 0);
+    for (int i = 0; i < FO_N; ++i)
+        if (p.origen_fd[i] >= 0) ioctl(p.origen_fd[i], PERF_EVENT_IOC_DISABLE, 0);
+}
+
+// ¿Se abre el desglose por origen? Por defecto sí. Con OMPT_MASCARAS=0 se vuelve
+// al par 0xFF44/0xD044 exacto, para reproducir las campañas anteriores.
+static bool usar_mascaras_origen() {
+    static int cache = -1;
+    if (cache < 0) {
+        const char* e = getenv("OMPT_MASCARAS");
+        cache = (e && atoi(e) == 0) ? 0 : 1;
+    }
+    return cache != 0;
+}
+
+// Lee los rellenos y devuelve los DOS números que el mecanismo de decisión
+// necesita, venga de donde venga el desglose. Opcionalmente devuelve también el
+// vector por origen para poder informarlo.
+//
+// Esto es lo que mantiene intacto el mecanismo: ratio_rm = remoto/all sigue
+// significando lo mismo, con las seis máscaras o con el par antiguo.
+static bool read_fills(PerfFDs& p, uint64_t& all, uint64_t& remoto,
+                       uint64_t* por_origen /* FO_N o nullptr */) {
+    all = 0; remoto = 0;
+    if (por_origen) for (int i = 0; i < FO_N; ++i) por_origen[i] = 0;
+
+    if (usar_mascaras_origen()) {
+        if (p.origen_fd[0] < 0) return false;
+        uint64_t v = 0;
+        for (int i = 0; i < FO_N; ++i) {
+            if (!read_counter(p.origen_fd[i], v)) return false;
+            if (por_origen) por_origen[i] = v;
+            all += v;
+            if (i == FO_FAR_CACHE || i == FO_FAR_DRAM) remoto += v;
+        }
+        return true;
+    }
+    if (!read_counter(p.all_fills_fd, all))   return false;
+    if (!read_counter(p.rm_misses,    remoto)) return false;
+    return true;
 }
 
 // Degradación por-fd en vez de todo-o-nada: si fallan los eventos crudos de AMD
@@ -459,15 +580,36 @@ static void open_perf_for_thread(ThreadInfo& t) {
                                    PERF_COUNT_HW_INSTRUCTIONS, leader);
     int e_ins = (t.perf.instr_fd < 0) ? errno : 0;
 
-    // remote fills AMD EPYC: event=0x44 umask=0xD0 → raw 0xD044
-    t.perf.rm_misses = open_counter(t.tid_linux, PERF_TYPE_RAW, 0xD044, leader);
-    int e_rm = (t.perf.rm_misses < 0) ? errno : 0;
+    int e_rm = 0, e_all = 0;
+    bool have_numa = false;
 
-    t.perf.all_fills_fd = open_counter(t.tid_linux, PERF_TYPE_RAW, 0xFF44, leader);
-    int e_all = (t.perf.all_fills_fd < 0) ? errno : 0;
+    if (usar_mascaras_origen()) {
+        // Seis máscaras de PMCx044, una por procedencia de la línea. NO se abren
+        // además 0xD044 y 0xFF44: serían 10 eventos sobre 6 PMC programables y el
+        // multiplexado caería justo sobre la variable de decisión. Los dos números
+        // que el mecanismo necesita se derivan de las seis (ver FillOrigen).
+        for (int i = 0; i < FO_N; ++i) {
+            t.perf.origen_fd[i] = open_counter(t.tid_linux, PERF_TYPE_RAW,
+                                               fill_config(i), leader);
+            if (t.perf.origen_fd[i] < 0 && e_rm == 0) e_rm = errno;
+        }
+        have_numa = (t.perf.origen_fd[FO_FAR_DRAM] >= 0 &&
+                     t.perf.origen_fd[FO_DRAM_LOCAL] >= 0);
+        e_all = e_rm;
+    } else {
+        // remote fills AMD EPYC: event=0x44 umask=0xD0 → raw 0xD044
+        t.perf.rm_misses = open_counter(t.tid_linux, PERF_TYPE_RAW,
+                                        (0xD0ULL << 8) | evento_familia(), leader);
+        e_rm = (t.perf.rm_misses < 0) ? errno : 0;
+
+        t.perf.all_fills_fd = open_counter(t.tid_linux, PERF_TYPE_RAW,
+                                           (0xFFULL << 8) | evento_familia(), leader);
+        e_all = (t.perf.all_fills_fd < 0) ? errno : 0;
+
+        have_numa = (t.perf.rm_misses >= 0 && t.perf.all_fills_fd >= 0);
+    }
 
     const bool have_ipc  = (t.perf.cycles_fd >= 0 && t.perf.instr_fd >= 0);
-    const bool have_numa = (t.perf.rm_misses >= 0 && t.perf.all_fills_fd >= 0);
 
     if (!have_ipc) {
         fprintf(stderr,
@@ -490,14 +632,17 @@ static void open_perf_for_thread(ThreadInfo& t) {
         fprintf(stderr,
             "[OMPT][PERF] tid=%d SIN eventos NUMA (solo IPC). "
             "Este hilo no podrá disparar migraciones.\n"
-            "    raw 0xD044 (remote fills) fd=%-3d %s\n"
-            "    raw 0xFF44 (all fills)    fd=%-3d %s\n"
-            "  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen\n",
+            "    modo=%s  primer errno: %s / %s\n"
+            "  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen\n"
+            "  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044\n",
             (int)t.tid_linux,
-            t.perf.rm_misses,    e_rm  ? strerror(e_rm)  : "ok",
-            t.perf.all_fills_fd, e_all ? strerror(e_all) : "ok");
+            usar_mascaras_origen() ? "6 mascaras por origen" : "0xFF44/0xD044",
+            e_rm  ? strerror(e_rm)  : "ok",
+            e_all ? strerror(e_all) : "ok");
         if (t.perf.rm_misses    >= 0) { close(t.perf.rm_misses);    t.perf.rm_misses    = -1; }
         if (t.perf.all_fills_fd >= 0) { close(t.perf.all_fills_fd); t.perf.all_fills_fd = -1; }
+        for (int i = 0; i < FO_N; ++i)
+            if (t.perf.origen_fd[i] >= 0) { close(t.perf.origen_fd[i]); t.perf.origen_fd[i] = -1; }
         t.perf.status = PERF_IPC_ONLY;
         ++g_perf_partial_threads;
     } else {
@@ -598,8 +743,10 @@ static void* monitor_loop(void*) {
             if (!read_counter(t.perf.instr_fd, ins))  continue;
             if (!read_counter(t.perf.cycles_fd, cyc)) continue;
             if (numa_ok) {
-                if (!read_counter(t.perf.rm_misses, remote))    continue;
-                if (!read_counter(t.perf.all_fills_fd, all))    continue;
+                // read_fills devuelve all y remoto con el mismo significado tanto
+                // con las seis máscaras como con el par 0xFF44/0xD044: el mecanismo
+                // de decisión no se entera de cuál está en uso.
+                if (!read_fills(t.perf, all, remote, nullptr)) continue;
             }
 
             // ── Primera lectura: solo baseline ────────────────────────────
@@ -802,8 +949,7 @@ static void on_ompt_callback_thread_end(ompt_data_t* thread_data) {
             read_counter(t.perf.instr_fd,     t.fin_ins);
             read_counter(t.perf.cycles_fd,    t.fin_cyc);
             if (t.perf.status == PERF_FULL) {
-                read_counter(t.perf.rm_misses,    t.fin_rm);
-                read_counter(t.perf.all_fills_fd, t.fin_all);
+                read_fills(t.perf, t.fin_all, t.fin_rm, t.fin_origen);
             }
             t.fin_valid = 1;
             close_perf(t.perf);
@@ -1073,7 +1219,9 @@ static int ompt_initialize(
     open_csv_file(getenv("OMPT_SUMMARY_CSV"),
                   "tag,tid,ompt_id,thread_type,last_cpu,numa_node,migrations,mig_failures,"
                   "remote_fills,all_fills,instructions,cycles,ipc,ratio_rm,"
-                  "windows_counted,first_migration_win,perf_status",
+                  "windows_counted,first_migration_win,perf_status,"
+                  "fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,"
+                  "fill_far_cache,fill_far_dram,mascaras,familia",
                   &g_summary_csv);
     open_csv_file(getenv("OMPT_OVERHEAD_CSV"),
                   "tag,monitor_ticks,monitor_us_total,monitor_us_max,callback_calls,"
@@ -1211,8 +1359,7 @@ static void ompt_finalize(ompt_data_t* tool_data) {
             read_counter(t.perf.instr_fd,  t.fin_ins);
             read_counter(t.perf.cycles_fd, t.fin_cyc);
             if (t.perf.status == PERF_FULL) {
-                read_counter(t.perf.rm_misses,    t.fin_rm);
-                read_counter(t.perf.all_fills_fd, t.fin_all);
+                read_fills(t.perf, t.fin_all, t.fin_rm, t.fin_origen);
             }
             t.fin_valid = 1;
             close_perf(t.perf);
@@ -1228,7 +1375,7 @@ static void ompt_finalize(ompt_data_t* tool_data) {
         if (g_summary_csv) {
             fprintf(g_summary_csv,
                 "%s,%d,%" PRIu64 ",%s,%d,%d,%" PRIu64 ",%" PRIu64 ","
-                "%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%.6f,%.6f,%d,%" PRId64 ",%s\n",
+                "%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",%.6f,%.6f,%d,%" PRId64 ",%s",
                 g_tag, (int)t.tid_linux, t.ompt_id,
                 thread_type_str((ompt_thread_t)t.ompt_type),
                 t.last_cpu, t.numa_node,
@@ -1237,6 +1384,13 @@ static void ompt_finalize(ompt_data_t* tool_data) {
                 ipc, ratio,
                 t.win_count, t.first_migration_win,
                 perf_status_str(t.perf.status));
+            // Desglose por origen: las mismas seis columnas que emite
+            // perf_region.hpp en las configuraciones sin tool, para que el script
+            // de campaña agregue los dos caminos con el mismo código.
+            for (int k = 0; k < FO_N; ++k)
+                fprintf(g_summary_csv, ",%" PRIu64, t.fin_origen[k]);
+            fprintf(g_summary_csv, ",%d,%s\n", usar_mascaras_origen() ? 1 : 0,
+                    familia_es_demanda() ? "dmnd" : "any");
         }
 
         fprintf(stderr,

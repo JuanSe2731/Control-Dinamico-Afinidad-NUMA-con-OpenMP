@@ -26,6 +26,12 @@
 #include <sys/prctl.h>
 #endif
 
+// Auto-instrumentación acotada a la región medida. Sustituye al `perf stat`
+// externo, que contaba también la generación de la matriz y hacía inutilizables el
+// IPC y el ratio_rm de las configuraciones sin tool OMPT. Se desactiva sola si el
+// tool está cargado, para no medir lo mismo dos veces.
+#include "perf_region.hpp"
+
 // Compuerta de contadores hardware, igual que en Stencil.cpp. Sin esto las
 // ventanas de perf de SpMV incluían la carga de la matriz, init_vector, la
 // validación SERIAL y los 2 warmups, con lo que sus series no eran comparables
@@ -279,10 +285,36 @@ CsrMatrix load_matrix_market(const std::string& filename)
     return mat;
 }
 
+// Semilla del experimento. Fija por defecto: la campaña tiene que poder repetirse
+// y dar la misma matriz. SPMV_SEED la sobreescribe para estudios de sensibilidad.
+static constexpr unsigned SEMILLA_DEFECTO = 42;
+
+static unsigned semilla_spmv()
+{
+    if (const char* e = std::getenv("SPMV_SEED")) {
+        long v = std::atol(e);
+        if (v > 0) return static_cast<unsigned>(v);
+    }
+    return SEMILLA_DEFECTO;
+}
+
+// Warm-up subido de 2 a 5, configurable por entorno para que el valor efectivo
+// quede en el registro experimental.
+static constexpr int WARMUP_ITERS_DEFECTO = 5;
+
+static int warmup_iters()
+{
+    if (const char* e = std::getenv("WARMUP_ITERS")) {
+        int v = std::atoi(e);
+        if (v >= 0) return v;
+    }
+    return WARMUP_ITERS_DEFECTO;
+}
+
 //  Generación de matriz aleatoria (modo sintético)
 //  Usa schedule(static) — no forma parte de las métricas de rendimiento
 CsrMatrix generate_random_matrix(IndexType rows, IndexType cols,
-                                  int avg_nnz, unsigned seed = 42)
+                                  int avg_nnz, unsigned seed = SEMILLA_DEFECTO)
 {
     CsrMatrix A;
     A.num_rows    = rows;
@@ -309,13 +341,15 @@ CsrMatrix generate_random_matrix(IndexType rows, IndexType cols,
     A.col_idxs.resize(A.nnz);
     A.values.resize(A.nnz);
 
+    // La semilla local depende SOLO del índice de fila, nunca de
+    // omp_get_thread_num(). Antes sí dependía, y eso hacía que la MISMA matriz
+    // saliera con índices de columna distintos según el número de hilos: el patrón
+    // de acceso a memoria cambiaba entre la corrida de 8 hilos y la de 128, que es
+    // exactamente la variable que este proyecto pretende medir. Ahora la matriz es
+    // idéntica con cualquier recuento de hilos y con o sin OpenMP.
 #pragma omp parallel for schedule(static)
     for (IndexType i = 0; i < rows; ++i) {
-#ifdef _OPENMP
-        std::mt19937 lgen(seed + (unsigned)(omp_get_thread_num() * 99991u + i));
-#else
         std::mt19937 lgen(seed + (unsigned)i);
-#endif
         std::uniform_int_distribution<IndexType> col_dist(0, cols - 1);
         std::uniform_real_distribution<ValueType> val_dist(0.0, 1.0);
 
@@ -336,19 +370,15 @@ void init_vector(std::vector<ValueType>& v, ValueType fill = -1.0)
         return;
     }
 
-    // Seed base distinta en cada ejecución
-    static const unsigned base_seed = static_cast<unsigned>(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count() ^
-        (unsigned)std::random_device{}()
-    );
+    // Semilla FIJA. Antes se derivaba del reloj XOR random_device, con lo que cada
+    // ejecución usaba un vector distinto y el experimento no era reproducible; y
+    // como además entraba omp_get_thread_num(), el vector cambiaba con el número de
+    // hilos. Se corrigen las dos cosas: SPMV_SEED la sobreescribe si hace falta.
+    static const unsigned base_seed = semilla_spmv();
 
 #pragma omp parallel for schedule(static)
     for (IndexType i = 0; i < n; ++i) {
-#ifdef _OPENMP
-        std::mt19937 lgen(base_seed + (unsigned)(omp_get_thread_num() * 99991u + i));
-#else
         std::mt19937 lgen(base_seed + (unsigned)i);
-#endif
         std::uniform_real_distribution<ValueType> d(0.0, 1.0);
         v[i] = d(lgen);
     }
@@ -416,31 +446,52 @@ bool validate_result(const CsrMatrix& A,
 }
 
 //  Métricas de rendimiento
-double compute_bandwidth_gibs(const CsrMatrix& mat, double elapsed_s)
+
+// Working set del CSR: values + col_idxs + row_ptrs + vector x + vector y. Es lo
+// que sitúa cada ejecución en su peldaño de la escalera de tamaños.
+double working_set_bytes(const CsrMatrix& mat)
 {
-    double bytes =
-          static_cast<double>(mat.nnz)          * sizeof(ValueType)
-        + static_cast<double>(mat.nnz)          * sizeof(IndexType)
-        + static_cast<double>(mat.num_rows + 1) * sizeof(IndexType)
-        + static_cast<double>(mat.num_cols)     * sizeof(ValueType)
-        + static_cast<double>(mat.num_rows)     * sizeof(ValueType);
-    return (bytes / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
+    return static_cast<double>(mat.nnz)          * sizeof(ValueType)
+         + static_cast<double>(mat.nnz)          * sizeof(IndexType)
+         + static_cast<double>(mat.num_rows + 1) * sizeof(IndexType)
+         + static_cast<double>(mat.num_cols)     * sizeof(ValueType)
+         + static_cast<double>(mat.num_rows)     * sizeof(ValueType);
 }
 
-// compute_bandwidth_gbs se eliminó: contaba un conjunto de bytes DISTINTO al de
-// compute_bandwidth_gibs (omitía row_ptrs y la escritura de y), así que las dos
-// columnas no eran la misma magnitud en dos bases de unidades y convertir una en
-// la otra no daba la otra. Queda solo bw_gibs, cuyo modelo de bytes es el de
-// arriba: values + col_idxs + row_ptrs + vector x + vector y.
+// CAUDAL ÚTIL, no "ancho de banda". Los bytes son una constante fijada por la
+// matriz, así que esto es 1/t reescalado: caudal_util_gibs * avg_ms es constante
+// exacta para una matriz dada. Más alto = más rápido.
+//
+// NO CONFUNDIR con el tráfico real de memoria. Los bytes que de verdad cruzan el
+// controlador y el enlace inter-nodo se cuentan con los rellenos por origen
+// (perf_region.hpp), y ahí MENOS ES MEJOR: menos tráfico remoto es menos tiempo
+// muerto de espera. Son dos magnitudes distintas y el proyecto las confundió.
+double compute_caudal_util_gibs(const CsrMatrix& mat, double elapsed_s)
+{
+    return (working_set_bytes(mat) / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
+}
+
+// GFLOPS. El cuerpo del kernel es `sum += val[k] * xv[ci[k]]`: una multiplicación
+// y una suma por cada no-cero, es decir 2*nnz flop por producto matriz-vector.
+double compute_gflops(const CsrMatrix& mat, double elapsed_s)
+{
+    return (2.0 * static_cast<double>(mat.nnz)) / (elapsed_s * 1e9);
+}
 
 //  Framework de benchmark
+//
+// TODAS las métricas derivadas se calculan sobre el tiempo MEDIO, no sobre el
+// mínimo. El mínimo es la repetición más afortunada de 150: favorece a cualquier
+// configuración y favorece MÁS a las de mayor varianza, que son justamente las que
+// no fijan afinidad. La convención anterior sesgaba a favor de la propuesta.
 struct BenchmarkResult {
     const char* strategy{nullptr};
     double min_time_s{0};
     double avg_time_s{0};
     double max_time_s{0};
     double stddev_s{0};
-    double bandwidth_gibs{0};   // derivado de min_time_s (convención HPC)
+    double caudal_util_gibs{0};  // derivado de avg_time_s
+    double gflops{0};            // derivado de avg_time_s
 };
 
 using SpMVFunc = void(*)(const CsrMatrix&,
@@ -454,18 +505,22 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
                                 SpMVFunc spmv_func,
                                 std::vector<double>& times_out,
                                 int reps   = 10,
-                                int warmup = 2)
+                                int warmup = WARMUP_ITERS_DEFECTO)
 {
     std::cout << "\n[BENCH] Estrategia: " << strategy_name << "\n";
 
     // Warm-up con la misma función; no se mide y se excluye de los contadores.
     perf_events_disable_all_threads();
+    // Los contadores propios se abren antes del warm-up para que el coste de
+    // abrirlos no caiga en la región medida. Inerte si el tool OMPT está cargado.
+    perf_region::init();
     for (int i = 0; i < warmup; ++i) spmv_func(A, x, y);
     perf_events_enable_all_threads();
 
     times_out.clear();
     times_out.reserve(reps);
     omp_control_tool(omp_control_tool_start, 1, nullptr);
+    perf_region::begin();
     for (int r = 0; r < reps; ++r) {
         // steady_clock, no high_resolution_clock: éste último es alias de
         // system_clock en libstdc++ y no es monótono.
@@ -476,6 +531,7 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
         // El printf por repetición estaba DENTRO de la región medida: eran 150
         // write() por corrida en la ventana que el tool OMPT está contando.
     }
+    perf_region::end();
     omp_control_tool(omp_control_tool_pause, 1, nullptr);
     // Se vuelven a apagar para que la validación, los printf y el volcado de CSV
     // no entren en el conteo agregado de perf.
@@ -490,26 +546,31 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
     for (double t : times) var += (t - avg_t) * (t - avg_t);
     double stddev = std::sqrt(var / ((reps > 1) ? (reps - 1) : 1));  // muestral (N-1)
 
-    double bw_gibs = compute_bandwidth_gibs(A, min_t);
+    // Sobre la MEDIA, no sobre el mínimo.
+    double caudal = compute_caudal_util_gibs(A, avg_t);
+    double gflops = compute_gflops(A, avg_t);
 
     printf("  Tiempo  : %.4f ms (min) | %.4f ms (avg) | %.4f ms (max) | stddev=%.4f ms\n",
            min_t*1e3, avg_t*1e3, max_t*1e3, stddev*1e3);
-    printf("  BW GiB/s: %.3f (min) | %.3f (avg)\n",
-           bw_gibs, compute_bandwidth_gibs(A, avg_t));
+    printf("  GFLOPS       : %.3f  (sobre la media)\n", gflops);
+    printf("  Caudal GiB/s : %.3f  (caudal util, NO trafico real)\n", caudal);
 
     BenchmarkResult res;
-    res.strategy       = strategy_name;
-    res.min_time_s     = min_t;
-    res.avg_time_s     = avg_t;
-    res.max_time_s     = max_t;
-    res.stddev_s       = stddev;
-    res.bandwidth_gibs = bw_gibs;
+    res.strategy         = strategy_name;
+    res.min_time_s       = min_t;
+    res.avg_time_s       = avg_t;
+    res.max_time_s       = max_t;
+    res.stddev_s         = stddev;
+    res.caudal_util_gibs = caudal;
+    res.gflops           = gflops;
     return res;
 }
 
 //  Exportación CSV
 void export_csv(const std::string& filename,
                 const CsrMatrix& A,
+                int warmup,
+                int reps,
                 const std::vector<BenchmarkResult>& results)
 {
     std::ofstream f(filename);
@@ -523,8 +584,8 @@ void export_csv(const std::string& filename,
     threads = omp_get_max_threads();
 #endif
 
-    f << "strategy,matrix,rows,cols,nnz,threads,"
-         "min_ms,avg_ms,max_ms,stddev_ms,bw_gibs\n";
+    f << "strategy,matrix,rows,cols,nnz,ws_bytes,threads,warmup,reps,"
+         "min_ms,avg_ms,max_ms,stddev_ms,caudal_util_gibs,gflops\n";
 
     for (const auto& r : results) {
         f << r.strategy       << ","
@@ -532,13 +593,17 @@ void export_csv(const std::string& filename,
           << A.num_rows       << ","
           << A.num_cols       << ","
           << A.nnz            << ","
+          << std::fixed << std::setprecision(0) << working_set_bytes(A) << ","
           << threads          << ","
-          << std::fixed << std::setprecision(6)
+          << warmup           << ","
+          << reps             << ","
+          << std::setprecision(6)
           << r.min_time_s*1e3 << ","
           << r.avg_time_s*1e3 << ","
           << r.max_time_s*1e3 << ","
           << r.stddev_s*1e3   << ","
-          << r.bandwidth_gibs << "\n";
+          << r.caudal_util_gibs << ","
+          << r.gflops         << "\n";
     }
     std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
 }
@@ -562,16 +627,35 @@ void export_times_csv(const std::string& filename,
 //  Main
 int main(int argc, char* argv[])
 {
-    // Uso: ./spmv [archivo.mtx] [hilos] [reps] [prefijo_csv]
-    std::string mtx_file   = "";
+    // Uso: ./spmv_static <filas|archivo.mtx> [hilos] [reps] [prefijo_csv]
+    //
+    // El primer argumento admite las dos formas y se distingue solo: si es un
+    // entero positivo se genera una matriz sintética de ese número de filas; en
+    // otro caso se interpreta como ruta a un .mtx. Así el tamaño pasa a ser un
+    // parámetro barrido (peldaños S0..S5) sin cambiar la forma posicional de la
+    // línea de órdenes, que es lo que construye build_cmd como arreglo de bash.
+    //
+    // La campaña ya no usa stokes.mtx: todos los peldaños salen del generador con
+    // semilla fija, de modo que el experimento es reproducible de punta a punta sin
+    // depender de un fichero de 4 GB que no está en git. La carga de .mtx se
+    // conserva porque sigue siendo útil para comprobaciones puntuales.
+    std::string mtx_file    = "";
+    IndexType   rows_arg    = 0;
     int         num_threads = 4;
     int         reps        = 10;
     std::string csv_prefix  = "";
 
-    if (argc >= 2) mtx_file    = argv[1];
+    if (argc >= 2) {
+        char* fin = nullptr;
+        long v = std::strtol(argv[1], &fin, 10);
+        if (fin && *fin == '\0' && v > 0) rows_arg = static_cast<IndexType>(v);
+        else                              mtx_file = argv[1];
+    }
     if (argc >= 3) num_threads  = std::stoi(argv[2]);
     if (argc >= 4) reps         = std::stoi(argv[3]);
     if (argc >= 5) csv_prefix   = argv[4];
+
+    const int warmup = warmup_iters();
 
     if (!kPrint) {
         std::freopen("/dev/null", "w", stdout);
@@ -596,21 +680,22 @@ int main(int argc, char* argv[])
     // ── Cargar o generar matriz
     CsrMatrix A;
     if (mtx_file.empty()) {
-        constexpr IndexType ROWS    = 5000000;
-        constexpr IndexType COLS    = 5000000;
-        int avg_nnz = 360;
+        // avg_nnz = 32 por defecto: da un working set de ~404 B por fila, con lo
+        // que los peldaños de tamaño del SpMV quedan emparejados uno a uno con los
+        // del Stencil (S0 253 KiB ... S5 4.11 GiB).
+        const IndexType ROWS = (rows_arg > 0) ? rows_arg : 10923000;
+        const IndexType COLS = ROWS;
+        int avg_nnz = 32;
         if (const char* env = std::getenv("SPMV_AVG_NNZ")) {
             int v = std::atoi(env);
             if (v > 0) avg_nnz = v;
         }
-        std::cout << "\n[INFO] Sin archivo .mtx → generando matriz aleatoria "
+        const unsigned run_seed = semilla_spmv();
+        std::cout << "\n[INFO] Generando matriz sintetica "
                   << ROWS << " x " << COLS
                   << "  avg_nnz_por_fila=" << avg_nnz << "\n";
-	unsigned run_seed = static_cast<unsigned>(
-    	std::chrono::high_resolution_clock::now().time_since_epoch().count() ^
-    	(unsigned)std::random_device{}()
-	);
-	std::cout << "[RNG] Seed de ejecucion: " << run_seed << "\n";
+        std::cout << "[RNG] Semilla FIJA de ejecucion: " << run_seed
+                  << "  (SPMV_SEED para cambiarla)\n";
         A = generate_random_matrix(ROWS, COLS, avg_nnz, run_seed);
     } else {
         std::cout << "\n[INFO] Cargando archivo: " << mtx_file << "\n";
@@ -642,21 +727,23 @@ std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
 
     init_vector(y, 0.0);
     results.push_back(
-        benchmark_spmv(A, x, y, "Static-256", spmv_static_chunk, times_s, reps));
+        benchmark_spmv(A, x, y, "Static-256", spmv_static_chunk, times_s,
+                       reps, warmup));
 
     // ── Tabla resumen
     std::cout << "\n"
-              << "+----------------------+----------+----------+----------+\n"
-              << "| Estrategia           | min (ms) | avg (ms) | GiB/s    |\n"
-              << "+----------------------+----------+----------+----------+\n";
+              << "+----------------------+----------+----------+----------+----------+\n"
+              << "| Estrategia           | min (ms) | avg (ms) | GFLOPS   | caudal   |\n"
+              << "+----------------------+----------+----------+----------+----------+\n";
     for (const auto& r : results) {
-        printf("| %-20s | %8.3f | %8.3f | %8.3f |\n",
+        printf("| %-20s | %8.3f | %8.3f | %8.3f | %8.3f |\n",
                r.strategy,
                r.min_time_s * 1e3,
                r.avg_time_s * 1e3,
-               r.bandwidth_gibs);
+               r.gflops,
+               r.caudal_util_gibs);
     }
-    std::cout << "+----------------------+----------+----------+----------+\n";
+    std::cout << "+----------------------+----------+----------+----------+----------+\n";
 
     // ── Primeras entradas del resultado
     std::cout << "\n=== Primeras entradas de y = A*x ===\n";
@@ -666,9 +753,14 @@ std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
 
     // ── Exportar CSV
     if (!csv_prefix.empty()) {
-        export_csv(csv_prefix + ".csv", A, results);
+        export_csv(csv_prefix + ".csv", A, warmup, reps, results);
         export_times_csv(csv_prefix + "_times.csv", times_s);
+        // Contadores por hilo acotados a la región medida. Vacío si el tool OMPT
+        // era el propietario: entonces los datos salen de ompt_summary.csv.
+        perf_region::escribir_csv((csv_prefix + "_counters.csv").c_str(),
+                                  csv_prefix.c_str());
     }
+    perf_region::shutdown();
 
     return 0;
 }
