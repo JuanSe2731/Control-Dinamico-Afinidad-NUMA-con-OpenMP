@@ -1,0 +1,17 @@
+tag,slot,tid,instructions,cycles,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,0,438179,5211474448,11591935175,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,1,438180,5505790656,11556244957,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,2,438181,5496910544,11559012687,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,3,438182,4472803494,11689746894,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,4,438183,5506653198,11561209831,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,5,438184,4915810255,11649471552,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,6,438185,5608874419,11546904686,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,7,438186,5539934687,11549456771,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,8,438187,5460811841,11562312490,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,9,438188,5648387088,11538670561,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,10,438189,5178456952,11606544554,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,11,438190,5519712220,11553880708,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,12,438191,5462466188,11560042913,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,13,438192,5644523185,11536039851,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,14,438193,5760862483,11526693925,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S4_t16_interleave,15,438194,4989838350,11621239000,0,0,0,0,0,0,0,0,1,any

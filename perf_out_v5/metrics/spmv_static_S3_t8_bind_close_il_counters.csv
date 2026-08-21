@@ -1,0 +1,9 @@
+tag,slot,tid,instructions,cycles,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v5/metrics/spmv_static_S3_t8_bind_close_il,0,428141,1653872951,3462666683,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t8_bind_close_il,1,428142,1673721647,3463684785,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t8_bind_close_il,2,428143,1686230022,3462010094,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t8_bind_close_il,3,428144,1666945181,3463646316,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t8_bind_close_il,4,428145,1680041807,3463866807,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t8_bind_close_il,5,428146,1665695206,3464410690,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t8_bind_close_il,6,428147,1684572792,3460422023,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t8_bind_close_il,7,428148,1666151813,3461325451,0,0,0,0,0,0,0,0,1,any

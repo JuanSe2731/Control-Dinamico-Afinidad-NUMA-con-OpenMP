@@ -1,0 +1,17 @@
+tag,slot,tid,instructions,cycles,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v5/metrics/spmv_static_S3_t16_base,0,428345,1083923276,1071789258,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,1,428346,930258712,1087772340,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,2,428347,963992266,1083315214,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,3,428348,1141467057,1064837122,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,4,428349,1084916079,1070641319,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,5,428350,1146610003,1064574411,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,6,428351,1099333693,1068830861,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,7,428352,1147127163,1064116273,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,8,428353,1049710237,1075656188,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,9,428354,991134407,1080481231,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,10,428355,982784544,1081726128,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,11,428356,865994634,1096701621,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,12,428357,829675799,1100038385,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,13,428358,938598360,1086161847,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,14,428359,828026721,1099717106,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S3_t16_base,15,428360,947769789,1084506513,0,0,0,0,0,0,0,0,1,any
