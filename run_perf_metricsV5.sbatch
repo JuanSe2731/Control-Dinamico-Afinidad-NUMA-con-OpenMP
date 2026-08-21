@@ -6,20 +6,33 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=256
 #SBATCH --mem=250000
-#SBATCH --time=24:00:00
+#SBATCH --time=48:00:00
 #SBATCH --output=perf_v5.%j.out
 #SBATCH --error=perf_v5.%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=jsotero12555@gmail.com
 
-# Campaña V5. La matriz completa son 576 ejecuciones (6 tamaños x 6 recuentos de
-# hilos x 8 configuraciones x 2 kernels) y NO cabe en una ventana de 24 h.
+# Campaña V5: 576 ejecuciones (6 tamaños x 6 recuentos de hilos x 8 configuraciones
+# x 2 kernels).
 #
-# Por eso el script es reanudable: cada (tamaño, config, hilos, kernel) que termina
-# bien deja un marcador en $OUTDIR/.done y se salta en la siguiente tanda. La forma
-# de trabajar es lanzar esto varias veces hasta que reporte "ejecutadas: 0".
+# ESTIMACION DE DURACION. La referencia es el job 29223: 600 ejecuciones en 17 472 s,
+# o sea ~29 s por ejecucion, y todas al tamaño grande cargando stokes.mtx desde
+# disco. Las nuestras son mayoritariamente de tamaños menores (S0-S4 son de
+# milisegundos) y las de S5 generan la matriz en memoria en vez de parsear 4 GB de
+# texto. Estimacion: entre 5 y 10 horas para el barrido completo.
 #
-# Para trocear por tamaños y que cada trabajo entre holgado:
+# El --time de 48 h es un COLCHON, no una necesidad. Si la particion no admite tanto
+# (`scontrol show partition amd | grep MaxTime`), bajarlo a 24:00:00 no cambia nada
+# en la practica.
+#
+# Y el colchon importa poco, porque el script es REANUDABLE: cada (tamaño, config,
+# hilos, kernel) que termina bien deja un marcador en $OUTDIR/.done y se salta en la
+# siguiente tanda. Que SLURM mate el trabajo por pared de tiempo no cuesta datos,
+# solo un reenvio. La forma de trabajar es lanzarlo hasta que diga "ejecutadas: 0".
+#
+# LO RECOMENDABLE ES TROCEAR POR TAMAÑO, no alargar el --time: el backfill del
+# planificador mete antes los trabajos cortos en los huecos, asi que cuatro trabajos
+# troceados suelen terminar antes que uno largo esperando una ventana enorme.
 #     SIZES="S0 S1 S2" sbatch run_perf_metricsV5.sbatch
 #     SIZES="S3"       sbatch run_perf_metricsV5.sbatch
 #     SIZES="S4"       sbatch run_perf_metricsV5.sbatch
