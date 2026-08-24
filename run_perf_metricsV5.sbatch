@@ -50,4 +50,28 @@
 set -euo pipefail
 cd "$SLURM_SUBMIT_DIR"
 
+# ── LIMITE DE DESCRIPTORES ────────────────────────────────────────────────────
+# OBLIGATORIO, no opcional. Cada hilo OpenMP abre varios fd de perf_event_open, y
+# con el limite por defecto de 1024 de exadell la cuenta revienta a partir de 128
+# hilos: el proceso ya no puede ni abrir su CSV de salida, sale con codigo 0 y deja
+# la fila entera vacia. Asi se perdieron 144 ejecuciones (el 25 %) en la campana
+# 29355, y en silencio, porque el stderr iba a /dev/null.
+#
+#   fds por hilo ~ 2 (ciclos+instr) + 2 (par 0xFF44/0xD044) + hasta 6 del desglose
+#   256 hilos x 10 = 2560, mas stdio, el runtime de OpenMP y los ficheros de salida
+ulimit -n 65536 2>/dev/null || ulimit -n "$(ulimit -Hn)" 2>/dev/null || true
+echo "=== limite de descriptores: $(ulimit -n) (hard: $(ulimit -Hn)) ==="
+if [ "$(ulimit -n)" -lt 4096 ]; then
+  echo "AVISO: menos de 4096 descriptores; los puntos de 128 y 256 hilos pueden fallar" >&2
+fi
+
+# ── Contadores libres ─────────────────────────────────────────────────────────
+# Zen 4 tiene 6 contadores programables, pero el nmi_watchdog ocupa uno de forma
+# permanente y deja solo CINCO. Un grupo de 6 eventos se abre pero NUNCA se
+# planifica (perf lo reporta como "<not counted> (0.00%)"). El codigo lo sondea en
+# tiempo de ejecucion y ajusta el tamano del desglose; ratio_rm no se ve afectado
+# porque sale de un par que siempre cabe. Se deja registrado el estado:
+echo "=== nmi_watchdog: $(cat /proc/sys/kernel/nmi_watchdog 2>/dev/null || echo '?') ==="
+echo "=== perf_event_paranoid: $(cat /proc/sys/kernel/perf_event_paranoid) ==="
+
 srun ./run_perf_metricsV5.sh

@@ -279,6 +279,33 @@ static uint64_t fill_config(int i) {
     return (FILL_UMASK[i] << 8) | evento_familia();
 }
 
+// Orden en que se conservan mascaras cuando no caben todas: primero las que CRUZAN
+// una interconexion, que son las que este trabajo estudia.
+static const int PRIORIDAD_FILL[FO_N] = {
+    FO_FAR_DRAM, FO_FAR_CACHE, FO_CCD_VECINO,
+    FO_DRAM_LOCAL, FO_L3_CCD, FO_L2
+};
+
+// Cuantas mascaras del desglose se abren ADEMAS del par. Por defecto 3, que es lo
+// que queda libre: Zen 4 tiene 6 contadores programables, el nmi_watchdog ocupa uno
+// y el par de ratio_rm ocupa dos. Pedir mas obligaria al kernel a multiplexar el
+// desglose contra el par, y aunque el cociente remoto/total seguiria siendo exacto
+// (van en el mismo grupo y se escalan igual), pasaria a muestrearse a rafagas: mas
+// varianza en la senal del detector y conteos absolutos extrapolados justo debajo
+// del filtro MIN_FILLS. La variable de decision del mecanismo no debe depender de
+// una extrapolacion.
+static int tope_origenes() {
+    static int cache = -1;
+    if (cache < 0) {
+        cache = 3;
+        if (const char* e = getenv("PERF_MAX_ORIGENES")) {
+            int v = atoi(e);
+            if (v >= 0 && v <= FO_N) cache = v;
+        }
+    }
+    return cache;
+}
+
 // Los nombres de columna correspondientes viven en la cabecera de
 // OMPT_SUMMARY_CSV y deben coincidir con los de perf_region.hpp, para que el
 // script de campaña agregue por igual los dos caminos de medida.
@@ -508,9 +535,10 @@ static void enable_perf(PerfFDs& p) {
                                 ioctl(p.cycles_fd,    PERF_EVENT_IOC_ENABLE, 0); }
     if (p.all_fills_fd >= 0) { ioctl(p.all_fills_fd, PERF_EVENT_IOC_RESET,  0);
                                 ioctl(p.all_fills_fd, PERF_EVENT_IOC_ENABLE, 0); }
-    for (int i = 0; i < FO_N; ++i)
-        if (p.origen_fd[i] >= 0) { ioctl(p.origen_fd[i], PERF_EVENT_IOC_RESET,  0);
-                                   ioctl(p.origen_fd[i], PERF_EVENT_IOC_ENABLE, 0); }
+    // Solo el lider del grupo del desglose: PERF_IOC_FLAG_GROUP arrastra al resto.
+    const int lider_fill = p.origen_fd[PRIORIDAD_FILL[0]];
+    if (lider_fill >= 0) { ioctl(lider_fill, PERF_EVENT_IOC_RESET,  PERF_IOC_FLAG_GROUP);
+                           ioctl(lider_fill, PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP); }
 }
 
 static void disable_perf(PerfFDs& p) {
@@ -525,6 +553,10 @@ static void disable_perf(PerfFDs& p) {
 
 // ¿Se abre el desglose por origen? Por defecto sí. Con OMPT_MASCARAS=0 se vuelve
 // al par 0xFF44/0xD044 exacto, para reproducir las campañas anteriores.
+// Se pone a 1 si algun hilo tuvo que caer al par degradado; sirve para que la
+// columna 'mascaras' del resumen diga la verdad.
+static int g_mascaras_degradadas = 0;
+
 static bool usar_mascaras_origen() {
     static int cache = -1;
     if (cache < 0) {
@@ -545,21 +577,20 @@ static bool read_fills(PerfFDs& p, uint64_t& all, uint64_t& remoto,
     all = 0; remoto = 0;
     if (por_origen) for (int i = 0; i < FO_N; ++i) por_origen[i] = 0;
 
-    if (usar_mascaras_origen()) {
-        if (p.origen_fd[0] < 0) return false;
+    // El desglose es opcional y solo informa; si esta, se rellena.
+    if (por_origen && p.origen_fd[0] >= 0) {
         uint64_t v = 0;
-        for (int i = 0; i < FO_N; ++i) {
-            if (!read_counter(p.origen_fd[i], v)) return false;
-            if (por_origen) por_origen[i] = v;
-            all += v;
-            if (i == FO_FAR_CACHE || i == FO_FAR_DRAM) remoto += v;
-        }
-        return true;
+        for (int i = 0; i < FO_N; ++i)
+            if (p.origen_fd[i] >= 0 && read_counter(p.origen_fd[i], v))
+                por_origen[i] = v;
     }
-    if (!read_counter(p.all_fills_fd, all))   return false;
+
+    // all y remoto vienen SIEMPRE del par exacto: es lo que sostiene ratio_rm.
+    if (!read_counter(p.all_fills_fd, all))    return false;
     if (!read_counter(p.rm_misses,    remoto)) return false;
     return true;
 }
+
 
 // Degradación por-fd en vez de todo-o-nada: si fallan los eventos crudos de AMD
 // (0xD044/0xFF44) pero sí abren instrucciones y ciclos, el hilo sigue aportando
@@ -583,30 +614,45 @@ static void open_perf_for_thread(ThreadInfo& t) {
     int e_rm = 0, e_all = 0;
     bool have_numa = false;
 
-    if (usar_mascaras_origen()) {
-        // Seis máscaras de PMCx044, una por procedencia de la línea. NO se abren
-        // además 0xD044 y 0xFF44: serían 10 eventos sobre 6 PMC programables y el
-        // multiplexado caería justo sobre la variable de decisión. Los dos números
-        // que el mecanismo necesita se derivan de las seis (ver FillOrigen).
-        for (int i = 0; i < FO_N; ++i) {
-            t.perf.origen_fd[i] = open_counter(t.tid_linux, PERF_TYPE_RAW,
-                                               fill_config(i), leader);
-            if (t.perf.origen_fd[i] < 0 && e_rm == 0) e_rm = errno;
+    // EL PAR PRIMERO, SIEMPRE. 0xFF44 y 0xD044 son dos eventos, caben seguro, y de
+    // aqui sale ratio_rm EXACTO: los dos van en el mismo grupo, asi que su cociente
+    // cubre el mismo intervalo. Es la variable de decision del mecanismo y no puede
+    // depender de que quepa el desglose.
+    //
+    // En la campana 29355 no era asi y salio mal: las seis mascaras colgaban del
+    // grupo de ciclos, o sea OCHO eventos en un grupo. Zen 4 tiene 6 contadores
+    // programables y el nmi_watchdog ocupa uno, asi que solo hay CINCO libres: el
+    // grupo nunca se planifico, 12 096 de 12 096 hilos quedaron en ipc_only, y el
+    // scheduler corrio sin poder migrar ni una vez.
+    t.perf.all_fills_fd = open_counter(t.tid_linux, PERF_TYPE_RAW,
+                                       (0xFFULL << 8) | evento_familia(), -1);
+    e_all = (t.perf.all_fills_fd < 0) ? errno : 0;
+    t.perf.rm_misses    = open_counter(t.tid_linux, PERF_TYPE_RAW,
+                                       (0xD0ULL << 8) | evento_familia(),
+                                       t.perf.all_fills_fd);
+    e_rm = (t.perf.rm_misses < 0) ? errno : 0;
+    have_numa = (t.perf.all_fills_fd >= 0 && t.perf.rm_misses >= 0);
+
+    // El desglose por origen es un EXTRA para informar: se abre en su propio grupo y
+    // solo si cabe entero. Si no cabe, se cierra y no pasa nada — ratio_rm sigue en
+    // pie y lo unico que se pierde es la figura de trafico por distancia.
+    if (usar_mascaras_origen() && tope_origenes() > 0) {
+        int lider_fill = -1;
+        bool todas = true;
+        for (int i = 0; i < tope_origenes(); ++i) {
+            const int org = PRIORIDAD_FILL[i];
+            t.perf.origen_fd[org] = open_counter(t.tid_linux, PERF_TYPE_RAW,
+                                                 fill_config(org), lider_fill);
+            if (t.perf.origen_fd[org] < 0) todas = false;
+            if (i == 0) lider_fill = t.perf.origen_fd[org];
         }
-        have_numa = (t.perf.origen_fd[FO_FAR_DRAM] >= 0 &&
-                     t.perf.origen_fd[FO_DRAM_LOCAL] >= 0);
-        e_all = e_rm;
-    } else {
-        // remote fills AMD EPYC: event=0x44 umask=0xD0 → raw 0xD044
-        t.perf.rm_misses = open_counter(t.tid_linux, PERF_TYPE_RAW,
-                                        (0xD0ULL << 8) | evento_familia(), leader);
-        e_rm = (t.perf.rm_misses < 0) ? errno : 0;
-
-        t.perf.all_fills_fd = open_counter(t.tid_linux, PERF_TYPE_RAW,
-                                           (0xFFULL << 8) | evento_familia(), leader);
-        e_all = (t.perf.all_fills_fd < 0) ? errno : 0;
-
-        have_numa = (t.perf.rm_misses >= 0 && t.perf.all_fills_fd >= 0);
+        if (!todas) {
+            for (int i = 0; i < FO_N; ++i)
+                if (t.perf.origen_fd[i] >= 0) { close(t.perf.origen_fd[i]);
+                                                t.perf.origen_fd[i] = -1; }
+            g_mascaras_degradadas = 1;
+        }
+        if (tope_origenes() < FO_N) g_mascaras_degradadas = 1;
     }
 
     const bool have_ipc  = (t.perf.cycles_fd >= 0 && t.perf.instr_fd >= 0);
@@ -634,9 +680,9 @@ static void open_perf_for_thread(ThreadInfo& t) {
             "Este hilo no podrá disparar migraciones.\n"
             "    modo=%s  primer errno: %s / %s\n"
             "  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen\n"
-            "  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044\n",
+            "  → comprobar perf_event_paranoid <= 2 y `perf list | grep -i fills`\n",
             (int)t.tid_linux,
-            usar_mascaras_origen() ? "6 mascaras por origen" : "0xFF44/0xD044",
+            "par 0xFF44/0xD044",
             e_rm  ? strerror(e_rm)  : "ok",
             e_all ? strerror(e_all) : "ok");
         if (t.perf.rm_misses    >= 0) { close(t.perf.rm_misses);    t.perf.rm_misses    = -1; }
@@ -1389,7 +1435,10 @@ static void ompt_finalize(ompt_data_t* tool_data) {
             // de campaña agregue los dos caminos con el mismo código.
             for (int k = 0; k < FO_N; ++k)
                 fprintf(g_summary_csv, ",%" PRIu64, t.fin_origen[k]);
-            fprintf(g_summary_csv, ",%d,%s\n", usar_mascaras_origen() ? 1 : 0,
+            // 'mascaras' = cuantas del desglose se midieron de verdad. Con el par
+            // exacto siempre abierto, 0 aqui NO significa que falte ratio_rm.
+            fprintf(g_summary_csv, ",%d,%s\n",
+                    usar_mascaras_origen() ? tope_origenes() : 0,
                     familia_es_demanda() ? "dmnd" : "any");
         }
 

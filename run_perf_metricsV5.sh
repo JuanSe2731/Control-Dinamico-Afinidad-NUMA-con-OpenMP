@@ -211,12 +211,23 @@ aggregate_counters() {
       fc  += col("fill_far_cache")
       fd  += col("fill_far_dram")
       mig += col("migrations")
+      # El PAR EXACTO. perf_region lo llama fill_all/fill_remoto y el tool
+      # all_fills/remote_fills; se aceptan los dos nombres.
+      par_all += col("fill_all")   + col("all_fills")
+      par_rem += col("fill_remoto") + col("remote_fills")
       n++
     }
     END {
       if (n == 0) { print "NA NA 0 0 0 0 0 0 0"; exit }
-      all = l2 + l3 + cv + dl + fc + fd
-      rem = fc + fd
+      # ratio_rm SALE DEL PAR, nunca de sumar las mascaras del desglose.
+      #
+      # Solo se miden TRES mascaras (las que cruzan una interconexion), porque el
+      # nmi_watchdog ocupa un contador y el par ocupa dos de los cinco libres.
+      # Sumar las seis columnas daria all = ccd_vecino + far_cache + far_dram, que
+      # no es el total sino solo la parte lejana: ratio_rm saldria ~0.7 en vez de
+      # ~0.1. El par 0xFF44/0xD044 si es el total exacto.
+      all = (par_all > 0) ? par_all : (l2 + l3 + cv + dl + fc + fd)
+      rem = (par_all > 0) ? par_rem : (fc + fd)
       printf "%s %s %.0f %.0f %.0f %.0f %.0f %.0f %d\n",
         (cyc > 0 ? sprintf("%.6f", ins/cyc) : "NA"),
         (all > 0 ? sprintf("%.6f", rem/all) : "NA"),
@@ -315,14 +326,19 @@ for size_tag in "${SIZE_LIST[@]}"; do
 
         # ── Ejecución ─────────────────────────────────────────────────────────
         build_cmd "$ktype" "$bin" "$tam" "$threads" "$csv_prefix"
+        # El stderr NO se tira: es donde avisan la instrumentacion y el tool cuando
+        # los contadores no abren. En la campana 29355 se mandaba a /dev/null y por
+        # eso 144 ejecuciones se perdieron en silencio con rc=0.
         rc=0
+        errlog="${LOGDIR}/${tag}.stderr"
         if [[ "$use_il" == "1" ]]; then
-          numactl --interleave=all -- "${cmd[@]}" >/dev/null 2>/dev/null || rc=$?
+          numactl --interleave=all -- "${cmd[@]}" >/dev/null 2>"$errlog" || rc=$?
         else
-          "${cmd[@]}" >/dev/null 2>/dev/null || rc=$?
+          "${cmd[@]}" >/dev/null 2>"$errlog" || rc=$?
         fi
+        [[ -s "$errlog" ]] || rm -f "$errlog"
         if [[ $rc -ne 0 ]]; then
-          echo "    FALLO rc=$rc"
+          echo "    FALLO rc=$rc  (ver $errlog)"
           (( ++fallidos ))
         fi
 
@@ -353,7 +369,9 @@ for size_tag in "${SIZE_LIST[@]}"; do
         # magnitud del director, y aquí MENOS ES MEJOR: menos tráfico remoto es menos
         # tiempo muerto esperando datos. No confundir con caudal_util_gibs, que es
         # 1/tiempo con unidades de ancho de banda.
-        read -r bw_remoto gib_remotos <<< "$(awk -v fc="$fc" -v fd="$fd" -v ms="$avg_ms" '
+        # Los bytes remotos salen del ratio exacto por el total exacto, no de sumar
+        # mascaras: fc+fd solo coincide con el par si las tres mascaras se abrieron.
+        read -r bw_remoto gib_remotos <<< "$(awk -v ratio="$ratio" -v fc="$fc" -v fd="$fd" -v ms="$avg_ms" '
           BEGIN {
             rem = fc + fd
             gib = rem * 64.0 / 1073741824.0
@@ -369,7 +387,15 @@ for size_tag in "${SIZE_LIST[@]}"; do
         echo "${label},${size_tag},${tam},${ws_bytes},${threads},${cfg_id},${binding_label},${mempol_label},${tool_label},${mig_label},${PERF_FAMILIA},${warm},${REPS},${min_ms},${avg_ms},${max_ms},${stdev_ms},${migraciones},${caudal},${mlups},${gflops},${ipc},${l2},${l3},${cv},${dl},${fc},${fd},${bw_remoto},${gib_remotos},${ratio}" \
           >> "$KERNEL_CSV"
 
-        [[ $rc -eq 0 ]] && touch "$marca"
+        # rc=0 NO basta: si el kernel no pudo abrir su CSV de salida (descriptores
+        # agotados, disco lleno) sale con 0 y deja la fila entera en NA. Solo se
+        # marca como hecha si el fichero existe de verdad.
+        if [[ $rc -eq 0 && -s "$kcsv" ]]; then
+          touch "$marca"
+        elif [[ $rc -eq 0 ]]; then
+          echo "    FALLO SILENCIOSO: rc=0 pero no hay ${kcsv}"
+          (( ++fallidos ))
+        fi
       done
     done
   done

@@ -149,6 +149,39 @@ inline std::uint64_t config_origen(int i) {
     return (UMASK_ORIGEN[i] << 8) | evento_familia();
 }
 
+// Orden en que se SACRIFICAN mascaras cuando no caben todas: se conservan primero
+// las lejanas, que son las que importan para NUMA, y se sueltan antes las cercanas.
+// Si solo caben 3, quedan far_dram + far_cache + ccd_vecino, que es justo el tramo
+// caro de esta maquina.
+static const int PRIORIDAD_ORIGEN[N_ORIGENES] = {
+    ORG_FAR_DRAM, ORG_FAR_CACHE, ORG_CCD_VECINO,
+    ORG_DRAM_LOCAL, ORG_L3_CCD, ORG_L2
+};
+
+inline int& n_origenes_activos() { static int n = -1; return n; }
+
+// TOPE de mascaras del desglose. Por defecto 3, y no es una limitacion tecnica sino
+// una DECISION: con 5 contadores libres, el par de ratio_rm ocupa 2 y quedan 3. Si
+// se piden mas, el kernel multiplexa el desglose contra el par, y aunque el cociente
+// remoto/total sigue siendo exacto (ambos van en el mismo grupo, se escalan igual),
+// pasa a muestrearse a rafagas: mete varianza en la senal que alimenta el detector y
+// deja los conteos absolutos extrapolados, justo debajo del filtro MIN_FILLS.
+//
+// Las 3 que se conservan son las que CRUZAN UNA INTERCONEXION, que es lo que este
+// trabajo estudia: near_cache (Infinity Fabric), far_cache y dram_io_far (xGMI). Las
+// tres cercanas se descartan porque no cruzan nada, y la banda "local" de la figura
+// de trafico se DERIVA como all - (las tres lejanas), con all exacto.
+//
+// PERF_MAX_ORIGENES lo cambia si algun dia hay mas contadores libres (por ejemplo si
+// se pudiera apagar el nmi_watchdog, que hoy ocupa uno de forma permanente).
+inline int tope_origenes() {
+    if (const char* e = std::getenv("PERF_MAX_ORIGENES")) {
+        int v = std::atoi(e);
+        if (v >= 0 && v <= N_ORIGENES) return v;
+    }
+    return 3;
+}
+
 // Modo degradado: el par que ya estaba validado en produccion (0xFF/0xD0), con
 // el evento de la familia activa.
 inline std::uint64_t config_all_fills()    { return (0xFFULL << 8) | evento_familia(); }
@@ -191,6 +224,7 @@ inline int& n_hilos_registrados() { static int n = 0; return n; }
 inline bool& esta_activo()        { static bool a = false; return a; }
 inline bool& usa_mascaras()       { static bool m = true;  return m; }
 inline int&  hilos_con_fallo()    { static int f = 0; return f; }
+inline int&  hilos_degradados()   { static int d = 0; return d; }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // perf_event_open
@@ -252,6 +286,70 @@ inline bool leer_contador(int, std::uint64_t& v) { v = 0; return false; }
 #endif
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Sonda: ¿cuantos eventos raw caben en UN grupo que el kernel llegue a planificar?
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// No basta con que perf_event_open devuelva un fd. Un grupo tiene que caber ENTERO
+// y a la vez en la PMU; si no cabe, el kernel lo abre pero NUNCA lo planifica, y
+// entonces time_running queda a 0 y no hay dato. Eso es exactamente lo que paso en
+// la campana 29355: Zen 4 tiene 6 contadores programables pero el nmi_watchdog
+// ocupa uno de forma permanente, asi que solo hay CINCO libres y el grupo de seis
+// nunca corrio. `perf stat` lo reporta como "<not counted> (0.00%)".
+//
+// Por eso se prueba de verdad: se abre el grupo, se habilita, se hace algo de
+// trabajo y se comprueba que time_running > 0. Se repite bajando el tamano hasta
+// que uno funcione. Se hace UNA vez, en el hilo principal, antes de la region
+// paralela.
+
+#if defined(__linux__)
+inline int probar_tamano_grupo() {
+    // El par 0xFF44/0xD044 se abre SIEMPRE y ocupa 2 contadores, asi que la sonda
+    // tiene que medir el hueco QUE QUEDA, no el total. Se abre un par de mentira y
+    // se prueba cuantas mascaras caben ADEMAS, que es la condicion real de no
+    // multiplexar: par + desglose <= contadores libres.
+    int par_a = abrir_contador(PERF_TYPE_RAW, config_all_fills(), -1);
+    int par_b = (par_a >= 0) ? abrir_contador(PERF_TYPE_RAW, config_remote_fills(),
+                                              par_a) : -1;
+    if (par_a >= 0) {
+        ioctl(par_a, PERF_EVENT_IOC_RESET,  PERF_IOC_FLAG_GROUP);
+        ioctl(par_a, PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP);
+    }
+
+    int resultado = 0;
+    for (int n = N_ORIGENES; n >= 1; --n) {
+        int fds[N_ORIGENES];
+        for (int i = 0; i < N_ORIGENES; ++i) fds[i] = -1;
+        int lider = -1;
+        bool ok = true;
+        for (int i = 0; i < n && ok; ++i) {
+            fds[i] = abrir_contador(PERF_TYPE_RAW,
+                                    config_origen(PRIORIDAD_ORIGEN[i]), lider);
+            if (fds[i] < 0) ok = false;
+            if (i == 0) lider = fds[0];
+        }
+        if (ok && lider >= 0) {
+            ioctl(lider, PERF_EVENT_IOC_RESET,  PERF_IOC_FLAG_GROUP);
+            ioctl(lider, PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP);
+            volatile double x = 0.0;
+            for (int k = 0; k < 300000; ++k) x += static_cast<double>(k);
+            LecturaPerf r{};
+            ok = (read(fds[0], &r, sizeof(r)) == static_cast<ssize_t>(sizeof(r)))
+                 && r.tiempo_corriendo > 0;
+            ioctl(lider, PERF_EVENT_IOC_DISABLE, PERF_IOC_FLAG_GROUP);
+        }
+        for (int i = 0; i < N_ORIGENES; ++i) if (fds[i] >= 0) close(fds[i]);
+        if (ok) { resultado = n; break; }
+    }
+
+    if (par_b >= 0) close(par_b);
+    if (par_a >= 0) close(par_a);
+    return resultado;
+}
+#else
+inline int probar_tamano_grupo() { return 0; }
+#endif
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Detección del tool OMPT
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -291,30 +389,43 @@ inline void abrir_este_hilo() {
     e.fd_instr  = abrir_contador(PERF_TYPE_HARDWARE, PERF_COUNT_HW_INSTRUCTIONS,
                                  e.fd_ciclos);
 
-    if (usa_mascaras()) {
-        // Grupo 2: los seis orígenes, agrupados para que cubran exactamente el
-        // mismo intervalo (sus proporciones solo tienen sentido si es así).
+    // Grupo 2: el par 0xFF44/0xD044. SIEMPRE se abre, pase lo que pase con el
+    // desglose. Son dos eventos, caben seguro, y de aqui sale ratio_rm EXACTO, que
+    // es la variable de decision del mecanismo y la que alimenta la figura de
+    // localidad. Perder el desglose es una molestia; perder ratio_rm invalida la
+    // campana entera, que es lo que ocurrio en la 29355.
+    e.fd_all_fills    = abrir_contador(PERF_TYPE_RAW, config_all_fills(), -1);
+    e.fd_remote_fills = abrir_contador(PERF_TYPE_RAW, config_remote_fills(),
+                                       e.fd_all_fills);
+    if (e.fd_all_fills < 0) ++hilos_con_fallo();
+
+    if (usa_mascaras() && n_origenes_activos() > 0) {
+        // Grupo 3: el desglose por origen, con el tamano que la sonda determino que
+        // el kernel llega a planificar de verdad, y en orden de prioridad (primero
+        // las lejanas). Van agrupadas para que cubran el mismo intervalo entre si.
         int lider = -1;
-        for (int i = 0; i < N_ORIGENES; ++i) {
-            e.fd_origen[i] = abrir_contador(PERF_TYPE_RAW, config_origen(i), lider);
-            if (i == 0) lider = e.fd_origen[0];
+        for (int i = 0; i < n_origenes_activos(); ++i) {
+            const int org = PRIORIDAD_ORIGEN[i];
+            e.fd_origen[org] = abrir_contador(PERF_TYPE_RAW, config_origen(org), lider);
+            if (i == 0) lider = e.fd_origen[org];
         }
-        if (e.fd_origen[0] < 0) ++hilos_con_fallo();
-    } else {
-        e.fd_all_fills    = abrir_contador(PERF_TYPE_RAW, config_all_fills(), -1);
-        e.fd_remote_fills = abrir_contador(PERF_TYPE_RAW, config_remote_fills(),
-                                           e.fd_all_fills);
-        if (e.fd_all_fills < 0) ++hilos_con_fallo();
+    } else if (usa_mascaras()) {
+        ++hilos_degradados();
     }
 
     if (e.fd_ciclos >= 0) {
         ioctl(e.fd_ciclos, PERF_EVENT_IOC_RESET, PERF_IOC_FLAG_GROUP);
         ioctl(e.fd_ciclos, PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP);
     }
-    int lider2 = usa_mascaras() ? e.fd_origen[0] : e.fd_all_fills;
-    if (lider2 >= 0) {
-        ioctl(lider2, PERF_EVENT_IOC_RESET, PERF_IOC_FLAG_GROUP);
-        ioctl(lider2, PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP);
+    const int lideres[2] = {
+        e.fd_all_fills,
+        (n_origenes_activos() > 0) ? e.fd_origen[PRIORIDAD_ORIGEN[0]] : -1
+    };
+    for (int j = 0; j < 2; ++j) {
+        if (lideres[j] >= 0) {
+            ioctl(lideres[j], PERF_EVENT_IOC_RESET,  PERF_IOC_FLAG_GROUP);
+            ioctl(lideres[j], PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP);
+        }
     }
 #endif
 }
@@ -327,13 +438,10 @@ inline void inicio_este_hilo() {
     EstadoHilo& e = tabla()[s];
     leer_contador(e.fd_ciclos, e.base_ciclos);
     leer_contador(e.fd_instr,  e.base_instr);
-    if (usa_mascaras()) {
-        for (int i = 0; i < N_ORIGENES; ++i)
-            leer_contador(e.fd_origen[i], e.base_origen[i]);
-    } else {
-        leer_contador(e.fd_all_fills,    e.base_all);
-        leer_contador(e.fd_remote_fills, e.base_remote);
-    }
+    for (int i = 0; i < N_ORIGENES; ++i)
+        if (e.fd_origen[i] >= 0) leer_contador(e.fd_origen[i], e.base_origen[i]);
+    leer_contador(e.fd_all_fills,    e.base_all);
+    leer_contador(e.fd_remote_fills, e.base_remote);
 }
 
 // Acumula el delta de la región para el hilo que llama. Se ACUMULA en vez de
@@ -348,16 +456,12 @@ inline void fin_este_hilo() {
     if (leer_contador(e.fd_ciclos, v) && v >= e.base_ciclos) e.d_ciclos += v - e.base_ciclos;
     if (leer_contador(e.fd_instr,  v) && v >= e.base_instr)  e.d_instr  += v - e.base_instr;
 
-    if (usa_mascaras()) {
-        for (int i = 0; i < N_ORIGENES; ++i)
-            if (leer_contador(e.fd_origen[i], v) && v >= e.base_origen[i])
-                e.d_origen[i] += v - e.base_origen[i];
-    } else {
-        if (leer_contador(e.fd_all_fills, v)    && v >= e.base_all)
-            e.d_all += v - e.base_all;
-        if (leer_contador(e.fd_remote_fills, v) && v >= e.base_remote)
-            e.d_remote += v - e.base_remote;
-    }
+    for (int i = 0; i < N_ORIGENES; ++i)
+        if (e.fd_origen[i] >= 0 && leer_contador(e.fd_origen[i], v)
+            && v >= e.base_origen[i])
+            e.d_origen[i] += v - e.base_origen[i];
+    if (leer_contador(e.fd_all_fills, v)    && v >= e.base_all)    e.d_all += v - e.base_all;
+    if (leer_contador(e.fd_remote_fills, v) && v >= e.base_remote) e.d_remote += v - e.base_remote;
 }
 
 inline void cerrar_este_hilo() {
@@ -393,6 +497,19 @@ inline void init() {
     }
     esta_activo() = true;
 
+    // La sonda va ANTES de la region paralela: determina una sola vez cuantas
+    // mascaras caben de verdad en esta PMU.
+    if (usa_mascaras()) {
+        const int caben = probar_tamano_grupo();
+        n_origenes_activos() = (caben < tope_origenes()) ? caben : tope_origenes();
+        std::fprintf(stderr,
+            "[perf_region] contadores: par 0xFF44/0xD044 (ratio_rm exacto) + %d "
+            "mascaras de desglose\n"
+            "              (caben %d ademas del par; tope por diseno %d). "
+            "SIN multiplexado.\n",
+            n_origenes_activos(), caben, tope_origenes());
+    }
+
 #ifdef _OPENMP
     #pragma omp parallel
     {
@@ -405,6 +522,14 @@ inline void init() {
     n_hilos_registrados() = 1;
 #endif
 
+    if (hilos_degradados() > 0) {
+        std::fprintf(stderr,
+            "[perf_region] AVISO: %d hilos no pudieron abrir el grupo de 6 mascaras\n"
+            "              y cayeron al par 0xFF44/0xD044. Hay ratio remoto pero NO\n"
+            "              desglose por origen. Causa tipica: menos de 6 contadores\n"
+            "              programables libres (comprobar kernel.nmi_watchdog).\n",
+            hilos_degradados());
+    }
     if (hilos_con_fallo() > 0) {
         std::fprintf(stderr,
             "[perf_region] AVISO: %d hilos no pudieron abrir los eventos de relleno.\n"
@@ -461,11 +586,10 @@ inline void diagnostico() {
         const EstadoHilo& e = tabla()[s];
         if (!e.usado) continue;
         total_ciclos += e.d_ciclos;
-        if (usa_mascaras()) {
-            for (int i = 0; i < N_ORIGENES; ++i) total_rellenos += e.d_origen[i];
-        } else {
-            total_rellenos += e.d_all;
-        }
+        // Mira el PAR, no el desglose: el par es el que siempre debe estar. Antes
+        // miraba el desglose y habria dado una falsa alarma en cuanto el desglose
+        // se recortara a 3 mascaras (o a 0) aunque el par funcionara bien.
+        total_rellenos += e.d_all;
     }
     if (total_ciclos == 0) {
         std::fprintf(stderr,
@@ -508,14 +632,10 @@ inline void escribir_csv(const char* ruta, const char* etiqueta) {
         const EstadoHilo& e = tabla()[s];
         if (!e.usado) continue;
 
-        std::uint64_t all = 0, remoto = 0;
-        if (usa_mascaras()) {
-            for (int i = 0; i < N_ORIGENES; ++i) all += e.d_origen[i];
-            remoto = e.d_origen[ORG_FAR_CACHE] + e.d_origen[ORG_FAR_DRAM];
-        } else {
-            all = e.d_all;
-            remoto = e.d_remote;
-        }
+        // all y remoto salen SIEMPRE del par exacto: los dos estan en el mismo
+        // grupo, asi que su cociente cubre el mismo intervalo y ratio_rm es valido
+        // aunque el desglose se haya quedado corto o vacio.
+        const std::uint64_t all = e.d_all, remoto = e.d_remote;
 
         std::fprintf(f, "%s,%d,%ld,%llu,%llu",
                      etiqueta ? etiqueta : "-", s, e.tid,
@@ -526,7 +646,7 @@ inline void escribir_csv(const char* ruta, const char* etiqueta) {
         std::fprintf(f, ",%llu,%llu,%d,%s\n",
                      static_cast<unsigned long long>(all),
                      static_cast<unsigned long long>(remoto),
-                     usa_mascaras() ? 1 : 0,
+                     n_origenes_activos() > 0 ? n_origenes_activos() : 0,
                      familia_es_demanda() ? "dmnd" : "any");
     }
     std::fclose(f);
