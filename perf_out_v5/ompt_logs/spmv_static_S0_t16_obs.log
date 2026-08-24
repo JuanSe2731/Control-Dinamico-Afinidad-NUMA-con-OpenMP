@@ -11,70 +11,6 @@
 [OMPT] Callbacks registrados
 [OMPT] Sistema: 0 procesadores lógicos
 [OMPT][MON] Monitor (C: integrador con fugas)  período=100ms  warmup=5  T=ref+1.00*MAD  leak=0.50*MAD  cap=8.00*MAD  max_mig=1  migracion=DESACTIVADA
-[OMPT][PERF] tid=399854 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399856 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399857 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399858 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399859 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399863 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399860 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399861 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399862 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399866 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399867 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399864 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399869 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399865 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399868 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=399870 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
 [perf_region] tool OMPT detectado: los contadores los lleva el tool, no se abren aqui
 [OMPT] control_tool: INICIANDO medicion
 [OMPT] control_tool: PAUSANDO medicion
@@ -82,26 +18,26 @@
 [OMPT][MON] Monitor detenido tras 1 ventanas
 [OMPT] CSV de ventanas: 0 filas volcadas (0 descartadas)
 [OMPT] ===== Tabla final: 16 hilos =====
-[OMPT] tid=399854 ompt_id=281474976710657 tipo=ompt_thread_initial    last_cpu=255 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.651 ratio_rm=-1.0000
-[OMPT] tid=399856 ompt_id=562949953421313 tipo=ompt_thread_worker     last_cpu= 88 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.613 ratio_rm=-1.0000
-[OMPT] tid=399857 ompt_id=844424930131969 tipo=ompt_thread_worker     last_cpu= 96 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.515 ratio_rm=-1.0000
-[OMPT] tid=399858 ompt_id=1125899906842625 tipo=ompt_thread_worker     last_cpu=121 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.641 ratio_rm=-1.0000
-[OMPT] tid=399859 ompt_id=1407374883553281 tipo=ompt_thread_worker     last_cpu=207 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.415 ratio_rm=-1.0000
-[OMPT] tid=399863 ompt_id=2533274790395905 tipo=ompt_thread_worker     last_cpu=120 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.520 ratio_rm=-1.0000
-[OMPT] tid=399860 ompt_id=1688849860263937 tipo=ompt_thread_worker     last_cpu=247 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.400 ratio_rm=-1.0000
-[OMPT] tid=399861 ompt_id=1970324836974593 tipo=ompt_thread_worker     last_cpu=  0 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.453 ratio_rm=-1.0000
-[OMPT] tid=399862 ompt_id=2251799813685249 tipo=ompt_thread_worker     last_cpu=215 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.398 ratio_rm=-1.0000
-[OMPT] tid=399866 ompt_id=3377699720527873 tipo=ompt_thread_worker     last_cpu=122 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.702 ratio_rm=-1.0000
-[OMPT] tid=399867 ompt_id=3659174697238529 tipo=ompt_thread_worker     last_cpu=231 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.376 ratio_rm=-1.0000
-[OMPT] tid=399864 ompt_id=2814749767106561 tipo=ompt_thread_worker     last_cpu=239 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.355 ratio_rm=-1.0000
-[OMPT] tid=399869 ompt_id=3940649673949185 tipo=ompt_thread_worker     last_cpu=223 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.340 ratio_rm=-1.0000
-[OMPT] tid=399865 ompt_id=3096224743817217 tipo=ompt_thread_worker     last_cpu=199 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.374 ratio_rm=-1.0000
-[OMPT] tid=399868 ompt_id=4222124650659841 tipo=ompt_thread_worker     last_cpu=191 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.468 ratio_rm=-1.0000
-[OMPT] tid=399870 ompt_id=4503599627370497 tipo=ompt_thread_worker     last_cpu= 17 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.444 ratio_rm=-1.0000
+[OMPT] tid=615023 ompt_id=281474976710657 tipo=ompt_thread_initial    last_cpu=255 numa=1 mig=0 fallos=0 perf=full ipc=0.698 ratio_rm=0.0030
+[OMPT] tid=615025 ompt_id=562949953421313 tipo=ompt_thread_worker     last_cpu=121 numa=1 mig=0 fallos=0 perf=full ipc=0.809 ratio_rm=0.0046
+[OMPT] tid=615026 ompt_id=844424930131969 tipo=ompt_thread_worker     last_cpu=223 numa=1 mig=0 fallos=0 perf=full ipc=0.545 ratio_rm=0.0189
+[OMPT] tid=615027 ompt_id=1125899906842625 tipo=ompt_thread_worker     last_cpu=120 numa=1 mig=0 fallos=0 perf=full ipc=0.532 ratio_rm=0.0235
+[OMPT] tid=615028 ompt_id=1407374883553281 tipo=ompt_thread_worker     last_cpu=  0 numa=0 mig=0 fallos=0 perf=full ipc=0.298 ratio_rm=0.0862
+[OMPT] tid=615029 ompt_id=1688849860263937 tipo=ompt_thread_worker     last_cpu=  3 numa=0 mig=0 fallos=0 perf=full ipc=0.324 ratio_rm=0.0305
+[OMPT] tid=615030 ompt_id=1970324836974593 tipo=ompt_thread_worker     last_cpu=  2 numa=0 mig=0 fallos=0 perf=full ipc=0.326 ratio_rm=0.0225
+[OMPT] tid=615032 ompt_id=2533274790395905 tipo=ompt_thread_worker     last_cpu=199 numa=1 mig=0 fallos=0 perf=full ipc=0.452 ratio_rm=0.0386
+[OMPT] tid=615034 ompt_id=3096224743817217 tipo=ompt_thread_worker     last_cpu=207 numa=1 mig=0 fallos=0 perf=full ipc=0.473 ratio_rm=0.1263
+[OMPT] tid=615033 ompt_id=2814749767106561 tipo=ompt_thread_worker     last_cpu= 65 numa=1 mig=0 fallos=0 perf=full ipc=0.487 ratio_rm=0.0697
+[OMPT] tid=615036 ompt_id=3659174697238529 tipo=ompt_thread_worker     last_cpu=215 numa=1 mig=0 fallos=0 perf=full ipc=0.623 ratio_rm=0.0968
+[OMPT] tid=615035 ompt_id=3377699720527873 tipo=ompt_thread_worker     last_cpu= 64 numa=1 mig=0 fallos=0 perf=full ipc=0.477 ratio_rm=0.0708
+[OMPT] tid=615038 ompt_id=4222124650659841 tipo=ompt_thread_worker     last_cpu=239 numa=1 mig=0 fallos=0 perf=full ipc=0.496 ratio_rm=0.0754
+[OMPT] tid=615037 ompt_id=3940649673949185 tipo=ompt_thread_worker     last_cpu=231 numa=1 mig=0 fallos=0 perf=full ipc=0.495 ratio_rm=0.0878
+[OMPT] tid=615031 ompt_id=2251799813685249 tipo=ompt_thread_worker     last_cpu=151 numa=0 mig=0 fallos=0 perf=full ipc=0.384 ratio_rm=0.0564
+[OMPT] tid=615039 ompt_id=4503599627370497 tipo=ompt_thread_worker     last_cpu=247 numa=1 mig=0 fallos=0 perf=full ipc=0.579 ratio_rm=0.0599
 [OMPT] ===== Overhead intrínseco =====
-  monitor: 1 ticks, 8.7 us total (max 8.7 us/tick)
-  callbacks implicit_task: 2625, 56572.1 us total
+  monitor: 1 ticks, 10.0 us total (max 10.0 us/tick)
+  callbacks implicit_task: 2625, 51199.6 us total
   migraciones: 0 (0.0 us total)
-  resyncs=0  lecturas escaladas por multiplexado=0
-  hilos con perf fallido=0  parcial(ipc_only)=16
+  resyncs=0  lecturas escaladas por multiplexado=64
+  hilos con perf fallido=0  parcial(ipc_only)=0
   ventanas con ciclos=0  con fills=0

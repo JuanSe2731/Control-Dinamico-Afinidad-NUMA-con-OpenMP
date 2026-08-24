@@ -11,1305 +11,273 @@
 [OMPT] Callbacks registrados
 [OMPT] Sistema: 0 procesadores lógicos
 [OMPT][MON] Monitor (C: integrador con fugas)  período=100ms  warmup=5  T=ref+1.00*MAD  leak=0.50*MAD  cap=8.00*MAD  max_mig=1  migracion=activa
-[OMPT][PERF] tid=417753 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417755 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417757 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417758 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417759 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417756 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417760 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417761 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417765 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417762 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417767 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417763 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417768 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417771 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417766 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417770 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417772 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417773 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417777 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417778 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417775 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417774 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417779 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417780 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417776 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417784 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417783 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417781 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417785 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417787 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417786 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417788 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417790 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417791 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417769 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417792 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417764 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417789 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417793 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417795 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417798 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417782 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417800 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417794 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417797 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417803 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417796 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417804 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417799 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417807 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417808 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417806 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417809 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417810 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417805 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417802 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417801 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417813 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417814 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417812 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417816 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417811 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417817 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417818 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417815 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417819 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417820 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417821 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417822 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417823 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417824 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417825 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417826 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417827 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417828 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417829 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417830 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417831 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417832 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417833 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417834 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417835 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417836 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417837 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417838 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417839 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417840 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417841 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417842 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417843 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417844 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417845 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417846 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417847 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417848 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417849 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417850 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417851 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417852 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417853 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417854 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417855 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417856 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417857 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417858 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417859 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417860 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417861 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417862 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417863 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417864 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417865 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417866 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417867 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417868 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417869 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417870 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417871 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417872 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417873 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417874 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417875 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417876 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417916 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417966 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418002 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417906 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417948 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417920 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417956 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418005 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417975 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417881 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417919 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417999 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418006 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417886 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417914 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417962 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417995 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418009 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417987 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417925 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417917 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417895 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417965 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417979 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417963 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417947 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417897 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417991 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417885 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417990 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417974 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417884 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417932 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417900 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417950 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418001 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418007 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417941 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417930 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417986 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417946 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418000 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417882 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417898 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417998 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417942 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417893 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417955 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417961 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417993 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417891 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417985 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417997 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417902 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417918 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417960 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417994 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417912 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417940 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418004 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417982 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417958 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417989 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417957 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417943 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417929 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417915 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417899 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417977 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417889 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417959 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417888 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417931 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417934 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418003 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417983 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417923 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417937 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417971 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417980 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417933 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417945 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417883 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417892 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417988 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417908 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417978 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417880 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417924 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417922 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417952 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417969 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417951 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417953 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417921 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417939 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417907 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417992 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417927 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417901 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417949 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417935 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417903 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417909 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417967 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417890 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417972 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417936 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417981 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417913 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417964 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417954 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417938 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417973 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417911 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417887 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417879 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417904 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417984 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417996 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=418008 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417926 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417905 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417910 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417894 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417968 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417944 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417976 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417970 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417877 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417878 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417896 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
-[OMPT][PERF] tid=417928 SIN eventos NUMA (solo IPC). Este hilo no podrá disparar migraciones.
-    modo=6 mascaras por origen  primer errno: Invalid argument / Invalid argument
-  → los eventos crudos son específicos de AMD Zen; en otra PMU no existen
-  → con OMPT_MASCARAS=0 se vuelve al par 0xFF44/0xD044
 [perf_region] tool OMPT detectado: los contadores los lleva el tool, no se abren aqui
 [OMPT] control_tool: INICIANDO medicion
 [OMPT] control_tool: PAUSANDO medicion
 [OMPT] ompt_finalize
 [OMPT][MON] Monitor detenido tras 5 ventanas
-[OMPT] CSV de ventanas: 768 filas volcadas (0 descartadas)
+[OMPT] CSV de ventanas: 256 filas volcadas (0 descartadas)
 [OMPT] ===== Tabla final: 256 hilos =====
-[OMPT] tid=417753 ompt_id=281474976710657 tipo=ompt_thread_initial    last_cpu=255 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.314 ratio_rm=-1.0000
-[OMPT] tid=417755 ompt_id=562949953421313 tipo=ompt_thread_worker     last_cpu= 65 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.257 ratio_rm=-1.0000
-[OMPT] tid=417757 ompt_id=1125899906842625 tipo=ompt_thread_worker     last_cpu=196 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.280 ratio_rm=-1.0000
-[OMPT] tid=417758 ompt_id=1407374883553281 tipo=ompt_thread_worker     last_cpu=170 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.338 ratio_rm=-1.0000
-[OMPT] tid=417759 ompt_id=1688849860263937 tipo=ompt_thread_worker     last_cpu=232 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.286 ratio_rm=-1.0000
-[OMPT] tid=417756 ompt_id=844424930131969 tipo=ompt_thread_worker     last_cpu= 86 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.292 ratio_rm=-1.0000
-[OMPT] tid=417760 ompt_id=1970324836974593 tipo=ompt_thread_worker     last_cpu=126 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.267 ratio_rm=-1.0000
-[OMPT] tid=417761 ompt_id=2251799813685249 tipo=ompt_thread_worker     last_cpu= 16 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.369 ratio_rm=-1.0000
-[OMPT] tid=417765 ompt_id=3096224743817217 tipo=ompt_thread_worker     last_cpu=144 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.344 ratio_rm=-1.0000
-[OMPT] tid=417762 ompt_id=2533274790395905 tipo=ompt_thread_worker     last_cpu=174 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.358 ratio_rm=-1.0000
-[OMPT] tid=417767 ompt_id=3940649673949185 tipo=ompt_thread_worker     last_cpu=124 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.331 ratio_rm=-1.0000
-[OMPT] tid=417763 ompt_id=2814749767106561 tipo=ompt_thread_worker     last_cpu=183 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.362 ratio_rm=-1.0000
-[OMPT] tid=417768 ompt_id=4222124650659841 tipo=ompt_thread_worker     last_cpu=219 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.271 ratio_rm=-1.0000
-[OMPT] tid=417771 ompt_id=5066549580791809 tipo=ompt_thread_worker     last_cpu= 87 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.307 ratio_rm=-1.0000
-[OMPT] tid=417766 ompt_id=3659174697238529 tipo=ompt_thread_worker     last_cpu=252 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.357 ratio_rm=-1.0000
-[OMPT] tid=417770 ompt_id=4785074604081153 tipo=ompt_thread_worker     last_cpu=243 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.299 ratio_rm=-1.0000
-[OMPT] tid=417772 ompt_id=5348024557502465 tipo=ompt_thread_worker     last_cpu= 25 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.325 ratio_rm=-1.0000
-[OMPT] tid=417773 ompt_id=5629499534213121 tipo=ompt_thread_worker     last_cpu=167 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.361 ratio_rm=-1.0000
-[OMPT] tid=417777 ompt_id=6755399441055745 tipo=ompt_thread_worker     last_cpu=143 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.379 ratio_rm=-1.0000
-[OMPT] tid=417778 ompt_id=7036874417766401 tipo=ompt_thread_worker     last_cpu=222 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.286 ratio_rm=-1.0000
-[OMPT] tid=417775 ompt_id=6192449487634433 tipo=ompt_thread_worker     last_cpu= 99 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.297 ratio_rm=-1.0000
-[OMPT] tid=417774 ompt_id=5910974510923777 tipo=ompt_thread_worker     last_cpu=123 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.313 ratio_rm=-1.0000
-[OMPT] tid=417779 ompt_id=7318349394477057 tipo=ompt_thread_worker     last_cpu= 28 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.328 ratio_rm=-1.0000
-[OMPT] tid=417780 ompt_id=7599824371187713 tipo=ompt_thread_worker     last_cpu= 15 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.376 ratio_rm=-1.0000
-[OMPT] tid=417776 ompt_id=6473924464345089 tipo=ompt_thread_worker     last_cpu=180 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.293 ratio_rm=-1.0000
-[OMPT] tid=417784 ompt_id=8725724278030337 tipo=ompt_thread_worker     last_cpu=182 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.382 ratio_rm=-1.0000
-[OMPT] tid=417783 ompt_id=8444249301319681 tipo=ompt_thread_worker     last_cpu= 95 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.291 ratio_rm=-1.0000
-[OMPT] tid=417781 ompt_id=7881299347898369 tipo=ompt_thread_worker     last_cpu= 39 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.365 ratio_rm=-1.0000
-[OMPT] tid=417785 ompt_id=9007199254740993 tipo=ompt_thread_worker     last_cpu=173 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.387 ratio_rm=-1.0000
-[OMPT] tid=417787 ompt_id=9570149208162305 tipo=ompt_thread_worker     last_cpu=  3 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.338 ratio_rm=-1.0000
-[OMPT] tid=417786 ompt_id=9288674231451649 tipo=ompt_thread_worker     last_cpu=153 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.325 ratio_rm=-1.0000
-[OMPT] tid=417788 ompt_id=9851624184872961 tipo=ompt_thread_worker     last_cpu= 32 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.357 ratio_rm=-1.0000
-[OMPT] tid=417790 ompt_id=10414574138294273 tipo=ompt_thread_worker     last_cpu=122 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.282 ratio_rm=-1.0000
-[OMPT] tid=417791 ompt_id=10696049115004929 tipo=ompt_thread_worker     last_cpu=  5 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.357 ratio_rm=-1.0000
-[OMPT] tid=417769 ompt_id=4503599627370497 tipo=ompt_thread_worker     last_cpu=176 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.352 ratio_rm=-1.0000
-[OMPT] tid=417792 ompt_id=10977524091715585 tipo=ompt_thread_worker     last_cpu= 35 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.344 ratio_rm=-1.0000
-[OMPT] tid=417764 ompt_id=3377699720527873 tipo=ompt_thread_worker     last_cpu=125 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.293 ratio_rm=-1.0000
-[OMPT] tid=417789 ompt_id=10133099161583617 tipo=ompt_thread_worker     last_cpu= 21 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.372 ratio_rm=-1.0000
-[OMPT] tid=417793 ompt_id=11258999068426241 tipo=ompt_thread_worker     last_cpu= 24 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.341 ratio_rm=-1.0000
-[OMPT] tid=417795 ompt_id=11821949021847553 tipo=ompt_thread_worker     last_cpu=112 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.315 ratio_rm=-1.0000
-[OMPT] tid=417798 ompt_id=12666373951979521 tipo=ompt_thread_worker     last_cpu=179 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.327 ratio_rm=-1.0000
-[OMPT] tid=417782 ompt_id=8162774324609025 tipo=ompt_thread_worker     last_cpu=197 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.284 ratio_rm=-1.0000
-[OMPT] tid=417800 ompt_id=13229323905400833 tipo=ompt_thread_worker     last_cpu= 88 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.252 ratio_rm=-1.0000
-[OMPT] tid=417794 ompt_id=11540474045136897 tipo=ompt_thread_worker     last_cpu=220 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.298 ratio_rm=-1.0000
-[OMPT] tid=417797 ompt_id=12384898975268865 tipo=ompt_thread_worker     last_cpu=108 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.298 ratio_rm=-1.0000
-[OMPT] tid=417803 ompt_id=14073748835532801 tipo=ompt_thread_worker     last_cpu= 96 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.315 ratio_rm=-1.0000
-[OMPT] tid=417796 ompt_id=12103423998558209 tipo=ompt_thread_worker     last_cpu= 33 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.330 ratio_rm=-1.0000
-[OMPT] tid=417804 ompt_id=14355223812243457 tipo=ompt_thread_worker     last_cpu=215 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.297 ratio_rm=-1.0000
-[OMPT] tid=417799 ompt_id=12947848928690177 tipo=ompt_thread_worker     last_cpu= 30 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.352 ratio_rm=-1.0000
-[OMPT] tid=417807 ompt_id=15199648742375425 tipo=ompt_thread_worker     last_cpu= 34 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.339 ratio_rm=-1.0000
-[OMPT] tid=417808 ompt_id=15481123719086081 tipo=ompt_thread_worker     last_cpu=152 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.333 ratio_rm=-1.0000
-[OMPT] tid=417806 ompt_id=14918173765664769 tipo=ompt_thread_worker     last_cpu=121 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.315 ratio_rm=-1.0000
-[OMPT] tid=417809 ompt_id=15762598695796737 tipo=ompt_thread_worker     last_cpu=  0 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.357 ratio_rm=-1.0000
-[OMPT] tid=417810 ompt_id=16044073672507393 tipo=ompt_thread_worker     last_cpu= 44 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.351 ratio_rm=-1.0000
-[OMPT] tid=417805 ompt_id=14636698788954113 tipo=ompt_thread_worker     last_cpu=245 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.387 ratio_rm=-1.0000
-[OMPT] tid=417802 ompt_id=13792273858822145 tipo=ompt_thread_worker     last_cpu=246 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.356 ratio_rm=-1.0000
-[OMPT] tid=417801 ompt_id=13510798882111489 tipo=ompt_thread_worker     last_cpu= 73 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.235 ratio_rm=-1.0000
-[OMPT] tid=417813 ompt_id=16888498602639361 tipo=ompt_thread_worker     last_cpu= 13 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.367 ratio_rm=-1.0000
-[OMPT] tid=417814 ompt_id=17169973579350017 tipo=ompt_thread_worker     last_cpu=134 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.348 ratio_rm=-1.0000
-[OMPT] tid=417812 ompt_id=16607023625928705 tipo=ompt_thread_worker     last_cpu= 29 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.360 ratio_rm=-1.0000
-[OMPT] tid=417816 ompt_id=17732923532771329 tipo=ompt_thread_worker     last_cpu=178 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.383 ratio_rm=-1.0000
-[OMPT] tid=417811 ompt_id=16325548649218049 tipo=ompt_thread_worker     last_cpu=111 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.324 ratio_rm=-1.0000
-[OMPT] tid=417817 ompt_id=18014398509481985 tipo=ompt_thread_worker     last_cpu= 85 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.288 ratio_rm=-1.0000
-[OMPT] tid=417818 ompt_id=18295873486192641 tipo=ompt_thread_worker     last_cpu=216 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.242 ratio_rm=-1.0000
-[OMPT] tid=417815 ompt_id=17451448556060673 tipo=ompt_thread_worker     last_cpu= 74 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.257 ratio_rm=-1.0000
-[OMPT] tid=417819 ompt_id=18577348462903297 tipo=ompt_thread_worker     last_cpu=218 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.277 ratio_rm=-1.0000
-[OMPT] tid=417820 ompt_id=18858823439613953 tipo=ompt_thread_worker     last_cpu=117 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.297 ratio_rm=-1.0000
-[OMPT] tid=417821 ompt_id=19140298416324609 tipo=ompt_thread_worker     last_cpu= 60 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.266 ratio_rm=-1.0000
-[OMPT] tid=417822 ompt_id=19421773393035265 tipo=ompt_thread_worker     last_cpu=104 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.287 ratio_rm=-1.0000
-[OMPT] tid=417823 ompt_id=19703248369745921 tipo=ompt_thread_worker     last_cpu=107 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.298 ratio_rm=-1.0000
-[OMPT] tid=417824 ompt_id=19984723346456577 tipo=ompt_thread_worker     last_cpu=106 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.302 ratio_rm=-1.0000
-[OMPT] tid=417825 ompt_id=20266198323167233 tipo=ompt_thread_worker     last_cpu=105 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.283 ratio_rm=-1.0000
-[OMPT] tid=417826 ompt_id=20547673299877889 tipo=ompt_thread_worker     last_cpu= 17 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.371 ratio_rm=-1.0000
-[OMPT] tid=417827 ompt_id=20829148276588545 tipo=ompt_thread_worker     last_cpu= 20 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.375 ratio_rm=-1.0000
-[OMPT] tid=417828 ompt_id=21110623253299201 tipo=ompt_thread_worker     last_cpu= 19 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.370 ratio_rm=-1.0000
-[OMPT] tid=417829 ompt_id=21392098230009857 tipo=ompt_thread_worker     last_cpu= 18 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.352 ratio_rm=-1.0000
-[OMPT] tid=417830 ompt_id=21673573206720513 tipo=ompt_thread_worker     last_cpu=120 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.305 ratio_rm=-1.0000
-[OMPT] tid=417831 ompt_id=21955048183431169 tipo=ompt_thread_worker     last_cpu= 45 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.354 ratio_rm=-1.0000
-[OMPT] tid=417832 ompt_id=22236523160141825 tipo=ompt_thread_worker     last_cpu=113 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.300 ratio_rm=-1.0000
-[OMPT] tid=417833 ompt_id=22517998136852481 tipo=ompt_thread_worker     last_cpu= 14 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.345 ratio_rm=-1.0000
-[OMPT] tid=417834 ompt_id=22799473113563137 tipo=ompt_thread_worker     last_cpu=233 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.290 ratio_rm=-1.0000
-[OMPT] tid=417835 ompt_id=23080948090273793 tipo=ompt_thread_worker     last_cpu= 98 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.321 ratio_rm=-1.0000
-[OMPT] tid=417836 ompt_id=23362423066984449 tipo=ompt_thread_worker     last_cpu= 12 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.339 ratio_rm=-1.0000
-[OMPT] tid=417837 ompt_id=23643898043695105 tipo=ompt_thread_worker     last_cpu= 97 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.309 ratio_rm=-1.0000
-[OMPT] tid=417838 ompt_id=23925373020405761 tipo=ompt_thread_worker     last_cpu= 75 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.259 ratio_rm=-1.0000
-[OMPT] tid=417839 ompt_id=24206847997116417 tipo=ompt_thread_worker     last_cpu= 78 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.260 ratio_rm=-1.0000
-[OMPT] tid=417840 ompt_id=24488322973827073 tipo=ompt_thread_worker     last_cpu= 77 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.283 ratio_rm=-1.0000
-[OMPT] tid=417841 ompt_id=24769797950537729 tipo=ompt_thread_worker     last_cpu= 76 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.262 ratio_rm=-1.0000
-[OMPT] tid=417842 ompt_id=25051272927248385 tipo=ompt_thread_worker     last_cpu= 89 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.292 ratio_rm=-1.0000
-[OMPT] tid=417843 ompt_id=25332747903959041 tipo=ompt_thread_worker     last_cpu= 92 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.302 ratio_rm=-1.0000
-[OMPT] tid=417844 ompt_id=25614222880669697 tipo=ompt_thread_worker     last_cpu= 91 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.269 ratio_rm=-1.0000
-[OMPT] tid=417845 ompt_id=25895697857380353 tipo=ompt_thread_worker     last_cpu= 90 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.280 ratio_rm=-1.0000
-[OMPT] tid=417846 ompt_id=26177172834091009 tipo=ompt_thread_worker     last_cpu=133 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.353 ratio_rm=-1.0000
-[OMPT] tid=417847 ompt_id=26458647810801665 tipo=ompt_thread_worker     last_cpu=114 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.299 ratio_rm=-1.0000
-[OMPT] tid=417848 ompt_id=26740122787512321 tipo=ompt_thread_worker     last_cpu=157 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.343 ratio_rm=-1.0000
-[OMPT] tid=417849 ompt_id=27021597764222977 tipo=ompt_thread_worker     last_cpu= 31 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.359 ratio_rm=-1.0000
-[OMPT] tid=417850 ompt_id=27303072740933633 tipo=ompt_thread_worker     last_cpu=194 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.267 ratio_rm=-1.0000
-[OMPT] tid=417851 ompt_id=27584547717644289 tipo=ompt_thread_worker     last_cpu= 79 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.276 ratio_rm=-1.0000
-[OMPT] tid=417852 ompt_id=27866022694354945 tipo=ompt_thread_worker     last_cpu= 50 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.336 ratio_rm=-1.0000
-[OMPT] tid=417853 ompt_id=28147497671065601 tipo=ompt_thread_worker     last_cpu= 72 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.281 ratio_rm=-1.0000
-[OMPT] tid=417854 ompt_id=28428972647776257 tipo=ompt_thread_worker     last_cpu= 80 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.290 ratio_rm=-1.0000
-[OMPT] tid=417855 ompt_id=28710447624486913 tipo=ompt_thread_worker     last_cpu= 54 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.347 ratio_rm=-1.0000
-[OMPT] tid=417856 ompt_id=28991922601197569 tipo=ompt_thread_worker     last_cpu= 83 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.273 ratio_rm=-1.0000
-[OMPT] tid=417857 ompt_id=29273397577908225 tipo=ompt_thread_worker     last_cpu= 82 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.294 ratio_rm=-1.0000
-[OMPT] tid=417858 ompt_id=29554872554618881 tipo=ompt_thread_worker     last_cpu=145 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.375 ratio_rm=-1.0000
-[OMPT] tid=417859 ompt_id=29836347531329537 tipo=ompt_thread_worker     last_cpu= 10 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.332 ratio_rm=-1.0000
-[OMPT] tid=417860 ompt_id=30117822508040193 tipo=ompt_thread_worker     last_cpu=  9 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.352 ratio_rm=-1.0000
-[OMPT] tid=417861 ompt_id=30399297484750849 tipo=ompt_thread_worker     last_cpu= 64 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.270 ratio_rm=-1.0000
-[OMPT] tid=417862 ompt_id=30680772461461505 tipo=ompt_thread_worker     last_cpu=169 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.373 ratio_rm=-1.0000
-[OMPT] tid=417863 ompt_id=30962247438172161 tipo=ompt_thread_worker     last_cpu= 66 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.270 ratio_rm=-1.0000
-[OMPT] tid=417864 ompt_id=31243722414882817 tipo=ompt_thread_worker     last_cpu=115 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.299 ratio_rm=-1.0000
-[OMPT] tid=417865 ompt_id=31525197391593473 tipo=ompt_thread_worker     last_cpu=  1 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.345 ratio_rm=-1.0000
-[OMPT] tid=417866 ompt_id=31806672368304129 tipo=ompt_thread_worker     last_cpu=  6 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.344 ratio_rm=-1.0000
-[OMPT] tid=417867 ompt_id=32088147345014785 tipo=ompt_thread_worker     last_cpu=131 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.330 ratio_rm=-1.0000
-[OMPT] tid=417868 ompt_id=32369622321725441 tipo=ompt_thread_worker     last_cpu=130 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.336 ratio_rm=-1.0000
-[OMPT] tid=417869 ompt_id=32651097298436097 tipo=ompt_thread_worker     last_cpu=129 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.352 ratio_rm=-1.0000
-[OMPT] tid=417870 ompt_id=32932572275146753 tipo=ompt_thread_worker     last_cpu=128 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.328 ratio_rm=-1.0000
-[OMPT] tid=417871 ompt_id=33214047251857409 tipo=ompt_thread_worker     last_cpu= 11 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.331 ratio_rm=-1.0000
-[OMPT] tid=417872 ompt_id=33495522228568065 tipo=ompt_thread_worker     last_cpu= 26 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.334 ratio_rm=-1.0000
-[OMPT] tid=417873 ompt_id=33776997205278721 tipo=ompt_thread_worker     last_cpu=  8 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.325 ratio_rm=-1.0000
-[OMPT] tid=417874 ompt_id=34058472181989377 tipo=ompt_thread_worker     last_cpu=  7 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.365 ratio_rm=-1.0000
-[OMPT] tid=417875 ompt_id=34339947158700033 tipo=ompt_thread_worker     last_cpu=132 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.345 ratio_rm=-1.0000
-[OMPT] tid=417876 ompt_id=34621422135410689 tipo=ompt_thread_worker     last_cpu= 93 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.254 ratio_rm=-1.0000
-[OMPT] tid=417916 ompt_id=45880421203836929 tipo=ompt_thread_worker     last_cpu=221 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.286 ratio_rm=-1.0000
-[OMPT] tid=417966 ompt_id=59954170039369729 tipo=ompt_thread_worker     last_cpu=193 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.259 ratio_rm=-1.0000
-[OMPT] tid=418002 ompt_id=70087269200953345 tipo=ompt_thread_worker     last_cpu= 58 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.321 ratio_rm=-1.0000
-[OMPT] tid=417906 ompt_id=43065671436730369 tipo=ompt_thread_worker     last_cpu=198 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.264 ratio_rm=-1.0000
-[OMPT] tid=417948 ompt_id=54887620458577921 tipo=ompt_thread_worker     last_cpu= 69 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.260 ratio_rm=-1.0000
-[OMPT] tid=417920 ompt_id=47006321110679553 tipo=ompt_thread_worker     last_cpu=110 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.332 ratio_rm=-1.0000
-[OMPT] tid=417956 ompt_id=57139420272263169 tipo=ompt_thread_worker     last_cpu=253 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.307 ratio_rm=-1.0000
-[OMPT] tid=418005 ompt_id=70931694131085313 tipo=ompt_thread_worker     last_cpu=205 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.336 ratio_rm=-1.0000
-[OMPT] tid=417975 ompt_id=62487444829765633 tipo=ompt_thread_worker     last_cpu=  2 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.354 ratio_rm=-1.0000
-[OMPT] tid=417881 ompt_id=36028797018963969 tipo=ompt_thread_worker     last_cpu=103 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.269 ratio_rm=-1.0000
-[OMPT] tid=417919 ompt_id=46724846133968897 tipo=ompt_thread_worker     last_cpu=109 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.255 ratio_rm=-1.0000
-[OMPT] tid=417999 ompt_id=69242844270821377 tipo=ompt_thread_worker     last_cpu=100 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.340 ratio_rm=-1.0000
-[OMPT] tid=418006 ompt_id=71213169107795969 tipo=ompt_thread_worker     last_cpu=208 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.307 ratio_rm=-1.0000
-[OMPT] tid=417886 ompt_id=37154696925806593 tipo=ompt_thread_worker     last_cpu=224 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.335 ratio_rm=-1.0000
-[OMPT] tid=417914 ompt_id=45317471250415617 tipo=ompt_thread_worker     last_cpu=199 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.314 ratio_rm=-1.0000
-[OMPT] tid=417962 ompt_id=58828270132527105 tipo=ompt_thread_worker     last_cpu= 67 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.268 ratio_rm=-1.0000
-[OMPT] tid=417995 ompt_id=68116944363978753 tipo=ompt_thread_worker     last_cpu=184 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.400 ratio_rm=-1.0000
-[OMPT] tid=418009 ompt_id=72057594037927937 tipo=ompt_thread_worker     last_cpu=186 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.414 ratio_rm=-1.0000
-[OMPT] tid=417987 ompt_id=65865144550293505 tipo=ompt_thread_worker     last_cpu= 22 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.388 ratio_rm=-1.0000
-[OMPT] tid=417925 ompt_id=48413695994232833 tipo=ompt_thread_worker     last_cpu=213 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.321 ratio_rm=-1.0000
-[OMPT] tid=417917 ompt_id=46161896180547585 tipo=ompt_thread_worker     last_cpu= 46 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.391 ratio_rm=-1.0000
-[OMPT] tid=417895 ompt_id=39969446692913153 tipo=ompt_thread_worker     last_cpu= 47 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.365 ratio_rm=-1.0000
-[OMPT] tid=417965 ompt_id=59672695062659073 tipo=ompt_thread_worker     last_cpu=135 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.340 ratio_rm=-1.0000
-[OMPT] tid=417979 ompt_id=63613344736608257 tipo=ompt_thread_worker     last_cpu= 40 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.346 ratio_rm=-1.0000
-[OMPT] tid=417963 ompt_id=59109745109237761 tipo=ompt_thread_worker     last_cpu= 51 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.328 ratio_rm=-1.0000
-[OMPT] tid=417947 ompt_id=54606145481867265 tipo=ompt_thread_worker     last_cpu= 43 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.344 ratio_rm=-1.0000
-[OMPT] tid=417897 ompt_id=40532396646334465 tipo=ompt_thread_worker     last_cpu=229 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.308 ratio_rm=-1.0000
-[OMPT] tid=417991 ompt_id=66991044457136129 tipo=ompt_thread_worker     last_cpu= 48 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.380 ratio_rm=-1.0000
-[OMPT] tid=417885 ompt_id=37436171902517249 tipo=ompt_thread_worker     last_cpu= 55 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.349 ratio_rm=-1.0000
-[OMPT] tid=417990 ompt_id=66709569480425473 tipo=ompt_thread_worker     last_cpu=209 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.302 ratio_rm=-1.0000
-[OMPT] tid=417974 ompt_id=62205969853054977 tipo=ompt_thread_worker     last_cpu= 59 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.338 ratio_rm=-1.0000
-[OMPT] tid=417884 ompt_id=36591746972385281 tipo=ompt_thread_worker     last_cpu=207 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.271 ratio_rm=-1.0000
-[OMPT] tid=417932 ompt_id=50384020831207425 tipo=ompt_thread_worker     last_cpu= 94 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.274 ratio_rm=-1.0000
-[OMPT] tid=417900 ompt_id=41376821576466433 tipo=ompt_thread_worker     last_cpu= 37 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.362 ratio_rm=-1.0000
-[OMPT] tid=417950 ompt_id=55450570411999233 tipo=ompt_thread_worker     last_cpu= 68 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.272 ratio_rm=-1.0000
-[OMPT] tid=418001 ompt_id=69805794224242689 tipo=ompt_thread_worker     last_cpu=101 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.284 ratio_rm=-1.0000
-[OMPT] tid=418007 ompt_id=71494644084506625 tipo=ompt_thread_worker     last_cpu=148 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.423 ratio_rm=-1.0000
-[OMPT] tid=417941 ompt_id=52917295621603329 tipo=ompt_thread_worker     last_cpu=212 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.402 ratio_rm=-1.0000
-[OMPT] tid=417930 ompt_id=49821070877786113 tipo=ompt_thread_worker     last_cpu=192 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.263 ratio_rm=-1.0000
-[OMPT] tid=417986 ompt_id=65583669573582849 tipo=ompt_thread_worker     last_cpu= 41 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.361 ratio_rm=-1.0000
-[OMPT] tid=417946 ompt_id=54324670505156609 tipo=ompt_thread_worker     last_cpu=195 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.274 ratio_rm=-1.0000
-[OMPT] tid=418000 ompt_id=69524319247532033 tipo=ompt_thread_worker     last_cpu= 62 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.352 ratio_rm=-1.0000
-[OMPT] tid=417882 ompt_id=36310271995674625 tipo=ompt_thread_worker     last_cpu= 71 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.258 ratio_rm=-1.0000
-[OMPT] tid=417898 ompt_id=40813871623045121 tipo=ompt_thread_worker     last_cpu= 70 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.208 ratio_rm=-1.0000
-[OMPT] tid=417998 ompt_id=68961369294110721 tipo=ompt_thread_worker     last_cpu= 38 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.378 ratio_rm=-1.0000
-[OMPT] tid=417942 ompt_id=53198770598313985 tipo=ompt_thread_worker     last_cpu=227 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.307 ratio_rm=-1.0000
-[OMPT] tid=417893 ompt_id=39406496739491841 tipo=ompt_thread_worker     last_cpu= 23 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.380 ratio_rm=-1.0000
-[OMPT] tid=417955 ompt_id=56857945295552513 tipo=ompt_thread_worker     last_cpu= 42 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.364 ratio_rm=-1.0000
-[OMPT] tid=417961 ompt_id=58546795155816449 tipo=ompt_thread_worker     last_cpu=  4 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.351 ratio_rm=-1.0000
-[OMPT] tid=417993 ompt_id=67553994410557441 tipo=ompt_thread_worker     last_cpu=168 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.375 ratio_rm=-1.0000
-[OMPT] tid=417891 ompt_id=38843546786070529 tipo=ompt_thread_worker     last_cpu= 36 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.363 ratio_rm=-1.0000
-[OMPT] tid=417985 ompt_id=65302194596872193 tipo=ompt_thread_worker     last_cpu=161 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.335 ratio_rm=-1.0000
-[OMPT] tid=417997 ompt_id=68679894317400065 tipo=ompt_thread_worker     last_cpu=160 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.348 ratio_rm=-1.0000
-[OMPT] tid=417902 ompt_id=41939771529887745 tipo=ompt_thread_worker     last_cpu=238 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.294 ratio_rm=-1.0000
-[OMPT] tid=417918 ompt_id=46443371157258241 tipo=ompt_thread_worker     last_cpu=237 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.312 ratio_rm=-1.0000
-[OMPT] tid=417960 ompt_id=58265320179105793 tipo=ompt_thread_worker     last_cpu=234 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.292 ratio_rm=-1.0000
-[OMPT] tid=417994 ompt_id=67835469387268097 tipo=ompt_thread_worker     last_cpu= 49 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.298 ratio_rm=-1.0000
-[OMPT] tid=417912 ompt_id=44754521296994305 tipo=ompt_thread_worker     last_cpu=230 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.321 ratio_rm=-1.0000
-[OMPT] tid=417940 ompt_id=52635820644892673 tipo=ompt_thread_worker     last_cpu=251 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.296 ratio_rm=-1.0000
-[OMPT] tid=418004 ompt_id=70650219154374657 tipo=ompt_thread_worker     last_cpu=127 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.381 ratio_rm=-1.0000
-[OMPT] tid=417982 ompt_id=64457769666740225 tipo=ompt_thread_worker     last_cpu=225 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.305 ratio_rm=-1.0000
-[OMPT] tid=417958 ompt_id=57702370225684481 tipo=ompt_thread_worker     last_cpu=226 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.309 ratio_rm=-1.0000
-[OMPT] tid=417989 ompt_id=66428094503714817 tipo=ompt_thread_worker     last_cpu= 57 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.362 ratio_rm=-1.0000
-[OMPT] tid=417957 ompt_id=57420895248973825 tipo=ompt_thread_worker     last_cpu= 53 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.319 ratio_rm=-1.0000
-[OMPT] tid=417943 ompt_id=53480245575024641 tipo=ompt_thread_worker     last_cpu=187 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.408 ratio_rm=-1.0000
-[OMPT] tid=417929 ompt_id=49539595901075457 tipo=ompt_thread_worker     last_cpu=228 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.335 ratio_rm=-1.0000
-[OMPT] tid=417915 ompt_id=45598946227126273 tipo=ompt_thread_worker     last_cpu=150 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.417 ratio_rm=-1.0000
-[OMPT] tid=417899 ompt_id=41095346599755777 tipo=ompt_thread_worker     last_cpu=151 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.394 ratio_rm=-1.0000
-[OMPT] tid=417977 ompt_id=63050394783186945 tipo=ompt_thread_worker     last_cpu=146 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.365 ratio_rm=-1.0000
-[OMPT] tid=417889 ompt_id=38280596832649217 tipo=ompt_thread_worker     last_cpu=149 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.367 ratio_rm=-1.0000
-[OMPT] tid=417959 ompt_id=57983845202395137 tipo=ompt_thread_worker     last_cpu=147 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.394 ratio_rm=-1.0000
-[OMPT] tid=417888 ompt_id=37717646879227905 tipo=ompt_thread_worker     last_cpu=223 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.293 ratio_rm=-1.0000
-[OMPT] tid=417931 ompt_id=50102545854496769 tipo=ompt_thread_worker     last_cpu= 52 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.379 ratio_rm=-1.0000
-[OMPT] tid=417934 ompt_id=50946970784628737 tipo=ompt_thread_worker     last_cpu=236 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.297 ratio_rm=-1.0000
-[OMPT] tid=418003 ompt_id=70368744177664001 tipo=ompt_thread_worker     last_cpu=136 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.377 ratio_rm=-1.0000
-[OMPT] tid=417983 ompt_id=64739244643450881 tipo=ompt_thread_worker     last_cpu=137 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.345 ratio_rm=-1.0000
-[OMPT] tid=417923 ompt_id=47850746040811521 tipo=ompt_thread_worker     last_cpu=141 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.369 ratio_rm=-1.0000
-[OMPT] tid=417937 ompt_id=51791395714760705 tipo=ompt_thread_worker     last_cpu=140 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.333 ratio_rm=-1.0000
-[OMPT] tid=417971 ompt_id=61361544922923009 tipo=ompt_thread_worker     last_cpu=162 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.348 ratio_rm=-1.0000
-[OMPT] tid=417980 ompt_id=63894819713318913 tipo=ompt_thread_worker     last_cpu=217 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.283 ratio_rm=-1.0000
-[OMPT] tid=417933 ompt_id=50665495807918081 tipo=ompt_thread_worker     last_cpu=172 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.377 ratio_rm=-1.0000
-[OMPT] tid=417945 ompt_id=54043195528445953 tipo=ompt_thread_worker     last_cpu=171 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.357 ratio_rm=-1.0000
-[OMPT] tid=417883 ompt_id=36873221949095937 tipo=ompt_thread_worker     last_cpu=175 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.365 ratio_rm=-1.0000
-[OMPT] tid=417892 ompt_id=39125021762781185 tipo=ompt_thread_worker     last_cpu=248 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.301 ratio_rm=-1.0000
-[OMPT] tid=417988 ompt_id=66146619527004161 tipo=ompt_thread_worker     last_cpu=254 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.283 ratio_rm=-1.0000
-[OMPT] tid=417908 ompt_id=43628621390151681 tipo=ompt_thread_worker     last_cpu=249 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.337 ratio_rm=-1.0000
-[OMPT] tid=417978 ompt_id=63331869759897601 tipo=ompt_thread_worker     last_cpu= 81 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.244 ratio_rm=-1.0000
-[OMPT] tid=417880 ompt_id=35747322042253313 tipo=ompt_thread_worker     last_cpu=239 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.298 ratio_rm=-1.0000
-[OMPT] tid=417924 ompt_id=48132221017522177 tipo=ompt_thread_worker     last_cpu=250 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.336 ratio_rm=-1.0000
-[OMPT] tid=417922 ompt_id=47569271064100865 tipo=ompt_thread_worker     last_cpu= 56 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.321 ratio_rm=-1.0000
-[OMPT] tid=417952 ompt_id=56013520365420545 tipo=ompt_thread_worker     last_cpu=235 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.307 ratio_rm=-1.0000
-[OMPT] tid=417969 ompt_id=60798594969501697 tipo=ompt_thread_worker     last_cpu=138 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.353 ratio_rm=-1.0000
-[OMPT] tid=417951 ompt_id=55732045388709889 tipo=ompt_thread_worker     last_cpu=139 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.330 ratio_rm=-1.0000
-[OMPT] tid=417953 ompt_id=56294995342131201 tipo=ompt_thread_worker     last_cpu=163 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.349 ratio_rm=-1.0000
-[OMPT] tid=417921 ompt_id=47287796087390209 tipo=ompt_thread_worker     last_cpu=165 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.400 ratio_rm=-1.0000
-[OMPT] tid=417939 ompt_id=52354345668182017 tipo=ompt_thread_worker     last_cpu=164 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.359 ratio_rm=-1.0000
-[OMPT] tid=417907 ompt_id=43347146413441025 tipo=ompt_thread_worker     last_cpu=166 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.437 ratio_rm=-1.0000
-[OMPT] tid=417992 ompt_id=67272519433846785 tipo=ompt_thread_worker     last_cpu=200 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.299 ratio_rm=-1.0000
-[OMPT] tid=417927 ompt_id=48976645947654145 tipo=ompt_thread_worker     last_cpu=188 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.447 ratio_rm=-1.0000
-[OMPT] tid=417901 ompt_id=41658296553177089 tipo=ompt_thread_worker     last_cpu=190 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.422 ratio_rm=-1.0000
-[OMPT] tid=417949 ompt_id=55169095435288577 tipo=ompt_thread_worker     last_cpu=155 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.351 ratio_rm=-1.0000
-[OMPT] tid=417935 ompt_id=51228445761339393 tipo=ompt_thread_worker     last_cpu=156 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.334 ratio_rm=-1.0000
-[OMPT] tid=417903 ompt_id=42221246506598401 tipo=ompt_thread_worker     last_cpu=158 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.360 ratio_rm=-1.0000
-[OMPT] tid=417909 ompt_id=43910096366862337 tipo=ompt_thread_worker     last_cpu= 27 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.391 ratio_rm=-1.0000
-[OMPT] tid=417967 ompt_id=60235645016080385 tipo=ompt_thread_worker     last_cpu=154 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.366 ratio_rm=-1.0000
-[OMPT] tid=417890 ompt_id=38562071809359873 tipo=ompt_thread_worker     last_cpu=159 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.362 ratio_rm=-1.0000
-[OMPT] tid=417972 ompt_id=61643019899633665 tipo=ompt_thread_worker     last_cpu=242 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.303 ratio_rm=-1.0000
-[OMPT] tid=417936 ompt_id=51509920738050049 tipo=ompt_thread_worker     last_cpu=244 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.321 ratio_rm=-1.0000
-[OMPT] tid=417981 ompt_id=64176294690029569 tipo=ompt_thread_worker     last_cpu=177 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.362 ratio_rm=-1.0000
-[OMPT] tid=417913 ompt_id=45035996273704961 tipo=ompt_thread_worker     last_cpu=181 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.396 ratio_rm=-1.0000
-[OMPT] tid=417964 ompt_id=59391220085948417 tipo=ompt_thread_worker     last_cpu=210 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.274 ratio_rm=-1.0000
-[OMPT] tid=417954 ompt_id=56576470318841857 tipo=ompt_thread_worker     last_cpu=211 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.267 ratio_rm=-1.0000
-[OMPT] tid=417938 ompt_id=52072870691471361 tipo=ompt_thread_worker     last_cpu= 84 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.264 ratio_rm=-1.0000
-[OMPT] tid=417973 ompt_id=61924494876344321 tipo=ompt_thread_worker     last_cpu=185 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.354 ratio_rm=-1.0000
-[OMPT] tid=417911 ompt_id=44473046320283649 tipo=ompt_thread_worker     last_cpu=189 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.400 ratio_rm=-1.0000
-[OMPT] tid=417887 ompt_id=37999121855938561 tipo=ompt_thread_worker     last_cpu=191 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.364 ratio_rm=-1.0000
-[OMPT] tid=417879 ompt_id=35465847065542657 tipo=ompt_thread_worker     last_cpu= 63 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.363 ratio_rm=-1.0000
-[OMPT] tid=417904 ompt_id=42502721483309057 tipo=ompt_thread_worker     last_cpu=214 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.264 ratio_rm=-1.0000
-[OMPT] tid=417984 ompt_id=65020719620161537 tipo=ompt_thread_worker     last_cpu=241 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.303 ratio_rm=-1.0000
-[OMPT] tid=417996 ompt_id=68398419340689409 tipo=ompt_thread_worker     last_cpu=240 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.327 ratio_rm=-1.0000
-[OMPT] tid=418008 ompt_id=71776119061217281 tipo=ompt_thread_worker     last_cpu=119 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.361 ratio_rm=-1.0000
-[OMPT] tid=417926 ompt_id=48695170970943489 tipo=ompt_thread_worker     last_cpu=118 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.227 ratio_rm=-1.0000
-[OMPT] tid=417905 ompt_id=42784196460019713 tipo=ompt_thread_worker     last_cpu=142 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.352 ratio_rm=-1.0000
-[OMPT] tid=417910 ompt_id=44191571343572993 tipo=ompt_thread_worker     last_cpu=102 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.217 ratio_rm=-1.0000
-[OMPT] tid=417894 ompt_id=39687971716202497 tipo=ompt_thread_worker     last_cpu= 61 numa=0 mig=0 fallos=0 perf=ipc_only ipc=0.263 ratio_rm=-1.0000
-[OMPT] tid=417968 ompt_id=60517119992791041 tipo=ompt_thread_worker     last_cpu=202 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.308 ratio_rm=-1.0000
-[OMPT] tid=417944 ompt_id=53761720551735297 tipo=ompt_thread_worker     last_cpu=203 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.274 ratio_rm=-1.0000
-[OMPT] tid=417976 ompt_id=62768919806476289 tipo=ompt_thread_worker     last_cpu=201 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.248 ratio_rm=-1.0000
-[OMPT] tid=417970 ompt_id=61080069946212353 tipo=ompt_thread_worker     last_cpu=116 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.294 ratio_rm=-1.0000
-[OMPT] tid=417877 ompt_id=34902897112121345 tipo=ompt_thread_worker     last_cpu=247 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.318 ratio_rm=-1.0000
-[OMPT] tid=417878 ompt_id=35184372088832001 tipo=ompt_thread_worker     last_cpu=231 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.301 ratio_rm=-1.0000
-[OMPT] tid=417896 ompt_id=40250921669623809 tipo=ompt_thread_worker     last_cpu=206 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.264 ratio_rm=-1.0000
-[OMPT] tid=417928 ompt_id=49258120924364801 tipo=ompt_thread_worker     last_cpu=204 numa=1 mig=0 fallos=0 perf=ipc_only ipc=0.302 ratio_rm=-1.0000
+[OMPT] tid=632928 ompt_id=281474976710657 tipo=ompt_thread_initial    last_cpu=205 numa=1 mig=0 fallos=0 perf=full ipc=0.292 ratio_rm=0.0201
+[OMPT] tid=632930 ompt_id=562949953421313 tipo=ompt_thread_worker     last_cpu= 73 numa=1 mig=0 fallos=0 perf=full ipc=0.303 ratio_rm=0.0387
+[OMPT] tid=632931 ompt_id=844424930131969 tipo=ompt_thread_worker     last_cpu=215 numa=1 mig=0 fallos=0 perf=full ipc=0.340 ratio_rm=0.0259
+[OMPT] tid=632932 ompt_id=1125899906842625 tipo=ompt_thread_worker     last_cpu= 89 numa=1 mig=0 fallos=0 perf=full ipc=0.269 ratio_rm=0.0358
+[OMPT] tid=632933 ompt_id=1407374883553281 tipo=ompt_thread_worker     last_cpu=128 numa=0 mig=0 fallos=0 perf=full ipc=0.260 ratio_rm=0.0333
+[OMPT] tid=632934 ompt_id=1688849860263937 tipo=ompt_thread_worker     last_cpu=231 numa=1 mig=0 fallos=0 perf=full ipc=0.321 ratio_rm=0.0316
+[OMPT] tid=632935 ompt_id=1970324836974593 tipo=ompt_thread_worker     last_cpu=105 numa=1 mig=0 fallos=0 perf=full ipc=0.349 ratio_rm=0.0268
+[OMPT] tid=632936 ompt_id=2533274790395905 tipo=ompt_thread_worker     last_cpu=179 numa=0 mig=0 fallos=0 perf=full ipc=0.226 ratio_rm=0.0202
+[OMPT] tid=632937 ompt_id=2251799813685249 tipo=ompt_thread_worker     last_cpu= 52 numa=0 mig=0 fallos=0 perf=full ipc=0.235 ratio_rm=0.0113
+[OMPT] tid=632940 ompt_id=2814749767106561 tipo=ompt_thread_worker     last_cpu=129 numa=0 mig=0 fallos=0 perf=full ipc=0.230 ratio_rm=0.0349
+[OMPT] tid=632938 ompt_id=3096224743817217 tipo=ompt_thread_worker     last_cpu=177 numa=0 mig=0 fallos=0 perf=full ipc=0.272 ratio_rm=0.0182
+[OMPT] tid=632941 ompt_id=3659174697238529 tipo=ompt_thread_worker     last_cpu=201 numa=1 mig=0 fallos=0 perf=full ipc=0.290 ratio_rm=0.0375
+[OMPT] tid=632939 ompt_id=3377699720527873 tipo=ompt_thread_worker     last_cpu= 57 numa=0 mig=0 fallos=0 perf=full ipc=0.222 ratio_rm=0.0243
+[OMPT] tid=632942 ompt_id=3940649673949185 tipo=ompt_thread_worker     last_cpu= 25 numa=0 mig=0 fallos=0 perf=full ipc=0.188 ratio_rm=0.0357
+[OMPT] tid=632944 ompt_id=4503599627370497 tipo=ompt_thread_worker     last_cpu= 80 numa=1 mig=0 fallos=0 perf=full ipc=0.301 ratio_rm=0.0416
+[OMPT] tid=632943 ompt_id=4222124650659841 tipo=ompt_thread_worker     last_cpu= 96 numa=1 mig=0 fallos=0 perf=full ipc=0.285 ratio_rm=0.0467
+[OMPT] tid=632945 ompt_id=4785074604081153 tipo=ompt_thread_worker     last_cpu=247 numa=1 mig=0 fallos=0 perf=full ipc=0.280 ratio_rm=0.0272
+[OMPT] tid=632946 ompt_id=5066549580791809 tipo=ompt_thread_worker     last_cpu=112 numa=1 mig=0 fallos=0 perf=full ipc=0.298 ratio_rm=0.0369
+[OMPT] tid=632947 ompt_id=5348024557502465 tipo=ompt_thread_worker     last_cpu= 77 numa=1 mig=0 fallos=0 perf=full ipc=0.269 ratio_rm=0.0365
+[OMPT] tid=632948 ompt_id=5629499534213121 tipo=ompt_thread_worker     last_cpu= 24 numa=0 mig=0 fallos=0 perf=full ipc=0.227 ratio_rm=0.0353
+[OMPT] tid=632949 ompt_id=5910974510923777 tipo=ompt_thread_worker     last_cpu= 86 numa=1 mig=0 fallos=0 perf=full ipc=0.326 ratio_rm=0.0306
+[OMPT] tid=632950 ompt_id=6192449487634433 tipo=ompt_thread_worker     last_cpu= 78 numa=1 mig=0 fallos=0 perf=full ipc=0.281 ratio_rm=0.0321
+[OMPT] tid=632951 ompt_id=6473924464345089 tipo=ompt_thread_worker     last_cpu= 97 numa=1 mig=0 fallos=0 perf=full ipc=0.257 ratio_rm=0.0355
+[OMPT] tid=632952 ompt_id=6755399441055745 tipo=ompt_thread_worker     last_cpu=104 numa=1 mig=0 fallos=0 perf=full ipc=0.336 ratio_rm=0.0356
+[OMPT] tid=632953 ompt_id=7036874417766401 tipo=ompt_thread_worker     last_cpu=120 numa=1 mig=0 fallos=0 perf=full ipc=0.303 ratio_rm=0.0372
+[OMPT] tid=632954 ompt_id=7318349394477057 tipo=ompt_thread_worker     last_cpu= 55 numa=0 mig=0 fallos=0 perf=full ipc=0.239 ratio_rm=0.0277
+[OMPT] tid=632955 ompt_id=7599824371187713 tipo=ompt_thread_worker     last_cpu=206 numa=1 mig=0 fallos=0 perf=full ipc=0.285 ratio_rm=0.0253
+[OMPT] tid=632956 ompt_id=7881299347898369 tipo=ompt_thread_worker     last_cpu=121 numa=1 mig=0 fallos=0 perf=full ipc=0.328 ratio_rm=0.0259
+[OMPT] tid=632957 ompt_id=8162774324609025 tipo=ompt_thread_worker     last_cpu= 10 numa=0 mig=0 fallos=0 perf=full ipc=0.189 ratio_rm=0.0388
+[OMPT] tid=632958 ompt_id=8444249301319681 tipo=ompt_thread_worker     last_cpu= 17 numa=0 mig=0 fallos=0 perf=full ipc=0.173 ratio_rm=0.0246
+[OMPT] tid=632959 ompt_id=8725724278030337 tipo=ompt_thread_worker     last_cpu= 16 numa=0 mig=0 fallos=0 perf=full ipc=0.190 ratio_rm=0.0183
+[OMPT] tid=632960 ompt_id=9007199254740993 tipo=ompt_thread_worker     last_cpu= 11 numa=0 mig=0 fallos=0 perf=full ipc=0.229 ratio_rm=0.0323
+[OMPT] tid=632961 ompt_id=9288674231451649 tipo=ompt_thread_worker     last_cpu= 82 numa=1 mig=0 fallos=0 perf=full ipc=0.319 ratio_rm=0.0346
+[OMPT] tid=632962 ompt_id=9570149208162305 tipo=ompt_thread_worker     last_cpu= 88 numa=1 mig=0 fallos=0 perf=full ipc=0.286 ratio_rm=0.0392
+[OMPT] tid=632963 ompt_id=9851624184872961 tipo=ompt_thread_worker     last_cpu= 64 numa=1 mig=0 fallos=0 perf=full ipc=0.311 ratio_rm=0.0432
+[OMPT] tid=632964 ompt_id=10133099161583617 tipo=ompt_thread_worker     last_cpu= 72 numa=1 mig=0 fallos=0 perf=full ipc=0.289 ratio_rm=0.0434
+[OMPT] tid=633134 ompt_id=57983845202395137 tipo=ompt_thread_worker     last_cpu=114 numa=1 mig=0 fallos=0 perf=full ipc=0.261 ratio_rm=0.0346
+[OMPT] tid=633006 ompt_id=21955048183431169 tipo=ompt_thread_worker     last_cpu= 32 numa=0 mig=0 fallos=0 perf=full ipc=0.259 ratio_rm=0.0171
+[OMPT] tid=633171 ompt_id=67835469387268097 tipo=ompt_thread_worker     last_cpu= 75 numa=1 mig=0 fallos=0 perf=full ipc=0.297 ratio_rm=0.0331
+[OMPT] tid=633036 ompt_id=30399297484750849 tipo=ompt_thread_worker     last_cpu=203 numa=1 mig=0 fallos=0 perf=full ipc=0.289 ratio_rm=0.0310
+[OMPT] tid=632970 ompt_id=11821949021847553 tipo=ompt_thread_worker     last_cpu=207 numa=1 mig=0 fallos=0 perf=full ipc=0.311 ratio_rm=0.0267
+[OMPT] tid=633180 ompt_id=70931694131085313 tipo=ompt_thread_worker     last_cpu= 74 numa=1 mig=0 fallos=0 perf=full ipc=0.265 ratio_rm=0.0440
+[OMPT] tid=633072 ompt_id=40532396646334465 tipo=ompt_thread_worker     last_cpu=137 numa=0 mig=0 fallos=0 perf=full ipc=0.244 ratio_rm=0.0317
+[OMPT] tid=633115 ompt_id=52635820644892673 tipo=ompt_thread_worker     last_cpu=218 numa=1 mig=0 fallos=0 perf=full ipc=0.290 ratio_rm=0.0427
+[OMPT] tid=632990 ompt_id=17451448556060673 tipo=ompt_thread_worker     last_cpu= 34 numa=0 mig=0 fallos=0 perf=full ipc=0.240 ratio_rm=0.0112
+[OMPT] tid=633058 ompt_id=36591746972385281 tipo=ompt_thread_worker     last_cpu=202 numa=1 mig=0 fallos=0 perf=full ipc=0.270 ratio_rm=0.0401
+[OMPT] tid=633075 ompt_id=41376821576466433 tipo=ompt_thread_worker     last_cpu= 50 numa=0 mig=0 fallos=0 perf=full ipc=0.219 ratio_rm=0.0333
+[OMPT] tid=633037 ompt_id=30680772461461505 tipo=ompt_thread_worker     last_cpu= 45 numa=0 mig=0 fallos=0 perf=full ipc=0.225 ratio_rm=0.0312
+[OMPT] tid=633101 ompt_id=48413695994232833 tipo=ompt_thread_worker     last_cpu= 48 numa=0 mig=0 fallos=0 perf=full ipc=0.213 ratio_rm=0.0372
+[OMPT] tid=632977 ompt_id=13792273858822145 tipo=ompt_thread_worker     last_cpu=183 numa=0 mig=0 fallos=0 perf=full ipc=0.234 ratio_rm=0.0303
+[OMPT] tid=633147 ompt_id=61643019899633665 tipo=ompt_thread_worker     last_cpu=182 numa=0 mig=0 fallos=0 perf=full ipc=0.230 ratio_rm=0.0365
+[OMPT] tid=633079 ompt_id=42502721483309057 tipo=ompt_thread_worker     last_cpu=176 numa=0 mig=0 fallos=0 perf=full ipc=0.240 ratio_rm=0.0319
+[OMPT] tid=633057 ompt_id=36310271995674625 tipo=ompt_thread_worker     last_cpu=178 numa=0 mig=0 fallos=0 perf=full ipc=0.241 ratio_rm=0.0473
+[OMPT] tid=633021 ompt_id=26177172834091009 tipo=ompt_thread_worker     last_cpu=152 numa=0 mig=0 fallos=0 perf=full ipc=0.214 ratio_rm=0.0374
+[OMPT] tid=633150 ompt_id=62487444829765633 tipo=ompt_thread_worker     last_cpu= 20 numa=0 mig=0 fallos=0 perf=full ipc=0.194 ratio_rm=0.0294
+[OMPT] tid=632968 ompt_id=11258999068426241 tipo=ompt_thread_worker     last_cpu=148 numa=0 mig=0 fallos=0 perf=full ipc=0.194 ratio_rm=0.0343
+[OMPT] tid=632997 ompt_id=19421773393035265 tipo=ompt_thread_worker     last_cpu=  2 numa=0 mig=0 fallos=0 perf=full ipc=0.213 ratio_rm=0.0415
+[OMPT] tid=633175 ompt_id=69524319247532033 tipo=ompt_thread_worker     last_cpu= 60 numa=0 mig=0 fallos=0 perf=full ipc=0.249 ratio_rm=0.0238
+[OMPT] tid=633070 ompt_id=39969446692913153 tipo=ompt_thread_worker     last_cpu=217 numa=1 mig=0 fallos=0 perf=full ipc=0.285 ratio_rm=0.0335
+[OMPT] tid=633024 ompt_id=27021597764222977 tipo=ompt_thread_worker     last_cpu=220 numa=1 mig=0 fallos=0 perf=full ipc=0.316 ratio_rm=0.0303
+[OMPT] tid=633178 ompt_id=70368744177664001 tipo=ompt_thread_worker     last_cpu= 90 numa=1 mig=0 fallos=0 perf=full ipc=0.304 ratio_rm=0.0344
+[OMPT] tid=632974 ompt_id=12666373951979521 tipo=ompt_thread_worker     last_cpu=223 numa=1 mig=0 fallos=0 perf=full ipc=0.322 ratio_rm=0.0284
+[OMPT] tid=633162 ompt_id=65865144550293505 tipo=ompt_thread_worker     last_cpu= 91 numa=1 mig=0 fallos=0 perf=full ipc=0.308 ratio_rm=0.0266
+[OMPT] tid=633042 ompt_id=32088147345014785 tipo=ompt_thread_worker     last_cpu=219 numa=1 mig=0 fallos=0 perf=full ipc=0.296 ratio_rm=0.0299
+[OMPT] tid=633056 ompt_id=36028797018963969 tipo=ompt_thread_worker     last_cpu=138 numa=0 mig=0 fallos=0 perf=full ipc=0.193 ratio_rm=0.0354
+[OMPT] tid=633054 ompt_id=35465847065542657 tipo=ompt_thread_worker     last_cpu=210 numa=1 mig=0 fallos=0 perf=full ipc=0.306 ratio_rm=0.0377
+[OMPT] tid=633110 ompt_id=50946970784628737 tipo=ompt_thread_worker     last_cpu= 87 numa=1 mig=0 fallos=0 perf=full ipc=0.326 ratio_rm=0.0255
+[OMPT] tid=633059 ompt_id=36873221949095937 tipo=ompt_thread_worker     last_cpu=162 numa=0 mig=0 fallos=0 perf=full ipc=0.264 ratio_rm=0.0322
+[OMPT] tid=633045 ompt_id=32932572275146753 tipo=ompt_thread_worker     last_cpu=186 numa=0 mig=0 fallos=0 perf=full ipc=0.236 ratio_rm=0.0323
+[OMPT] tid=633029 ompt_id=28428972647776257 tipo=ompt_thread_worker     last_cpu=187 numa=0 mig=0 fallos=0 perf=full ipc=0.256 ratio_rm=0.0349
+[OMPT] tid=632983 ompt_id=15481123719086081 tipo=ompt_thread_worker     last_cpu=190 numa=0 mig=0 fallos=0 perf=full ipc=0.257 ratio_rm=0.0293
+[OMPT] tid=633122 ompt_id=54606145481867265 tipo=ompt_thread_worker     last_cpu= 62 numa=0 mig=0 fallos=0 perf=full ipc=0.265 ratio_rm=0.0306
+[OMPT] tid=633121 ompt_id=54324670505156609 tipo=ompt_thread_worker     last_cpu=110 numa=1 mig=0 fallos=0 perf=full ipc=0.380 ratio_rm=0.0270
+[OMPT] tid=632986 ompt_id=16325548649218049 tipo=ompt_thread_worker     last_cpu=238 numa=1 mig=0 fallos=0 perf=full ipc=0.338 ratio_rm=0.0287
+[OMPT] tid=633018 ompt_id=25332747903959041 tipo=ompt_thread_worker     last_cpu=236 numa=1 mig=0 fallos=0 perf=full ipc=0.365 ratio_rm=0.0256
+[OMPT] tid=633090 ompt_id=45598946227126273 tipo=ompt_thread_worker     last_cpu=232 numa=1 mig=0 fallos=0 perf=full ipc=0.328 ratio_rm=0.0355
+[OMPT] tid=633048 ompt_id=33776997205278721 tipo=ompt_thread_worker     last_cpu=234 numa=1 mig=0 fallos=0 perf=full ipc=0.330 ratio_rm=0.0321
+[OMPT] tid=633004 ompt_id=21392098230009857 tipo=ompt_thread_worker     last_cpu=237 numa=1 mig=0 fallos=0 perf=full ipc=0.357 ratio_rm=0.0254
+[OMPT] tid=633132 ompt_id=57420895248973825 tipo=ompt_thread_worker     last_cpu=109 numa=1 mig=0 fallos=0 perf=full ipc=0.341 ratio_rm=0.0270
+[OMPT] tid=633066 ompt_id=38843546786070529 tipo=ompt_thread_worker     last_cpu=233 numa=1 mig=0 fallos=0 perf=full ipc=0.337 ratio_rm=0.0304
+[OMPT] tid=633148 ompt_id=61924494876344321 tipo=ompt_thread_worker     last_cpu=108 numa=1 mig=0 fallos=0 perf=full ipc=0.359 ratio_rm=0.0228
+[OMPT] tid=633182 ompt_id=71494644084506625 tipo=ompt_thread_worker     last_cpu=106 numa=1 mig=0 fallos=0 perf=full ipc=0.332 ratio_rm=0.0323
+[OMPT] tid=633164 ompt_id=66428094503714817 tipo=ompt_thread_worker     last_cpu=107 numa=1 mig=0 fallos=0 perf=full ipc=0.335 ratio_rm=0.0236
+[OMPT] tid=633106 ompt_id=49821070877786113 tipo=ompt_thread_worker     last_cpu=111 numa=1 mig=0 fallos=0 perf=full ipc=0.342 ratio_rm=0.0246
+[OMPT] tid=633032 ompt_id=29273397577908225 tipo=ompt_thread_worker     last_cpu=235 numa=1 mig=0 fallos=0 perf=full ipc=0.355 ratio_rm=0.0210
+[OMPT] tid=632965 ompt_id=10414574138294273 tipo=ompt_thread_worker     last_cpu=239 numa=1 mig=0 fallos=0 perf=full ipc=0.353 ratio_rm=0.0222
+[OMPT] tid=633081 ompt_id=43065671436730369 tipo=ompt_thread_worker     last_cpu=168 numa=0 mig=0 fallos=0 perf=full ipc=0.228 ratio_rm=0.0364
+[OMPT] tid=633105 ompt_id=49539595901075457 tipo=ompt_thread_worker     last_cpu= 47 numa=0 mig=0 fallos=0 perf=full ipc=0.223 ratio_rm=0.0429
+[OMPT] tid=633010 ompt_id=23080948090273793 tipo=ompt_thread_worker     last_cpu=221 numa=1 mig=0 fallos=0 perf=full ipc=0.288 ratio_rm=0.0255
+[OMPT] tid=633127 ompt_id=56013520365420545 tipo=ompt_thread_worker     last_cpu= 93 numa=1 mig=0 fallos=0 perf=full ipc=0.290 ratio_rm=0.0261
+[OMPT] tid=632993 ompt_id=18295873486192641 tipo=ompt_thread_worker     last_cpu=222 numa=1 mig=0 fallos=0 perf=full ipc=0.298 ratio_rm=0.0280
+[OMPT] tid=633113 ompt_id=52072870691471361 tipo=ompt_thread_worker     last_cpu= 94 numa=1 mig=0 fallos=0 perf=full ipc=0.320 ratio_rm=0.0249
+[OMPT] tid=633080 ompt_id=42784196460019713 tipo=ompt_thread_worker     last_cpu=216 numa=1 mig=0 fallos=0 perf=full ipc=0.265 ratio_rm=0.0371
+[OMPT] tid=633104 ompt_id=49258120924364801 tipo=ompt_thread_worker     last_cpu= 95 numa=1 mig=0 fallos=0 perf=full ipc=0.327 ratio_rm=0.0250
+[OMPT] tid=633152 ompt_id=63050394783186945 tipo=ompt_thread_worker     last_cpu= 92 numa=1 mig=0 fallos=0 perf=full ipc=0.318 ratio_rm=0.0251
+[OMPT] tid=633026 ompt_id=27584547717644289 tipo=ompt_thread_worker     last_cpu=212 numa=1 mig=0 fallos=0 perf=full ipc=0.298 ratio_rm=0.0279
+[OMPT] tid=632992 ompt_id=18014398509481985 tipo=ompt_thread_worker     last_cpu=214 numa=1 mig=0 fallos=0 perf=full ipc=0.300 ratio_rm=0.0277
+[OMPT] tid=633140 ompt_id=59391220085948417 tipo=ompt_thread_worker     last_cpu= 83 numa=1 mig=0 fallos=0 perf=full ipc=0.293 ratio_rm=0.0286
+[OMPT] tid=633131 ompt_id=56857945295552513 tipo=ompt_thread_worker     last_cpu= 81 numa=1 mig=0 fallos=0 perf=full ipc=0.287 ratio_rm=0.0340
+[OMPT] tid=633040 ompt_id=31525197391593473 tipo=ompt_thread_worker     last_cpu=211 numa=1 mig=0 fallos=0 perf=full ipc=0.270 ratio_rm=0.0302
+[OMPT] tid=633074 ompt_id=41095346599755777 tipo=ompt_thread_worker     last_cpu=209 numa=1 mig=0 fallos=0 perf=full ipc=0.288 ratio_rm=0.0322
+[OMPT] tid=633088 ompt_id=45035996273704961 tipo=ompt_thread_worker     last_cpu=208 numa=1 mig=0 fallos=0 perf=full ipc=0.278 ratio_rm=0.0401
+[OMPT] tid=633008 ompt_id=22517998136852481 tipo=ompt_thread_worker     last_cpu=213 numa=1 mig=0 fallos=0 perf=full ipc=0.299 ratio_rm=0.0270
+[OMPT] tid=633172 ompt_id=68398419340689409 tipo=ompt_thread_worker     last_cpu= 85 numa=1 mig=0 fallos=0 perf=full ipc=0.297 ratio_rm=0.0300
+[OMPT] tid=633156 ompt_id=64176294690029569 tipo=ompt_thread_worker     last_cpu= 84 numa=1 mig=0 fallos=0 perf=full ipc=0.299 ratio_rm=0.0284
+[OMPT] tid=633163 ompt_id=66146619527004161 tipo=ompt_thread_worker     last_cpu= 19 numa=0 mig=0 fallos=0 perf=full ipc=0.176 ratio_rm=0.0362
+[OMPT] tid=633007 ompt_id=22236523160141825 tipo=ompt_thread_worker     last_cpu=149 numa=0 mig=0 fallos=0 perf=full ipc=0.213 ratio_rm=0.0375
+[OMPT] tid=633126 ompt_id=55732045388709889 tipo=ompt_thread_worker     last_cpu= 21 numa=0 mig=0 fallos=0 perf=full ipc=0.209 ratio_rm=0.0384
+[OMPT] tid=633061 ompt_id=37436171902517249 tipo=ompt_thread_worker     last_cpu=185 numa=0 mig=0 fallos=0 perf=full ipc=0.246 ratio_rm=0.0354
+[OMPT] tid=633173 ompt_id=68679894317400065 tipo=ompt_thread_worker     last_cpu= 59 numa=0 mig=0 fallos=0 perf=full ipc=0.225 ratio_rm=0.0428
+[OMPT] tid=632967 ompt_id=10977524091715585 tipo=ompt_thread_worker     last_cpu=191 numa=0 mig=0 fallos=0 perf=full ipc=0.237 ratio_rm=0.0361
+[OMPT] tid=633107 ompt_id=50102545854496769 tipo=ompt_thread_worker     last_cpu= 63 numa=0 mig=0 fallos=0 perf=full ipc=0.254 ratio_rm=0.0320
+[OMPT] tid=633155 ompt_id=63894819713318913 tipo=ompt_thread_worker     last_cpu= 28 numa=0 mig=0 fallos=0 perf=full ipc=0.211 ratio_rm=0.0348
+[OMPT] tid=633085 ompt_id=44191571343572993 tipo=ompt_thread_worker     last_cpu= 98 numa=1 mig=0 fallos=0 perf=full ipc=0.292 ratio_rm=0.0317
+[OMPT] tid=632973 ompt_id=12947848928690177 tipo=ompt_thread_worker     last_cpu=159 numa=0 mig=0 fallos=0 perf=full ipc=0.209 ratio_rm=0.0402
+[OMPT] tid=633009 ompt_id=22799473113563137 tipo=ompt_thread_worker     last_cpu=157 numa=0 mig=0 fallos=0 perf=full ipc=0.192 ratio_rm=0.0393
+[OMPT] tid=633137 ompt_id=58828270132527105 tipo=ompt_thread_worker     last_cpu= 29 numa=0 mig=0 fallos=0 perf=full ipc=0.185 ratio_rm=0.0437
+[OMPT] tid=633179 ompt_id=70650219154374657 tipo=ompt_thread_worker     last_cpu= 40 numa=0 mig=0 fallos=0 perf=full ipc=0.229 ratio_rm=0.0324
+[OMPT] tid=633064 ompt_id=38280596832649217 tipo=ompt_thread_worker     last_cpu=225 numa=1 mig=0 fallos=0 perf=full ipc=0.252 ratio_rm=0.0312
+[OMPT] tid=633138 ompt_id=59109745109237761 tipo=ompt_thread_worker     last_cpu=101 numa=1 mig=0 fallos=0 perf=full ipc=0.268 ratio_rm=0.0261
+[OMPT] tid=633017 ompt_id=25051272927248385 tipo=ompt_thread_worker     last_cpu=180 numa=0 mig=0 fallos=0 perf=full ipc=0.253 ratio_rm=0.0443
+[OMPT] tid=632991 ompt_id=17732923532771329 tipo=ompt_thread_worker     last_cpu= 33 numa=0 mig=0 fallos=0 perf=full ipc=0.257 ratio_rm=0.0229
+[OMPT] tid=633114 ompt_id=52354345668182017 tipo=ompt_thread_worker     last_cpu= 54 numa=0 mig=0 fallos=0 perf=full ipc=0.217 ratio_rm=0.0386
+[OMPT] tid=633067 ompt_id=39125021762781185 tipo=ompt_thread_worker     last_cpu=169 numa=0 mig=0 fallos=0 perf=full ipc=0.231 ratio_rm=0.0381
+[OMPT] tid=633135 ompt_id=58265320179105793 tipo=ompt_thread_worker     last_cpu= 39 numa=0 mig=0 fallos=0 perf=full ipc=0.240 ratio_rm=0.0348
+[OMPT] tid=633153 ompt_id=63331869759897601 tipo=ompt_thread_worker     last_cpu= 44 numa=0 mig=0 fallos=0 perf=full ipc=0.240 ratio_rm=0.0359
+[OMPT] tid=633011 ompt_id=23362423066984449 tipo=ompt_thread_worker     last_cpu=173 numa=0 mig=0 fallos=0 perf=full ipc=0.225 ratio_rm=0.0298
+[OMPT] tid=633044 ompt_id=32651097298436097 tipo=ompt_thread_worker     last_cpu=252 numa=1 mig=0 fallos=0 perf=full ipc=0.297 ratio_rm=0.0249
+[OMPT] tid=633158 ompt_id=64739244643450881 tipo=ompt_thread_worker     last_cpu=124 numa=1 mig=0 fallos=0 perf=full ipc=0.293 ratio_rm=0.0300
+[OMPT] tid=633060 ompt_id=37154696925806593 tipo=ompt_thread_worker     last_cpu=253 numa=1 mig=0 fallos=0 perf=full ipc=0.326 ratio_rm=0.0220
+[OMPT] tid=633093 ompt_id=46443371157258241 tipo=ompt_thread_worker     last_cpu=127 numa=1 mig=0 fallos=0 perf=full ipc=0.324 ratio_rm=0.0234
+[OMPT] tid=633094 ompt_id=51228445761339393 tipo=ompt_thread_worker     last_cpu=255 numa=1 mig=0 fallos=0 perf=full ipc=0.326 ratio_rm=0.0216
+[OMPT] tid=632996 ompt_id=19140298416324609 tipo=ompt_thread_worker     last_cpu=249 numa=1 mig=0 fallos=0 perf=full ipc=0.330 ratio_rm=0.0285
+[OMPT] tid=633125 ompt_id=55450570411999233 tipo=ompt_thread_worker     last_cpu=123 numa=1 mig=0 fallos=0 perf=full ipc=0.313 ratio_rm=0.0262
+[OMPT] tid=633012 ompt_id=23643898043695105 tipo=ompt_thread_worker     last_cpu=250 numa=1 mig=0 fallos=0 perf=full ipc=0.299 ratio_rm=0.0346
+[OMPT] tid=633174 ompt_id=68961369294110721 tipo=ompt_thread_worker     last_cpu=122 numa=1 mig=0 fallos=0 perf=full ipc=0.324 ratio_rm=0.0297
+[OMPT] tid=633108 ompt_id=50384020831207425 tipo=ompt_thread_worker     last_cpu=254 numa=1 mig=0 fallos=0 perf=full ipc=0.314 ratio_rm=0.0239
+[OMPT] tid=632980 ompt_id=14636698788954113 tipo=ompt_thread_worker     last_cpu=248 numa=1 mig=0 fallos=0 perf=full ipc=0.307 ratio_rm=0.0374
+[OMPT] tid=632979 ompt_id=14355223812243457 tipo=ompt_thread_worker     last_cpu=175 numa=0 mig=0 fallos=0 perf=full ipc=0.223 ratio_rm=0.0315
+[OMPT] tid=633073 ompt_id=40813871623045121 tipo=ompt_thread_worker     last_cpu=161 numa=0 mig=0 fallos=0 perf=full ipc=0.244 ratio_rm=0.0449
+[OMPT] tid=633170 ompt_id=69242844270821377 tipo=ompt_thread_worker     last_cpu=143 numa=0 mig=0 fallos=0 perf=full ipc=0.236 ratio_rm=0.0424
+[OMPT] tid=633176 ompt_id=69805794224242689 tipo=ompt_thread_worker     last_cpu= 58 numa=0 mig=0 fallos=0 perf=full ipc=0.217 ratio_rm=0.0295
+[OMPT] tid=632972 ompt_id=12103423998558209 tipo=ompt_thread_worker     last_cpu=130 numa=0 mig=0 fallos=0 perf=full ipc=0.251 ratio_rm=0.0378
+[OMPT] tid=633128 ompt_id=56576470318841857 tipo=ompt_thread_worker     last_cpu= 53 numa=0 mig=0 fallos=0 perf=full ipc=0.212 ratio_rm=0.0361
+[OMPT] tid=633003 ompt_id=21110623253299201 tipo=ompt_thread_worker     last_cpu=181 numa=0 mig=0 fallos=0 perf=full ipc=0.249 ratio_rm=0.0402
+[OMPT] tid=633116 ompt_id=52917295621603329 tipo=ompt_thread_worker     last_cpu= 14 numa=0 mig=0 fallos=0 perf=full ipc=0.232 ratio_rm=0.0397
+[OMPT] tid=633049 ompt_id=34058472181989377 tipo=ompt_thread_worker     last_cpu=154 numa=0 mig=0 fallos=0 perf=full ipc=0.174 ratio_rm=0.0454
+[OMPT] tid=633013 ompt_id=23925373020405761 tipo=ompt_thread_worker     last_cpu=188 numa=0 mig=0 fallos=0 perf=full ipc=0.230 ratio_rm=0.0360
+[OMPT] tid=633046 ompt_id=33214047251857409 tipo=ompt_thread_worker     last_cpu=226 numa=1 mig=0 fallos=0 perf=full ipc=0.288 ratio_rm=0.0348
+[OMPT] tid=632982 ompt_id=15199648742375425 tipo=ompt_thread_worker     last_cpu=230 numa=1 mig=0 fallos=0 perf=full ipc=0.281 ratio_rm=0.0254
+[OMPT] tid=633000 ompt_id=20266198323167233 tipo=ompt_thread_worker     last_cpu=229 numa=1 mig=0 fallos=0 perf=full ipc=0.273 ratio_rm=0.0252
+[OMPT] tid=633084 ompt_id=43910096366862337 tipo=ompt_thread_worker     last_cpu=224 numa=1 mig=0 fallos=0 perf=full ipc=0.265 ratio_rm=0.0366
+[OMPT] tid=633160 ompt_id=65302194596872193 tipo=ompt_thread_worker     last_cpu= 99 numa=1 mig=0 fallos=0 perf=full ipc=0.280 ratio_rm=0.0270
+[OMPT] tid=632981 ompt_id=14918173765664769 tipo=ompt_thread_worker     last_cpu=  0 numa=0 mig=0 fallos=0 perf=full ipc=0.287 ratio_rm=0.0503
+[OMPT] tid=633092 ompt_id=46161896180547585 tipo=ompt_thread_worker     last_cpu=132 numa=0 mig=0 fallos=0 perf=full ipc=0.255 ratio_rm=0.0262
+[OMPT] tid=633071 ompt_id=40250921669623809 tipo=ompt_thread_worker     last_cpu=  4 numa=0 mig=0 fallos=0 perf=full ipc=0.233 ratio_rm=0.0340
+[OMPT] tid=633055 ompt_id=35747322042253313 tipo=ompt_thread_worker     last_cpu= 41 numa=0 mig=0 fallos=0 perf=full ipc=0.225 ratio_rm=0.0402
+[OMPT] tid=633082 ompt_id=43347146413441025 tipo=ompt_thread_worker     last_cpu=240 numa=1 mig=0 fallos=0 perf=full ipc=0.281 ratio_rm=0.0318
+[OMPT] tid=633052 ompt_id=34902897112121345 tipo=ompt_thread_worker     last_cpu=242 numa=1 mig=0 fallos=0 perf=full ipc=0.300 ratio_rm=0.0336
+[OMPT] tid=633062 ompt_id=37717646879227905 tipo=ompt_thread_worker     last_cpu=241 numa=1 mig=0 fallos=0 perf=full ipc=0.308 ratio_rm=0.0275
+[OMPT] tid=633123 ompt_id=54887620458577921 tipo=ompt_thread_worker     last_cpu=118 numa=1 mig=0 fallos=0 perf=full ipc=0.315 ratio_rm=0.0249
+[OMPT] tid=633161 ompt_id=65583669573582849 tipo=ompt_thread_worker     last_cpu= 51 numa=0 mig=0 fallos=0 perf=full ipc=0.214 ratio_rm=0.0529
+[OMPT] tid=632999 ompt_id=19984723346456577 tipo=ompt_thread_worker     last_cpu=189 numa=0 mig=0 fallos=0 perf=full ipc=0.215 ratio_rm=0.0343
+[OMPT] tid=633077 ompt_id=41939771529887745 tipo=ompt_thread_worker     last_cpu=184 numa=0 mig=0 fallos=0 perf=full ipc=0.240 ratio_rm=0.0464
+[OMPT] tid=633068 ompt_id=39406496739491841 tipo=ompt_thread_worker     last_cpu=193 numa=1 mig=0 fallos=0 perf=full ipc=0.338 ratio_rm=0.0529
+[OMPT] tid=633168 ompt_id=67553994410557441 tipo=ompt_thread_worker     last_cpu= 67 numa=1 mig=0 fallos=0 perf=full ipc=0.307 ratio_rm=0.0315
+[OMPT] tid=633102 ompt_id=48695170970943489 tipo=ompt_thread_worker     last_cpu= 71 numa=1 mig=0 fallos=0 perf=full ipc=0.305 ratio_rm=0.0300
+[OMPT] tid=633119 ompt_id=53761720551735297 tipo=ompt_thread_worker     last_cpu= 70 numa=1 mig=0 fallos=0 perf=full ipc=0.309 ratio_rm=0.0256
+[OMPT] tid=633016 ompt_id=24769797950537729 tipo=ompt_thread_worker     last_cpu=196 numa=1 mig=0 fallos=0 perf=full ipc=0.343 ratio_rm=0.0248
+[OMPT] tid=633154 ompt_id=63613344736608257 tipo=ompt_thread_worker     last_cpu= 68 numa=1 mig=0 fallos=0 perf=full ipc=0.331 ratio_rm=0.0259
+[OMPT] tid=632984 ompt_id=15762598695796737 tipo=ompt_thread_worker     last_cpu=198 numa=1 mig=0 fallos=0 perf=full ipc=0.325 ratio_rm=0.0250
+[OMPT] tid=633184 ompt_id=72057594037927937 tipo=ompt_thread_worker     last_cpu= 66 numa=1 mig=0 fallos=0 perf=full ipc=0.328 ratio_rm=0.0347
+[OMPT] tid=633129 ompt_id=56294995342131201 tipo=ompt_thread_worker     last_cpu= 69 numa=1 mig=0 fallos=0 perf=full ipc=0.318 ratio_rm=0.0292
+[OMPT] tid=633014 ompt_id=24206847997116417 tipo=ompt_thread_worker     last_cpu=228 numa=1 mig=0 fallos=0 perf=full ipc=0.286 ratio_rm=0.0275
+[OMPT] tid=633142 ompt_id=60235645016080385 tipo=ompt_thread_worker     last_cpu=125 numa=1 mig=0 fallos=0 perf=full ipc=0.336 ratio_rm=0.0237
+[OMPT] tid=633076 ompt_id=41658296553177089 tipo=ompt_thread_worker     last_cpu=126 numa=1 mig=0 fallos=0 perf=full ipc=0.339 ratio_rm=0.0213
+[OMPT] tid=633028 ompt_id=28147497671065601 tipo=ompt_thread_worker     last_cpu=251 numa=1 mig=0 fallos=0 perf=full ipc=0.323 ratio_rm=0.0254
+[OMPT] tid=632988 ompt_id=16888498602639361 tipo=ompt_thread_worker     last_cpu=246 numa=1 mig=0 fallos=0 perf=full ipc=0.313 ratio_rm=0.0227
+[OMPT] tid=633159 ompt_id=65020719620161537 tipo=ompt_thread_worker     last_cpu=131 numa=0 mig=0 fallos=0 perf=full ipc=0.219 ratio_rm=0.0422
+[OMPT] tid=633041 ompt_id=31806672368304129 tipo=ompt_thread_worker     last_cpu=147 numa=0 mig=0 fallos=0 perf=full ipc=0.190 ratio_rm=0.0519
+[OMPT] tid=633047 ompt_id=33495522228568065 tipo=ompt_thread_worker     last_cpu=170 numa=0 mig=0 fallos=0 perf=full ipc=0.228 ratio_rm=0.0406
+[OMPT] tid=633050 ompt_id=34339947158700033 tipo=ompt_thread_worker     last_cpu=194 numa=1 mig=0 fallos=0 perf=full ipc=0.301 ratio_rm=0.0418
+[OMPT] tid=632976 ompt_id=13510798882111489 tipo=ompt_thread_worker     last_cpu=199 numa=1 mig=0 fallos=0 perf=full ipc=0.314 ratio_rm=0.0247
+[OMPT] tid=633034 ompt_id=29836347531329537 tipo=ompt_thread_worker     last_cpu=195 numa=1 mig=0 fallos=0 perf=full ipc=0.316 ratio_rm=0.0287
+[OMPT] tid=633078 ompt_id=42221246506598401 tipo=ompt_thread_worker     last_cpu=192 numa=1 mig=0 fallos=0 perf=full ipc=0.304 ratio_rm=0.0374
+[OMPT] tid=632998 ompt_id=19703248369745921 tipo=ompt_thread_worker     last_cpu=197 numa=1 mig=0 fallos=0 perf=full ipc=0.340 ratio_rm=0.0278
+[OMPT] tid=633144 ompt_id=60798594969501697 tipo=ompt_thread_worker     last_cpu=116 numa=1 mig=0 fallos=0 perf=full ipc=0.312 ratio_rm=0.0251
+[OMPT] tid=633069 ompt_id=39687971716202497 tipo=ompt_thread_worker     last_cpu=  3 numa=0 mig=0 fallos=0 perf=full ipc=0.220 ratio_rm=0.0378
+[OMPT] tid=633051 ompt_id=34621422135410689 tipo=ompt_thread_worker     last_cpu=146 numa=0 mig=0 fallos=0 perf=full ipc=0.200 ratio_rm=0.0404
+[OMPT] tid=633065 ompt_id=38562071809359873 tipo=ompt_thread_worker     last_cpu=145 numa=0 mig=0 fallos=0 perf=full ipc=0.183 ratio_rm=0.0425
+[OMPT] tid=633177 ompt_id=70087269200953345 tipo=ompt_thread_worker     last_cpu= 42 numa=0 mig=0 fallos=0 perf=full ipc=0.231 ratio_rm=0.0357
+[OMPT] tid=633025 ompt_id=27303072740933633 tipo=ompt_thread_worker     last_cpu=172 numa=0 mig=0 fallos=0 perf=full ipc=0.226 ratio_rm=0.0377
+[OMPT] tid=633141 ompt_id=59954170039369729 tipo=ompt_thread_worker     last_cpu= 56 numa=0 mig=0 fallos=0 perf=full ipc=0.247 ratio_rm=0.0521
+[OMPT] tid=633151 ompt_id=62768919806476289 tipo=ompt_thread_worker     last_cpu=100 numa=1 mig=0 fallos=0 perf=full ipc=0.295 ratio_rm=0.0272
+[OMPT] tid=633030 ompt_id=28710447624486913 tipo=ompt_thread_worker     last_cpu=227 numa=1 mig=0 fallos=0 perf=full ipc=0.303 ratio_rm=0.0312
+[OMPT] tid=633157 ompt_id=64457769666740225 tipo=ompt_thread_worker     last_cpu=  8 numa=0 mig=0 fallos=0 perf=full ipc=0.292 ratio_rm=0.0470
+[OMPT] tid=633001 ompt_id=20547673299877889 tipo=ompt_thread_worker     last_cpu=141 numa=0 mig=0 fallos=0 perf=full ipc=0.256 ratio_rm=0.0405
+[OMPT] tid=633145 ompt_id=61361544922923009 tipo=ompt_thread_worker     last_cpu= 12 numa=0 mig=0 fallos=0 perf=full ipc=0.207 ratio_rm=0.0457
+[OMPT] tid=633086 ompt_id=44473046320283649 tipo=ompt_thread_worker     last_cpu=200 numa=1 mig=0 fallos=0 perf=full ipc=0.290 ratio_rm=0.0396
+[OMPT] tid=633146 ompt_id=61080069946212353 tipo=ompt_thread_worker     last_cpu= 76 numa=1 mig=0 fallos=0 perf=full ipc=0.307 ratio_rm=0.0044
+[OMPT] tid=633022 ompt_id=26458647810801665 tipo=ompt_thread_worker     last_cpu=204 numa=1 mig=0 fallos=0 perf=full ipc=0.311 ratio_rm=0.0283
+[OMPT] tid=633098 ompt_id=47569271064100865 tipo=ompt_thread_worker     last_cpu= 79 numa=1 mig=0 fallos=0 perf=full ipc=0.319 ratio_rm=0.0283
+[OMPT] tid=633117 ompt_id=53198770598313985 tipo=ompt_thread_worker     last_cpu=102 numa=1 mig=0 fallos=0 perf=full ipc=0.282 ratio_rm=0.0315
+[OMPT] tid=633096 ompt_id=47006321110679553 tipo=ompt_thread_worker     last_cpu=103 numa=1 mig=0 fallos=0 perf=full ipc=0.326 ratio_rm=0.0268
+[OMPT] tid=633027 ompt_id=27866022694354945 tipo=ompt_thread_worker     last_cpu=135 numa=0 mig=0 fallos=0 perf=full ipc=0.239 ratio_rm=0.0428
+[OMPT] tid=633109 ompt_id=50665495807918081 tipo=ompt_thread_worker     last_cpu=  5 numa=0 mig=0 fallos=0 perf=full ipc=0.248 ratio_rm=0.0411
+[OMPT] tid=632969 ompt_id=11540474045136897 tipo=ompt_thread_worker     last_cpu=  1 numa=0 mig=0 fallos=0 perf=full ipc=0.241 ratio_rm=0.0470
+[OMPT] tid=633130 ompt_id=57139420272263169 tipo=ompt_thread_worker     last_cpu= 37 numa=0 mig=0 fallos=0 perf=full ipc=0.262 ratio_rm=0.0334
+[OMPT] tid=633083 ompt_id=43628621390151681 tipo=ompt_thread_worker     last_cpu=160 numa=0 mig=0 fallos=0 perf=full ipc=0.248 ratio_rm=0.0423
+[OMPT] tid=633063 ompt_id=37999121855938561 tipo=ompt_thread_worker     last_cpu=153 numa=0 mig=0 fallos=0 perf=full ipc=0.172 ratio_rm=0.0448
+[OMPT] tid=633167 ompt_id=67272519433846785 tipo=ompt_thread_worker     last_cpu= 27 numa=0 mig=0 fallos=0 perf=full ipc=0.200 ratio_rm=0.0420
+[OMPT] tid=633099 ompt_id=47850746040811521 tipo=ompt_thread_worker     last_cpu= 31 numa=0 mig=0 fallos=0 perf=full ipc=0.242 ratio_rm=0.0429
+[OMPT] tid=633019 ompt_id=25614222880669697 tipo=ompt_thread_worker     last_cpu=156 numa=0 mig=0 fallos=0 perf=full ipc=0.192 ratio_rm=0.0437
+[OMPT] tid=633136 ompt_id=58546795155816449 tipo=ompt_thread_worker     last_cpu=117 numa=1 mig=0 fallos=0 perf=full ipc=0.327 ratio_rm=0.0242
+[OMPT] tid=633100 ompt_id=48132221017522177 tipo=ompt_thread_worker     last_cpu=119 numa=1 mig=0 fallos=0 perf=full ipc=0.306 ratio_rm=0.0260
+[OMPT] tid=633002 ompt_id=20829148276588545 tipo=ompt_thread_worker     last_cpu=245 numa=1 mig=0 fallos=0 perf=full ipc=0.305 ratio_rm=0.0241
+[OMPT] tid=633166 ompt_id=66991044457136129 tipo=ompt_thread_worker     last_cpu=115 numa=1 mig=0 fallos=0 perf=full ipc=0.301 ratio_rm=0.0261
+[OMPT] tid=632966 ompt_id=10696049115004929 tipo=ompt_thread_worker     last_cpu=113 numa=1 mig=0 fallos=0 perf=full ipc=0.287 ratio_rm=0.0288
+[OMPT] tid=633020 ompt_id=25895697857380353 tipo=ompt_thread_worker     last_cpu=244 numa=1 mig=0 fallos=0 perf=full ipc=0.303 ratio_rm=0.0197
+[OMPT] tid=633038 ompt_id=30962247438172161 tipo=ompt_thread_worker     last_cpu=243 numa=1 mig=0 fallos=0 perf=full ipc=0.305 ratio_rm=0.0253
+[OMPT] tid=633053 ompt_id=35184372088832001 tipo=ompt_thread_worker     last_cpu=  9 numa=0 mig=0 fallos=0 perf=full ipc=0.255 ratio_rm=0.0450
+[OMPT] tid=632994 ompt_id=18577348462903297 tipo=ompt_thread_worker     last_cpu=142 numa=0 mig=0 fallos=0 perf=full ipc=0.234 ratio_rm=0.0375
+[OMPT] tid=633039 ompt_id=31243722414882817 tipo=ompt_thread_worker     last_cpu=139 numa=0 mig=0 fallos=0 perf=full ipc=0.223 ratio_rm=0.0414
+[OMPT] tid=632978 ompt_id=14073748835532801 tipo=ompt_thread_worker     last_cpu= 49 numa=0 mig=0 fallos=0 perf=full ipc=0.239 ratio_rm=0.0536
+[OMPT] tid=633097 ompt_id=47287796087390209 tipo=ompt_thread_worker     last_cpu= 15 numa=0 mig=0 fallos=0 perf=full ipc=0.237 ratio_rm=0.0433
+[OMPT] tid=633023 ompt_id=26740122787512321 tipo=ompt_thread_worker     last_cpu=140 numa=0 mig=0 fallos=0 perf=full ipc=0.200 ratio_rm=0.0419
+[OMPT] tid=633183 ompt_id=71776119061217281 tipo=ompt_thread_worker     last_cpu= 18 numa=0 mig=0 fallos=0 perf=full ipc=0.205 ratio_rm=0.0473
+[OMPT] tid=633031 ompt_id=28991922601197569 tipo=ompt_thread_worker     last_cpu=163 numa=0 mig=0 fallos=0 perf=full ipc=0.271 ratio_rm=0.0316
+[OMPT] tid=633005 ompt_id=21673573206720513 tipo=ompt_thread_worker     last_cpu=165 numa=0 mig=0 fallos=0 perf=full ipc=0.240 ratio_rm=0.0274
+[OMPT] tid=633181 ompt_id=71213169107795969 tipo=ompt_thread_worker     last_cpu= 26 numa=0 mig=0 fallos=0 perf=full ipc=0.182 ratio_rm=0.0464
+[OMPT] tid=633043 ompt_id=32369622321725441 tipo=ompt_thread_worker     last_cpu=134 numa=0 mig=0 fallos=0 perf=full ipc=0.286 ratio_rm=0.0472
+[OMPT] tid=633091 ompt_id=45880421203836929 tipo=ompt_thread_worker     last_cpu=133 numa=0 mig=0 fallos=0 perf=full ipc=0.222 ratio_rm=0.0321
+[OMPT] tid=633143 ompt_id=60517119992791041 tipo=ompt_thread_worker     last_cpu=  7 numa=0 mig=0 fallos=0 perf=full ipc=0.244 ratio_rm=0.0402
+[OMPT] tid=632971 ompt_id=12384898975268865 tipo=ompt_thread_worker     last_cpu=151 numa=0 mig=0 fallos=0 perf=full ipc=0.225 ratio_rm=0.0362
+[OMPT] tid=633103 ompt_id=48976645947654145 tipo=ompt_thread_worker     last_cpu= 23 numa=0 mig=0 fallos=0 perf=full ipc=0.233 ratio_rm=0.0469
+[OMPT] tid=633087 ompt_id=44754521296994305 tipo=ompt_thread_worker     last_cpu=144 numa=0 mig=0 fallos=0 perf=full ipc=0.195 ratio_rm=0.0402
+[OMPT] tid=632985 ompt_id=16044073672507393 tipo=ompt_thread_worker     last_cpu=150 numa=0 mig=0 fallos=0 perf=full ipc=0.193 ratio_rm=0.0415
+[OMPT] tid=632995 ompt_id=18858823439613953 tipo=ompt_thread_worker     last_cpu=174 numa=0 mig=0 fallos=0 perf=full ipc=0.229 ratio_rm=0.0378
+[OMPT] tid=633139 ompt_id=59672695062659073 tipo=ompt_thread_worker     last_cpu= 61 numa=0 mig=0 fallos=0 perf=full ipc=0.233 ratio_rm=0.0409
+[OMPT] tid=633124 ompt_id=55169095435288577 tipo=ompt_thread_worker     last_cpu=  6 numa=0 mig=0 fallos=0 perf=full ipc=0.318 ratio_rm=0.0447
+[OMPT] tid=633015 ompt_id=24488322973827073 tipo=ompt_thread_worker     last_cpu=164 numa=0 mig=0 fallos=0 perf=full ipc=0.248 ratio_rm=0.0363
+[OMPT] tid=632989 ompt_id=17169973579350017 tipo=ompt_thread_worker     last_cpu=166 numa=0 mig=0 fallos=0 perf=full ipc=0.260 ratio_rm=0.0341
+[OMPT] tid=632975 ompt_id=13229323905400833 tipo=ompt_thread_worker     last_cpu=167 numa=0 mig=0 fallos=0 perf=full ipc=0.266 ratio_rm=0.0310
+[OMPT] tid=633035 ompt_id=30117822508040193 tipo=ompt_thread_worker     last_cpu=155 numa=0 mig=0 fallos=0 perf=full ipc=0.215 ratio_rm=0.0373
+[OMPT] tid=633112 ompt_id=51791395714760705 tipo=ompt_thread_worker     last_cpu= 30 numa=0 mig=0 fallos=0 perf=full ipc=0.217 ratio_rm=0.0283
+[OMPT] tid=632987 ompt_id=16607023625928705 tipo=ompt_thread_worker     last_cpu=158 numa=0 mig=0 fallos=0 perf=full ipc=0.209 ratio_rm=0.0334
+[OMPT] tid=633120 ompt_id=54043195528445953 tipo=ompt_thread_worker     last_cpu= 46 numa=0 mig=0 fallos=0 perf=full ipc=0.246 ratio_rm=0.0334
+[OMPT] tid=633033 ompt_id=29554872554618881 tipo=ompt_thread_worker     last_cpu=171 numa=0 mig=0 fallos=0 perf=full ipc=0.253 ratio_rm=0.0381
+[OMPT] tid=633165 ompt_id=66709569480425473 tipo=ompt_thread_worker     last_cpu= 43 numa=0 mig=0 fallos=0 perf=full ipc=0.202 ratio_rm=0.0435
+[OMPT] tid=633118 ompt_id=53480245575024641 tipo=ompt_thread_worker     last_cpu= 38 numa=0 mig=0 fallos=0 perf=full ipc=0.251 ratio_rm=0.0369
+[OMPT] tid=633089 ompt_id=45317471250415617 tipo=ompt_thread_worker     last_cpu=136 numa=0 mig=0 fallos=0 perf=full ipc=0.208 ratio_rm=0.0405
+[OMPT] tid=633133 ompt_id=57702370225684481 tipo=ompt_thread_worker     last_cpu= 13 numa=0 mig=0 fallos=0 perf=full ipc=0.263 ratio_rm=0.0345
+[OMPT] tid=633111 ompt_id=51509920738050049 tipo=ompt_thread_worker     last_cpu= 22 numa=0 mig=0 fallos=0 perf=full ipc=0.184 ratio_rm=0.0378
+[OMPT] tid=633095 ompt_id=46724846133968897 tipo=ompt_thread_worker     last_cpu= 65 numa=1 mig=0 fallos=0 perf=full ipc=0.317 ratio_rm=0.0554
+[OMPT] tid=633169 ompt_id=68116944363978753 tipo=ompt_thread_worker     last_cpu= 35 numa=0 mig=0 fallos=0 perf=full ipc=0.304 ratio_rm=0.0425
+[OMPT] tid=633149 ompt_id=62205969853054977 tipo=ompt_thread_worker     last_cpu= 36 numa=0 mig=0 fallos=0 perf=full ipc=0.236 ratio_rm=0.0361
 [OMPT] ===== Overhead intrínseco =====
-  monitor: 5 ticks, 24264.2 us total (max 11292.8 us/tick)
-  callbacks implicit_task: 40449, 50028080.2 us total
+  monitor: 5 ticks, 17255.6 us total (max 8755.6 us/tick)
+  callbacks implicit_task: 40449, 48715906.4 us total
   migraciones: 0 (0.0 us total)
-  resyncs=0  lecturas escaladas por multiplexado=0
-  hilos con perf fallido=0  parcial(ipc_only)=256
-  ventanas con ciclos=768  con fills=0
-
-[OMPT] *** AVISO GRAVE ***
-  Se midieron 768 ventanas con ciclos pero NINGUNA con data cache fills.
-  Los eventos crudos 0xD044/0xFF44 abrieron pero cuentan siempre 0:
-  esta PMU no los implementa (son de AMD Zen). ratio_rm no existe y el
-  scheduler NO PUEDE decidir migraciones. Los resultados de localidad de
-  esta corrida no son válidos.
-
+  resyncs=0  lecturas escaladas por multiplexado=3072
+  hilos con perf fallido=0  parcial(ipc_only)=0
+  ventanas con ciclos=256  con fills=256

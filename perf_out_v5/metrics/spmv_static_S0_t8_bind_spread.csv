@@ -1,2 +1,2 @@
 strategy,matrix,rows,cols,nnz,ws_bytes,threads,warmup,reps,min_ms,avg_ms,max_ms,stddev_ms,caudal_util_gibs,gflops
-Static-256,(aleatoria-Poisson),640,640,20699,261192,8,5,150,0.006660,0.007307,0.018650,0.000954,33.291091,5.665619
+Static-256,(aleatoria-Poisson),640,640,20699,261192,8,5,150,0.006630,0.007127,0.018790,0.000969,34.131875,5.808707
