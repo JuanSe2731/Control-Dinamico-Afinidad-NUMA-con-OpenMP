@@ -1,663 +1,1070 @@
 #!/usr/bin/env python3
-"""
-Figuras de la campana experimental.
+"""Figuras de las campañas V5 y V6 — seaborn, solo PNG, una carpeta por campaña.
 
-Todas las figuras responden a la misma pregunta desde angulos distintos: que le
-pasa al scheduler dinamico segun el GRADO DE PARALELISMO, y por que.
+Las figuras son LAS MISMAS para las dos campañas: mismas configuraciones, mismas
+series, mismos nombres de fichero. En V6 la serie `scheduler` sale del disparador
+con el umbral al minimo alcanzable; la comparacion V5/V6 se hace poniendo las dos
+figuras lado a lado, no dentro de una misma figura:
+    --outdir perf_out_v5 --figdir plots/figuras      (V5)
+    --outdir perf_out_v6 --figdir plots/figuras_v6   (V6, por defecto)
 
-  1  throughput      rendimiento vs hilos (metrica primaria) con IC95
-  2  speedup         T_spread / T_scheduler vs hilos, con significancia
-  3  overhead        coste puro del tool a igual afinidad
-  4  descomposicion  en que se descompone la diferencia total  <-- la figura clave
-  5  escalado        escalado fuerte relativo a 8 hilos
-  6  localidad       ratio_rm y remote_fills vs hilos
-  7  migraciones     cuantas, y en que ventana ocurre la primera
-  8  boxplot         distribucion de las REPS repeticiones
-  9  mecanismo       balde vs umbral en el tiempo (por que decide migrar)
- 10  ipc             instrucciones por ciclo vs hilos
+QUÉ CAMBIA RESPECTO A LA VERSIÓN ANTERIOR
+-----------------------------------------
+1. TODO EN MILISEGUNDOS ABSOLUTOS. Las figuras de speedup (T_ref/T_nuevo) y de
+   sobrecoste ((T/T_ref - 1)*100) se han eliminado: son de donde salían el "<1" y
+   el "sobrecoste negativo" que nadie entendía. Un sobrecoste negativo es una
+   ganancia, y llamarlo así hace que el signo apunte al lado bueno.
 
-Entradas (ver run_perf_metricsV4.sh):
-  <outdir>/kernel_metrics.csv, <outdir>/metrics/*_times.csv,
-  <outdir>/ompt_window_metrics.csv, <outdir>/ompt_summary.csv
+2. LOS TÉRMINOS SUMAN, NO MULTIPLICAN. En milisegundos:
+       C_monitor = T_obs  - T_base      coste de instrumentar
+       G_migrar  = T_obs  - T_sched     ganancia por migrar
+       G_neta    = T_base - T_sched     ganancia neta = G_migrar - C_monitor
+   La descomposición anterior era un producto de razones y necesitaba una sección
+   entera de la guía advirtiendo "se multiplican, no se suman".
 
-Dependencias: matplotlib + biblioteca estandar. Sin pandas ni numpy.
+3. SOLO QUEDA UNA MAGNITUD EN GiB/s, Y ES TRAFICO REAL.
+       bw_remoto_gibs = rellenos_remotos * 64 B / t -> MENOS es mejor
+   `caudal_util_gibs` se retira en V6: era bytes_del_modelo / tiempo con los bytes
+   fijados por el tamano, o sea 1/t reescalado, y se confundia sistematicamente con
+   lo anterior. Retirado el numerador constante, no queda ambiguedad posible.
+
+4. Se eliminan, por indicación del director: el speedup relativo por hilos, el
+   volumen de tráfico remoto y la ventana de la primera migración.
+
+DISEÑO DE COLOR
+---------------
+Paleta de referencia de la skill dataviz, sin modificar. Como las figuras son
+paneles múltiples (facetas por tamaño), aplica la regla de "todos los pares", y
+solo los TRES primeros slots la superan en ambos modos. Por eso las figuras de
+línea llevan como mucho tres series de identidad (base / obs / scheduler) y las
+demás comparaciones se resuelven con mapas de calor de rampa secuencial en vez de
+con más colores.
+
+El desglose de tráfico por origen NO es categórico: es una magnitud ordenada por
+distancia al núcleo (L2 -> L3 propia -> CCD vecino -> DRAM local -> otro socket),
+así que usa una rampa secuencial de un solo tono, cerca=claro, lejos=oscuro.
+
+Dependencias: seaborn + pandas + matplotlib. El análisis es LOCAL; el cluster solo
+produce los CSV.
 """
 
 import argparse
-import csv
-import glob
-import math
 import os
-import re
-from collections import defaultdict
+import sys
+
+import textwrap
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
+import pandas as pd
+import seaborn as sns
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Paleta. Los tres primeros slots estan validados para TODAS las parejas; el
-# resto solo para parejas adyacentes (barras/boxplots), que es como se usan aqui.
-# El color sigue a la ENTIDAD: una configuracion tiene siempre el mismo color en
-# todas las figuras, aunque cambie el conjunto que se dibuja.
-# Marcador y trazo son codificacion SECUNDARIA: la identidad nunca depende solo
-# del color (imprescindible para imprimir la memoria en escala de grises).
+# Paleta (skill dataviz, instancia de referencia, modo claro)
 # ─────────────────────────────────────────────────────────────────────────────
-ESTILO = {
-    "spread":    dict(color="#2a78d6", marker="o", ls="-",   label="estatico spread"),
-    "close":     dict(color="#eb6834", marker="s", ls="--",  label="estatico close"),
-    "scheduler": dict(color="#1baf7a", marker="D", ls="-",   label="scheduler (dinamico)"),
-    "nobind":    dict(color="#eda100", marker="^", ls=":",   label="sin fijar (control)"),
-    "obs":       dict(color="#e87ba4", marker="v", ls=":",   label="tool sin migrar (control)"),
-    "ovh":       dict(color="#4a3aa7", marker="P", ls="-.",  label="tool + spread (control)"),
-}
-# Componentes de la descomposicion (slots 1-3, validados all-pairs)
-COMP = [
-    ("binding", "#2a78d6", "coste de no fijar afinidad"),
-    ("instr",   "#eb6834", "coste de monitorizar"),
-    ("migr",    "#1baf7a", "efecto de migrar"),
-]
 
+# Slots categóricos 1-3: los únicos que superan la comprobación de todos los pares
+# en ambos modos, que es la que aplica a los paneles múltiples.
+AZUL, NARANJA, AGUA = "#2a78d6", "#eb6834", "#1baf7a"
+
+# Tinta y cromo. El texto NUNCA lleva el color de la serie: la identidad la carga
+# la marca de color que tiene al lado.
 TINTA        = "#0b0b0b"
-TINTA_SUAVE  = "#52514e"
-TINTA_TENUE  = "#898781"
+TINTA_2      = "#52514e"
+TINTA_MUTE   = "#898781"
 REJILLA      = "#e1e0d9"
 EJE          = "#c3c2b7"
+SUPERFICIE   = "#fcfcfb"
 
-plt.rcParams.update({
-    "figure.dpi": 110, "savefig.dpi": 200, "savefig.bbox": "tight",
-    "font.size": 11, "axes.titlesize": 12, "axes.labelsize": 11,
-    "legend.fontsize": 9.5, "xtick.labelsize": 10, "ytick.labelsize": 10,
-    "axes.edgecolor": EJE, "axes.labelcolor": TINTA, "text.color": TINTA,
-    "xtick.color": TINTA_TENUE, "ytick.color": TINTA_TENUE,
-    "axes.linewidth": 0.8, "axes.grid": True, "grid.color": REJILLA,
-    "grid.linewidth": 0.8, "grid.linestyle": "-",       # solida, nunca discontinua
-    "axes.axisbelow": True, "axes.spines.top": False, "axes.spines.right": False,
-    "legend.frameon": False,
-})
+# Rampa secuencial azul, tramos ordinales (el más claro no baja del tramo 250 para
+# no perderse contra la superficie). Ordenada por DISTANCIA al núcleo.
+RAMPA_DISTANCIA = ["#86b6ef", "#2a78d6", "#184f95", "#0d366b"]
 
-KERNELS = [("stencil", "Stencil 2D", "mlups_min", "MLUPS"),
-           ("spmv_static", "SpMV CSR", "bw_gibs", "Ancho de banda (GiB/s)")]
-TAG_RE = re.compile(r"^(?P<kernel>.+)_t(?P<threads>\d+)_(?P<config>[a-z]+)$")
+# Rampa DIVERGENTE para la comparacion contra el caso base: dos tonos opuestos y
+# un gris neutro en el centro (la regla es "dos hues + gris", nunca un tono en el
+# medio). El brazo rojo NO se eligio a ojo: cada paso tiene la MISMA L y la MISMA
+# croma en OKLCH que el paso azul que le corresponde, asi que los dos brazos pesan
+# igual visualmente y ninguno de los dos lados grita mas que el otro.
+#   azul  #184f95 L=0.433 C=0.128   <->  rojo #892b2a
+#   azul  #2a78d6 L=0.575 C=0.163   <->  rojo #c74845
+#   azul  #86b6ef L=0.764 C=0.097   <->  rojo #ea9a93
+# En una rampa divergente lo que se comprueba es la monotonia de luminosidad por
+# brazo, no el contraste entre pares: pasarle el validador categorico da FAIL por
+# diseno.
+RAMPA_DIVERGENTE = ["#184f95", "#2a78d6", "#86b6ef",
+                    "#f0efec",
+                    "#ea9a93", "#c74845", "#892b2a"]
+
+# Solo se miden las TRES que cruzan una interconexion. Con 5 contadores libres (el
+# nmi_watchdog ocupa uno de los 6) y 2 gastados en el par exacto de ratio_rm, quedan
+# 3. La banda "local" NO se mide: se DERIVA como all - (las tres lejanas), y sale
+# exacta porque all viene del par.
+ORIGENES = [
+    ("fills_locales",      "local (mismo chiplet)"),   # derivada
+    ("fills_ccd_vecino",   "L3 de otro CCD"),
+    ("fills_far_cache",    "cache del otro nodo"),
+    ("fills_far_dram",     "DRAM remota"),
+]
+
+# Las que sí salen de un contador propio.
+ORIGENES_MEDIDOS = ["fills_ccd_vecino", "fills_far_cache", "fills_far_dram"]
+
+# Las tres configuraciones que forman el argumento central. El color sigue a la
+# ENTIDAD: si una faceta se queda sin alguna, las demás no cambian de color.
+COLOR_CFG = {"base": AZUL, "obs": NARANJA, "scheduler": AGUA}
+ETIQUETA_CFG = {
+    "base":      "caso base (OpenMP puro)",
+    "obs":       "base + monitorizar",
+    "scheduler": "scheduler (migra)",
+}
+CFG_NUCLEO = ["base", "obs", "scheduler"]
+
+# Las seis estáticas, en el orden del diseño factorial afinidad x politica.
+CFG_ESTATICAS = ["base", "bind_close", "bind_spread",
+                 "interleave", "bind_close_il", "bind_spread_il"]
+
+# LAS OCHO, en el orden del diseno: la referencia, las cinco estaticas, el control
+# de monitorizacion y la propuesta. Es el unico sitio donde los dos grupos que el
+# resto de figuras separa (CFG_NUCLEO y CFG_ESTATICAS) se ven juntos.
+CFG_TODAS = ["base", "bind_close", "bind_spread", "interleave",
+             "bind_close_il", "bind_spread_il", "obs", "scheduler"]
+
+ETIQUETA_TODAS = {
+    "base":           "base (OpenMP puro)",
+    "bind_close":     "close",
+    "bind_spread":    "spread",
+    "interleave":     "interleave",
+    "bind_close_il":  "close + interleave",
+    "bind_spread_il": "spread + interleave",
+    "obs":            "obs (solo monitoriza)",
+    "scheduler":      "scheduler (migra)",
+}
+
+ORDEN_TAMANOS = ["S0", "S1", "S2", "S3", "S4", "S5"]
+TITULO_TAMANO = {
+    "S0": "S0 · L1d de un CCD",
+    "S1": "S1 · L2 de un CCD",
+    "S2": "S2 · L3 de UN CCD",
+    "S3": "S3 · L3 de un nodo",
+    "S4": "S4 · sobre la L3 total",
+    "S5": "S5 · DRAM / NUMA",
+}
+
+KERNELS = {
+    "stencil":     ("Stencil 2D", "mlups", "MLUPS"),
+    "spmv_static": ("SpMV CSR",   "gflops", "GFLOPS"),
+}
+
+
+def estilo():
+    sns.set_theme(style="whitegrid", context="notebook")
+    plt.rcParams.update({
+        "figure.facecolor":  SUPERFICIE,
+        "axes.facecolor":    SUPERFICIE,
+        "savefig.facecolor": SUPERFICIE,
+        "savefig.dpi":       200,
+        "savefig.bbox":      "tight",
+        "axes.edgecolor":    EJE,
+        "axes.labelcolor":   TINTA_2,
+        "axes.titlecolor":   TINTA,
+        "axes.titlesize":    11,
+        "axes.titleweight":  "semibold",
+        "grid.color":        REJILLA,
+        "grid.linewidth":    0.8,
+        "text.color":        TINTA,
+        "xtick.color":       TINTA_MUTE,
+        "ytick.color":       TINTA_MUTE,
+        "legend.frameon":    False,
+        "lines.linewidth":   2.0,       # marcas finas
+        "lines.markersize":  7,         # >= 8 px en pantalla a 200 dpi
+        "font.size":         10,
+    })
+
+
+def guardar(fig, figdir, nombre):
+    """Solo PNG. El .eps se ha retirado: ya no hace falta para la memoria, y con
+    él se va el apaño de mezclar-con-blanco que existía solo porque PostScript no
+    admite transparencia."""
+    ruta = os.path.join(figdir, f"{nombre}.png")
+    fig.savefig(ruta)
+    plt.close(fig)
+    return ruta
+
+
+def nota(fig, texto):
+    """Las notas al pie se ajustan al ancho de la figura.
+
+    Sin envolver, una nota larga se dibuja como una unica linea y, con
+    bbox_inches="tight" al guardar, ENSANCHA el lienzo hasta donde llegue el
+    texto: la figura del trafico paso de 4747 a 7511 px de ancho al alargar su
+    nota, dejando los paneles diminutos."""
+    ancho_pulgadas = fig.get_size_inches()[0]
+    # ~11 caracteres por pulgada a 8 pt es lo que cabe sin desbordar.
+    columnas = max(60, int(ancho_pulgadas * 11))
+    envuelto = "\n".join(textwrap.wrap(texto, width=columnas))
+    fig.text(0.005, -0.02, envuelto, fontsize=8, color=TINTA_MUTE,
+             ha="left", va="top")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Carga
 # ─────────────────────────────────────────────────────────────────────────────
-def num(v):
-    try:
-        x = float(v)
-        return x if math.isfinite(x) else None
-    except (TypeError, ValueError):
-        return None
-
-
-def leer_csv(ruta):
-    if not os.path.exists(ruta):
-        return []
-    with open(ruta, newline="") as f:
-        return list(csv.DictReader(f))
-
 
 def cargar(outdir):
-    d = {}
-    # kernel_metrics: {(kernel, threads, config): fila}
-    d["agg"] = {}
-    for r in leer_csv(os.path.join(outdir, "kernel_metrics.csv")):
-        cfg_full = r.get("config", "")
-        th = num(r.get("threads"))
-        if th is None:
-            continue
-        for k, _, _, _ in KERNELS:
-            if cfg_full.startswith(k + "_"):
-                d["agg"][(k, int(th), cfg_full[len(k) + 1:])] = r
-                break
-    # tiempos por repeticion
-    d["times"] = {}
-    for ruta in sorted(glob.glob(os.path.join(outdir, "metrics", "*_times.csv"))):
-        m = TAG_RE.match(os.path.basename(ruta)[:-len("_times.csv")])
+    ruta = os.path.join(outdir, "kernel_metrics.csv")
+    if not os.path.exists(ruta):
+        sys.exit(f"ERROR: no existe {ruta}")
+    df = pd.read_csv(ruta)
+
+    numericas = ["threads", "min_ms", "avg_ms", "max_ms", "stdev_ms", "ws_bytes",
+                 "mlups", "gflops", "ratio_rm",
+                 "bw_remoto_gibs", "gib_remotos_total", "migrations", "n_or_rows",
+                 "fills_l2", "fills_l3_ccd", "fills_dram_local"] + ORIGENES_MEDIDOS
+    for c in numericas:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    # Banda "local" derivada: todo lo que NO cruzo una interconexion. Se obtiene de
+    # all_fills (exacto, del par) menos las tres lejanas medidas. Si ratio_rm existe,
+    # all = remoto/ratio_rm; si no, se aproxima con lo que haya.
+    import numpy as np
+    if all(c in df.columns for c in ORIGENES_MEDIDOS) and "ratio_rm" in df.columns:
+        lejanas = df[ORIGENES_MEDIDOS].fillna(0).sum(axis=1)
+        remoto = df[["fills_far_cache", "fills_far_dram"]].fillna(0).sum(axis=1)
+        # total = remoto / ratio_rm. Un ratio de 0 o NA deja el total indefinido, y
+        # eso es correcto: significa que no hubo medida, no que fuera cero.
+        ratio = pd.to_numeric(df["ratio_rm"], errors="coerce")
+        total = remoto.divide(ratio.where(ratio > 0))
+        df["fills_locales"] = (total - lejanas).replace(
+            [np.inf, -np.inf], np.nan).clip(lower=0)
+    else:
+        df["fills_locales"] = np.nan
+
+    # ratio_rm = -1 es el centinela de "no medible" (sin eventos NUMA), que NO es
+    # lo mismo que 0: un 0 genuino significa "todos los rellenos fueron locales".
+    if "ratio_rm" in df.columns:
+        df.loc[df["ratio_rm"] < 0, "ratio_rm"] = pd.NA
+
+    df["size_tag"] = pd.Categorical(df["size_tag"], categories=ORDEN_TAMANOS, ordered=True)
+    return df
+
+
+def tamanos_presentes(df):
+    return [s for s in ORDEN_TAMANOS if (df["size_tag"] == s).any()]
+
+
+def cargar_repeticiones(outdir, kernel, configs=None):
+    """Long DataFrame (size_tag, threads, config, ms) desde los *_times.csv.
+
+    Es la MUESTRA real: 150 filas por ejecucion, en orden de ejecucion. El
+    kernel_metrics.csv agregado solo guarda min/avg/max/stdev, asi que cualquier
+    figura que necesite cuantiles o la forma de la distribucion tiene que venir
+    por aqui."""
+    import glob
+    import re
+    patron = os.path.join(outdir, "metrics", f"{kernel}_*_times.csv")
+    rx = re.compile(rf"^{re.escape(kernel)}_(S\d)_t(\d+)_([a-z_]+)_times\.csv$")
+    permitidas = CFG_NUCLEO if configs is None else configs
+
+    filas = []
+    for ruta in sorted(glob.glob(patron)):
+        m = rx.match(os.path.basename(ruta))
         if not m:
             continue
-        xs = [num(r["time_ms"]) for r in leer_csv(ruta)]
-        xs = [x for x in xs if x is not None]
-        if len(xs) > 1:
-            d["times"][(m.group("kernel"), int(m.group("threads")), m.group("config"))] = xs
-    # ventanas y resumen OMPT, indexados por tag
-    d["win"] = defaultdict(list)
-    for r in leer_csv(os.path.join(outdir, "ompt_window_metrics.csv")):
-        d["win"][r["tag"]].append(r)
-    d["sum"] = defaultdict(list)
-    for r in leer_csv(os.path.join(outdir, "ompt_summary.csv")):
-        d["sum"][r["tag"]].append(r)
-    return d
+        tam, hilos, cfg = m.group(1), int(m.group(2)), m.group(3)
+        if cfg not in permitidas:
+            continue
+        try:
+            t = pd.read_csv(ruta)
+        except Exception:
+            continue
+        if "time_ms" not in t.columns:
+            continue
+        for v in t["time_ms"]:
+            filas.append({"size_tag": tam, "threads": hilos, "config": cfg, "ms": v})
+    if not filas:
+        return None
+    g = pd.DataFrame(filas)
+    g["size_tag"] = pd.Categorical(g["size_tag"], categories=ORDEN_TAMANOS,
+                                   ordered=True)
+    return g
 
 
-def hilos_de(d, kernel):
-    return sorted({t for (k, t, _) in d["agg"] if k == kernel})
-
-
-def media_ic(xs):
-    """media y semiancho del IC95 (n>=100 -> la normal basta)."""
-    n = len(xs)
-    m = sum(xs) / n
-    if n < 2:
-        return m, 0.0
-    sd = math.sqrt(sum((x - m) ** 2 for x in xs) / (n - 1))
-    return m, 1.96 * sd / math.sqrt(n)
-
-
-def aclarar(hexcol, f=0.55):
-    """Mezcla el color con blanco. Se usa en vez de alpha porque el backend
-    PostScript (los .eps que van a la memoria) NO soporta transparencia y los
-    renderiza opacos, cambiando el color respecto al .png."""
-    r, g, b = (int(hexcol[i:i + 2], 16) for i in (1, 3, 5))
-    m = lambda c: int(round(c + (255 - c) * f))
-    return f"#{m(r):02x}{m(g):02x}{m(b):02x}"
-
-
-def guardar(fig, base):
-    fig.savefig(base + ".png")
-    fig.savefig(base + ".eps", format="eps")
-    plt.close(fig)
-    print(f"  [fig] {os.path.basename(base)}")
+def rejilla(df, ncols=3):
+    """Devuelve (fig, dict tamaño->eje) con un panel por tamaño presente."""
+    tams = tamanos_presentes(df)
+    n = len(tams)
+    ncols = min(ncols, n)
+    nrows = (n + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4.6 * ncols, 3.5 * nrows),
+                             squeeze=False)
+    ejes = {}
+    for i, t in enumerate(tams):
+        ejes[t] = axes[i // ncols][i % ncols]
+    for j in range(n, nrows * ncols):
+        axes[j // ncols][j % ncols].axis("off")
+    return fig, ejes
 
 
 def eje_hilos(ax, hilos):
     ax.set_xscale("log", base=2)
     ax.set_xticks(hilos)
     ax.set_xticklabels([str(h) for h in hilos])
-    ax.set_xlabel("Numero de hilos")
-    ax.minorticks_off()
+    ax.set_xlabel("hilos")
 
 
-def nota(fig, texto):
-    """Pie de figura: donde va lo que el lector necesita para no malinterpretar."""
-    fig.text(0.5, -0.045, texto, ha="center", va="top",
-             fontsize=8.5, color=TINTA_SUAVE, wrap=True)
+def etiquetar_series(ax, entradas, sep_min=0.075):
+    """Etiquetas directas en el último punto de cada serie, SIN solaparse.
 
+    Las series que acaban en valores parecidos escribían su texto una encima de
+    otra y salía ilegible ('obas' donde debía leerse obs y base). Aquí se pasan
+    las posiciones a fracción del eje, se ordenan y se separa cada etiqueta al
+    menos `sep_min`, de modo que la marca sigue apuntando a su punto pero el texto
+    queda escalonado.
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 1. Throughput vs hilos
-# ─────────────────────────────────────────────────────────────────────────────
-def fig_throughput(d, kernel, titulo, campo, etiqueta, base):
-    hilos = hilos_de(d, kernel)
-    if not hilos:
+    entradas: lista de (x, y, texto). Debe llamarse con los límites del eje ya
+    fijados, o sea al final del panel.
+    """
+    if not entradas:
         return
-    fig, ax = plt.subplots(figsize=(7.2, 4.6))
-    hay = False
-    for cfg in ("spread", "close", "scheduler"):
-        xs, ys = [], []
-        for h in hilos:
-            r = d["agg"].get((kernel, h, cfg))
-            v = num(r.get(campo)) if r else None
-            if v is not None:
-                xs.append(h); ys.append(v)
-        if not xs:
-            continue
-        hay = True
-        e = ESTILO[cfg]
-        ax.plot(xs, ys, color=e["color"], marker=e["marker"], linestyle=e["ls"],
-                linewidth=2, markersize=7, label=e["label"],
-                markeredgecolor="white", markeredgewidth=1.2)
-    if not hay:
-        plt.close(fig); return
-    eje_hilos(ax, hilos)
-    ax.set_ylabel(etiqueta)
-    ax.set_title(f"{titulo} — rendimiento segun el grado de paralelismo")
-    ax.legend(loc="upper left")
-    nota(fig, "Metrica derivada del tiempo minimo de las repeticiones (convencion HPC).")
-    guardar(fig, base)
+    inv = ax.transAxes.inverted()
+    puntos = []
+    for x, y, texto in entradas:
+        px, py = ax.transData.transform((x, y))
+        fx, fy = inv.transform((px, py))
+        puntos.append([fx, fy, texto])
+
+    puntos.sort(key=lambda p: p[1])
+    for i in range(1, len(puntos)):
+        if puntos[i][1] - puntos[i - 1][1] < sep_min:
+            puntos[i][1] = puntos[i - 1][1] + sep_min
+
+    for fx, fy, texto in puntos:
+        ax.annotate(texto, xy=(fx, fy), xycoords="axes fraction",
+                    xytext=(7, 0), textcoords="offset points",
+                    fontsize=8.5, color=TINTA_2, va="center", ha="left",
+                    annotation_clip=False)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 2. Speedup del scheduler frente al baseline estatico
+# 01 — tiempo absoluto
 # ─────────────────────────────────────────────────────────────────────────────
-def fig_speedup(d, kernel, titulo, base):
-    hilos = hilos_de(d, kernel)
-    xs, ys, err, marca = [], [], [], []
-    for h in hilos:
-        a = d["times"].get((kernel, h, "scheduler"))
-        b = d["times"].get((kernel, h, "spread"))
-        if not a or not b:
-            continue
-        ma, ea = media_ic(a)
-        mb, eb = media_ic(b)
-        if ma <= 0:
-            continue
-        s = mb / ma                       # >1 => el scheduler es mas rapido
-        # propagacion de la incertidumbre del cociente
-        rel = math.sqrt((eb / mb) ** 2 + (ea / ma) ** 2) if mb > 0 else 0.0
-        xs.append(h); ys.append(s); err.append(s * rel)
-        marca.append(abs(s - 1.0) > s * rel)   # el IC no cruza 1
-    if not xs:
-        return
-    fig, ax = plt.subplots(figsize=(7.2, 4.6))
-    e = ESTILO["scheduler"]
-    ax.errorbar(xs, ys, yerr=err, color=e["color"], marker=e["marker"],
-                linewidth=2, markersize=7, capsize=3, elinewidth=1,
-                markeredgecolor="white", markeredgewidth=1.2)
-    ax.axhline(1.0, color=EJE, linewidth=1.2, zorder=1)
-    ax.text(xs[0], 1.0, " paridad con spread", va="bottom", ha="left",
-            fontsize=8.5, color=TINTA_TENUE)
-    # Etiqueta selectiva: solo los extremos, nunca un numero en cada punto.
-    for i in (0, len(xs) - 1):
-        ax.annotate(f"{ys[i]:.3f}x", (xs[i], ys[i]), textcoords="offset points",
-                    xytext=(0, 11), ha="center", fontsize=9, color=TINTA_SUAVE)
-    for x, y, m in zip(xs, ys, marca):
-        if m:
-            ax.annotate("*", (x, y), textcoords="offset points", xytext=(0, -16),
-                        ha="center", fontsize=13, color=TINTA_SUAVE)
-    eje_hilos(ax, hilos)
-    ax.set_ylabel("Speedup  (T spread / T scheduler)")
-    ax.set_title(f"{titulo} — speedup del scheduler frente al estatico")
-    nota(fig, "Barras: IC95 sobre la media de las repeticiones.  "
-              "*: el IC95 no cruza la paridad.  Por encima de 1 el scheduler gana.")
-    guardar(fig, base)
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 3. Overhead del tool a igual afinidad
-# ─────────────────────────────────────────────────────────────────────────────
-def fig_overhead(d, kernel, titulo, base):
-    hilos = hilos_de(d, kernel)
-    series = [("ovh", "spread", "tool cargado, misma afinidad (spread)"),
-              ("obs", "nobind", "tool cargado, sin fijar afinidad")]
-    fig, ax = plt.subplots(figsize=(7.2, 4.6))
-    hay = False
-    for cfg, ref, etiq in series:
-        xs, ys, err = [], [], []
-        for h in hilos:
-            a = d["times"].get((kernel, h, cfg))
-            b = d["times"].get((kernel, h, ref))
-            if not a or not b:
+def fig_tiempo(df, kernel, figdir):
+    d = df[df["kernel"] == kernel]
+    if d.empty:
+        return None
+    fig, ejes = rejilla(d)
+    for tam, ax in ejes.items():
+        sub = d[d["size_tag"] == tam]
+        hilos = sorted(sub["threads"].unique())
+        marcas = []
+        for cfg in CFG_NUCLEO:
+            s = sub[sub["config"] == cfg].sort_values("threads")
+            if s.empty:
                 continue
-            ma, ea = media_ic(a); mb, eb = media_ic(b)
-            if mb <= 0:
-                continue
-            xs.append(h); ys.append((ma / mb - 1) * 100)
-            ys_rel = math.sqrt((ea / ma) ** 2 + (eb / mb) ** 2)
-            err.append(abs(ma / mb) * ys_rel * 100)
-        if not xs:
-            continue
-        hay = True
-        e = ESTILO[cfg]
-        ax.errorbar(xs, ys, yerr=err, color=e["color"], marker=e["marker"],
-                    linestyle=e["ls"], linewidth=2, markersize=7, capsize=3,
-                    elinewidth=1, label=etiq, markeredgecolor="white",
-                    markeredgewidth=1.2)
-    if not hay:
-        plt.close(fig); return
-    ax.axhline(0.0, color=EJE, linewidth=1.2, zorder=1)
-    eje_hilos(ax, hilos)
-    ax.set_ylabel("Sobrecoste en tiempo (%)")
-    ax.set_title(f"{titulo} — overhead introducido por el tool OMPT")
-    ax.legend(loc="upper left")
-    nota(fig, "Migracion DESACTIVADA en ambas series: mide solo el coste de instrumentar "
-              "(monitor, callbacks y lectura de contadores).")
-    guardar(fig, base)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 4. Descomposicion — la figura que explica la diferencia total
-# ─────────────────────────────────────────────────────────────────────────────
-def fig_descomposicion(d, kernel, titulo, base):
-    hilos = hilos_de(d, kernel)
-    filas = []
-    for h in hilos:
-        t = {c: d["times"].get((kernel, h, c)) for c in
-             ("spread", "nobind", "obs", "scheduler")}
-        if not all(t.values()):
-            continue
-        m = {c: sum(v) / len(v) for c, v in t.items()}
-        filas.append((h,
-                      (m["nobind"] / m["spread"] - 1) * 100,
-                      (m["obs"] / m["nobind"] - 1) * 100,
-                      (m["scheduler"] / m["obs"] - 1) * 100,
-                      (m["scheduler"] / m["spread"] - 1) * 100))
-    if not filas:
-        return
-    fig, ax = plt.subplots(figsize=(7.6, 5.0))
-    x = list(range(len(filas)))
-    ancho = min(0.5, 1.6 / max(1, len(filas)))   # con pocas categorias, barras finas
-    pos = [0.0] * len(filas)
-    neg = [0.0] * len(filas)
-    for j, (nombre, color, etiq) in enumerate(COMP):
-        vals = [f[j + 1] for f in filas]
-        abajo = [pos[i] if vals[i] >= 0 else neg[i] for i in range(len(vals))]
-        ax.bar(x, vals, bottom=abajo, width=ancho, color=color, label=etiq,
-               edgecolor="white", linewidth=1.5)   # separacion entre segmentos
-        for i, v in enumerate(vals):
-            if v >= 0:
-                pos[i] += v
-            else:
-                neg[i] += v
-    total = [f[4] for f in filas]
-    ax.plot(x, total, color=TINTA, marker="o", markersize=7, linewidth=0,
-            markeredgecolor="white", markeredgewidth=1.5, label="total observado",
-            zorder=5)
-    for i, v in enumerate(total):
-        ax.annotate(f"{v:+.1f}%", (x[i], v), textcoords="offset points",
-                    xytext=(0, 13 if v >= 0 else -20), ha="center",
-                    fontsize=9, color=TINTA, zorder=6,
-                    bbox=dict(boxstyle="round,pad=0.18", fc="white",
-                              ec="none", alpha=0.85))
-    ax.axhline(0.0, color=EJE, linewidth=1.2, zorder=1)
-    ax.set_xticks(x)
-    ax.set_xticklabels([str(f[0]) for f in filas])
-    ax.set_xlabel("Numero de hilos")
-    ax.set_ylabel("Contribucion al sobrecoste en tiempo (%)")
-    ax.set_title(f"{titulo} — de que se compone la diferencia frente al estatico",
-                 pad=42)
-    # Leyenda FUERA del area de trazado: dentro chocaba con las barras.
-    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.01), ncol=2, borderaxespad=0)
-    ax.set_xlim(-0.7, len(filas) - 0.3)
-    lo = min(min(neg), min(total), 0.0)
-    hi = max(max(pos), max(total), 0.0)
-    margen = max((hi - lo) * 0.18, 0.5)
-    ax.set_ylim(lo - margen, hi + margen)
-    nota(fig, "Positivo = mas lento. Los tres bloques se multiplican para dar el total; "
-              "el punto negro es el total medido directamente (spread vs scheduler).")
-    guardar(fig, base)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 5. Escalado fuerte relativo
-# ─────────────────────────────────────────────────────────────────────────────
-def fig_escalado(d, kernel, titulo, base):
-    hilos = hilos_de(d, kernel)
-    if len(hilos) < 2:
-        return
-    h0 = hilos[0]
-    fig, ax = plt.subplots(figsize=(7.2, 4.6))
-    ax.plot(hilos, [h / h0 for h in hilos], color=TINTA_TENUE, linewidth=1.2,
-            linestyle=(0, (6, 4)), label=f"ideal (lineal desde {h0})", zorder=1)
-    hay = False
-    for cfg in ("spread", "scheduler"):
-        ref = d["times"].get((kernel, h0, cfg))
-        if not ref:
-            continue
-        t0 = sum(ref) / len(ref)
-        xs, ys = [], []
-        for h in hilos:
-            v = d["times"].get((kernel, h, cfg))
-            if v:
-                xs.append(h); ys.append(t0 / (sum(v) / len(v)))
-        if not xs:
-            continue
-        hay = True
-        e = ESTILO[cfg]
-        ax.plot(xs, ys, color=e["color"], marker=e["marker"], linestyle=e["ls"],
-                linewidth=2, markersize=7, label=e["label"],
-                markeredgecolor="white", markeredgewidth=1.2)
-    if not hay:
-        plt.close(fig); return
-    eje_hilos(ax, hilos)
-    ax.set_ylabel(f"Speedup relativo a {h0} hilos")
-    ax.set_title(f"{titulo} — escalado fuerte")
-    ax.legend(loc="upper left")
-    nota(fig, f"Referencia = {h0} hilos, no la version serial: la comparacion del "
-              "proyecto es dinamico vs estatico.")
-    guardar(fig, base)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 6. Localidad — dos paneles, NUNCA dos ejes en uno
-# ─────────────────────────────────────────────────────────────────────────────
-def fig_localidad(d, kernel, titulo, base):
-    hilos = hilos_de(d, kernel)
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11.2, 4.4))
-    hay = False
-    for cfg in ("spread", "close", "scheduler"):
-        xr, yr, xf, yf = [], [], [], []
-        for h in hilos:
-            r = d["agg"].get((kernel, h, cfg))
-            if r:
-                v = num(r.get("ratio_rm"))
-                if v is not None and v >= 0:      # -1 = no medible
-                    xr.append(h); yr.append(v)
-            filas = d["sum"].get(f"{kernel}_t{h}_{cfg}", [])
-            tot = sum(num(f.get("remote_fills")) or 0 for f in filas)
-            if filas and tot > 0:
-                xf.append(h); yf.append(tot)
-        e = ESTILO[cfg]
-        if xr:
-            hay = True
-            a1.plot(xr, yr, color=e["color"], marker=e["marker"], linestyle=e["ls"],
-                    linewidth=2, markersize=7, label=e["label"],
-                    markeredgecolor="white", markeredgewidth=1.2)
-        if xf:
-            hay = True
-            a2.plot(xf, yf, color=e["color"], marker=e["marker"], linestyle=e["ls"],
-                    linewidth=2, markersize=7, label=e["label"],
-                    markeredgecolor="white", markeredgewidth=1.2)
-    if not hay:
-        plt.close(fig); return
-    for ax, ylab, tit in ((a1, "ratio_rm  (fills remotos / totales)", "Proporcion de accesos remotos"),
-                          (a2, "remote_fills acumulados", "Volumen de trafico remoto")):
+            ax.plot(s["threads"], s["avg_ms"], marker="o",
+                    color=COLOR_CFG[cfg], label=ETIQUETA_CFG[cfg])
+            # Banda de +-1 desviacion: la dispersion es parte del resultado, sobre
+            # todo en las configuraciones que no fijan afinidad.
+            ax.fill_between(s["threads"], s["avg_ms"] - s["stdev_ms"],
+                            s["avg_ms"] + s["stdev_ms"],
+                            color=COLOR_CFG[cfg], alpha=0.15, linewidth=0)
+            marcas.append((s["threads"].iloc[-1], s["avg_ms"].iloc[-1], cfg))
         eje_hilos(ax, hilos)
-        ax.set_ylabel(ylab)
-        ax.set_title(tit, fontsize=11)
-    a2.set_yscale("log")
-    a1.legend(loc="upper left")
-    fig.suptitle(f"{titulo} — localidad de datos segun el grado de paralelismo", y=1.02)
-    nota(fig, "Izquierda: proporcion (perf agregado para las estaticas, contadores por hilo "
-              "para el scheduler). Derecha: volumen absoluto, escala logaritmica; solo hay "
-              "dato donde el tool estuvo cargado.")
-    guardar(fig, base)
+        ax.set_yscale("log")
+        etiquetar_series(ax, marcas)
+        ax.set_ylabel("tiempo medio por repeticion (ms)")
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+
+    manejadores = [plt.Line2D([], [], color=COLOR_CFG[c], marker="o", lw=2,
+                              label=ETIQUETA_CFG[c]) for c in CFG_NUCLEO]
+    fig.legend(handles=manejadores, loc="upper center", ncol=3,
+               bbox_to_anchor=(0.5, 1.04))
+    fig.suptitle(f"{KERNELS[kernel][0]} — tiempo de ejecucion  ·  MENOS ES MEJOR",
+                 y=1.09, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Media de las repeticiones (no el minimo). Banda = ±1 desviacion tipica. "
+              "Eje Y logaritmico: los tamanos abarcan cuatro ordenes de magnitud.")
+    return guardar(fig, figdir, f"{kernel}_01_tiempo")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 7. Migraciones
+# 01b — tiempo con banda de CUANTILES (candidata a sustituir a la 01)
 # ─────────────────────────────────────────────────────────────────────────────
-def fig_migraciones(d, kernel, titulo, base):
-    hilos = hilos_de(d, kernel)
-    xs, mig, frac, prim = [], [], [], []
-    for h in hilos:
-        filas = d["sum"].get(f"{kernel}_t{h}_scheduler", [])
-        if not filas:
+
+def fig_tiempo_cuantiles(df, kernel, outdir, figdir):
+    """La misma lectura que la 01, con dos cambios y sin tocar la 01.
+
+    1. LA BANDA ES p10-p90, NO media +- 1 sigma. La banda de sigma supone una
+       distribucion simetrica que estas muestras no tienen: tienen un suelo (el
+       tiempo minimo alcanzable) y una cola larga hacia arriba. En 9 de las 216
+       celdas sigma es MAYOR que la media, asi que el borde inferior sale
+       negativo y el eje logaritmico no puede dibujarlo: la banda se derrama
+       hasta el suelo del panel y se lee como "el tiempo podria ser casi cero",
+       que es falso. La p10-p90 no puede salir negativa y dice algo exacto: el
+       80 % central de las repeticiones cayo aqui dentro.
+
+    2. LA LINEA ES LA MEDIA, la misma que la 01 y la misma que reporta
+       kernel_metrics.csv, de modo que la figura no introduce una tercera cifra
+       que nadie mas usa. Lo unico que cambia respecto a la 01 es COMO se dibuja
+       la dispersion a su alrededor.
+
+    CONSECUENCIA QUE HAY QUE CONOCER: al ser la media el centro y los cuantiles
+    la banda, en 21 de las 216 celdas la LINEA CAE FUERA DE SU PROPIA BANDA,
+    siempre por arriba. No es un fallo de dibujo: es la definicion de una
+    distribucion sesgada a la derecha. Si mas del 10 % de las repeticiones son
+    muy lentas, la media se va por encima del p90 aunque el 80 % central este
+    apretado. El caso de libro es SpMV S5 con 8 hilos y scheduler: p10-p90 =
+    [266,4 , 267,0] y media 273,2, porque las 5 primeras repeticiones corren a
+    414 ms, antes de que la migracion llegue a saltar. Donde la linea se sale de
+    la banda hay una cola, y la cola es el resultado.
+    """
+    g = cargar_repeticiones(outdir, kernel)
+    if g is None:
+        return None
+
+    resumen = (g.groupby(["size_tag", "threads", "config"], observed=True)["ms"]
+                 .agg(p10=lambda x: x.quantile(0.10),
+                      p50="median",
+                      p90=lambda x: x.quantile(0.90),
+                      media="mean")
+                 .reset_index())
+
+    fig, ejes = rejilla(resumen)
+    for tam, ax in ejes.items():
+        sub = resumen[resumen["size_tag"] == tam]
+        if sub.empty:
             continue
-        m = sum(int(num(f.get("migrations")) or 0) for f in filas)
-        ventanas = [num(f.get("first_migration_win")) for f in filas]
-        ventanas = [v for v in ventanas if v is not None and v >= 0]
-        xs.append(h); mig.append(m)
-        frac.append(100.0 * m / len(filas))
-        prim.append(sum(ventanas) / len(ventanas) if ventanas else None)
-    if not xs:
-        return
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11.2, 4.4))
-    x = list(range(len(xs)))
-    a1.bar(x, mig, width=0.55, color=ESTILO["scheduler"]["color"],
-           edgecolor="white", linewidth=1.5)
-    for i, (m, f) in enumerate(zip(mig, frac)):
-        a1.annotate(f"{m}\n({f:.0f}%)", (x[i], m), textcoords="offset points",
-                    xytext=(0, 6), ha="center", fontsize=9, color=TINTA_SUAVE)
-    a1.set_xticks(x); a1.set_xticklabels([str(v) for v in xs])
-    a1.set_xlabel("Numero de hilos"); a1.set_ylabel("Hilos migrados")
-    a1.set_title("Cuantos hilos migran", fontsize=11)
-    a1.set_ylim(0, max(mig) * 1.3 if max(mig) else 1)
+        hilos = sorted(sub["threads"].unique())
+        marcas = []
+        for cfg in CFG_NUCLEO:
+            r = sub[sub["config"] == cfg].sort_values("threads")
+            if r.empty:
+                continue
+            ax.plot(r["threads"], r["media"], marker="o", color=COLOR_CFG[cfg],
+                    label=ETIQUETA_CFG[cfg], zorder=3)
+            ax.fill_between(r["threads"], r["p10"], r["p90"],
+                            color=COLOR_CFG[cfg], alpha=0.15, linewidth=0)
+            marcas.append((r["threads"].iloc[-1], r["media"].iloc[-1], cfg))
+        eje_hilos(ax, hilos)
+        # ESCALA LINEAL, como la figura 02, y a diferencia de la 01. En un eje
+        # lineal los milisegundos se RESTAN: la distancia entre dos lineas es
+        # directamente la diferencia en ms, y el grosor de la banda es
+        # directamente la dispersion en ms. En el eje logaritmico de la 01 una
+        # misma distancia visual significa una misma RAZON, no una misma
+        # diferencia, y por eso alli no se puede medir nada a ojo.
+        #
+        # Lo que se paga: dentro de un panel los valores llegan a diferir 300x
+        # (en S0, de 0,0063 ms a 2,03 ms), asi que las series mas rapidas quedan
+        # aplastadas contra el suelo en los recuentos de hilos bajos. Es el mismo
+        # efecto que ya tiene la 02 en sus paneles S0 y S1. Para leer los valores
+        # pequenos esta la 01, que para eso es logaritmica.
+        etiquetar_series(ax, marcas)
+        ax.set_ylabel("ms por repeticion")
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
 
-    xv = [x[i] for i, p in enumerate(prim) if p is not None]
-    yv = [p for p in prim if p is not None]
-    if xv:
-        a2.bar(xv, yv, width=0.55, color=ESTILO["obs"]["color"],
-               edgecolor="white", linewidth=1.5)
-    a2.set_xticks(x); a2.set_xticklabels([str(v) for v in xs])
-    a2.set_xlabel("Numero de hilos")
-    a2.set_ylabel("Ventana media de la 1a migracion")
-    a2.set_title("Cuando migran (1 ventana = 100 ms)", fontsize=11)
-    fig.suptitle(f"{titulo} — actividad del scheduler", y=1.02)
-    nota(fig, "El porcentaje es sobre el total de hilos. Cada hilo migra como maximo "
-              "una vez (MAX_MIGRATIONS=1); el warmup impide migrar antes de la ventana 5.")
-    guardar(fig, base)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 8. Boxplots de las repeticiones
-# ─────────────────────────────────────────────────────────────────────────────
-def fig_boxplot(d, kernel, titulo, base):
-    hilos = hilos_de(d, kernel)
-    cfgs = [c for c in ("spread", "close", "scheduler")
-            if any((kernel, h, c) in d["times"] for h in hilos)]
-    if not cfgs or not hilos:
-        return
-    fig, axes = plt.subplots(1, len(hilos), figsize=(2.6 * len(hilos) + 1.4, 4.4),
-                             sharey=False)
-    if len(hilos) == 1:
-        axes = [axes]
-    for ax, h in zip(axes, hilos):
-        datos, colores, etiquetas = [], [], []
-        for c in cfgs:
-            v = d["times"].get((kernel, h, c))
-            if v:
-                datos.append(v); colores.append(ESTILO[c]["color"]); etiquetas.append(c)
-        if not datos:
-            ax.set_visible(False); continue
-        bp = ax.boxplot(datos, patch_artist=True, widths=0.55, showfliers=False,
-                        medianprops=dict(color=TINTA, linewidth=1.6),
-                        whiskerprops=dict(color=EJE, linewidth=1),
-                        capprops=dict(color=EJE, linewidth=1))
-        for caja, col in zip(bp["boxes"], colores):
-            caja.set_facecolor(aclarar(col, 0.62))
-            caja.set_edgecolor(col); caja.set_linewidth(1.5)
-        ax.set_xticks(range(1, len(etiquetas) + 1))
-        ax.set_xticklabels(etiquetas, rotation=30, ha="right")
-        ax.set_title(f"{h} hilos", fontsize=11)
-        ax.grid(axis="x", visible=False)
-    axes[0].set_ylabel("Tiempo por repeticion (ms)")
-    fig.suptitle(f"{titulo} — distribucion de las repeticiones", y=1.02)
-    nota(fig, "Sin valores atipicos dibujados. Cada panel tiene su propia escala: "
-              "interesa la FORMA de la distribucion, no comparar entre paneles.")
-    guardar(fig, base)
+    manejadores = [plt.Line2D([], [], color=COLOR_CFG[c], marker="o", lw=2,
+                              label=ETIQUETA_CFG[c]) for c in CFG_NUCLEO]
+    manejadores += [
+        plt.Line2D([], [], color=TINTA_2, lw=2, marker="o",
+                   label="media + banda p10-p90 (80 % central)"),
+    ]
+    fig.legend(handles=manejadores, loc="upper center", ncol=4,
+               bbox_to_anchor=(0.5, 1.05), fontsize=9)
+    fig.suptitle(f"{KERNELS[kernel][0]} — tiempo por repeticion, escala lineal"
+                 "  ·  MENOS ES MEJOR",
+                 y=1.11, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "VARIANTE de la figura 01, con DOS cambios. (1) Escala LINEAL, como la 02: "
+              "las distancias en vertical son milisegundos y se pueden restar; a cambio, "
+              "las series rapidas quedan aplastadas contra el suelo en S0-S2, y para "
+              "leerlas hay que ir a la 01, que es logaritmica. (2) La banda es la franja "
+              "p10-p90 (el 80 % central de las 150 repeticiones) en vez de media +- 1 "
+              "desviacion tipica: no puede salir negativa y no supone simetria. La linea "
+              "sigue siendo la MEDIA, la misma que la 01 y la de las tablas. En 21 de las "
+              "216 celdas la linea queda POR ENCIMA de su propia banda: no es un fallo, es "
+              "una cola de repeticiones lentas. En SpMV S5 con 8 hilos son las 5 previas a "
+              "que salte la migracion.")
+    return guardar(fig, figdir, f"{kernel}_01b_tiempo_cuantiles")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 9. Mecanismo en el tiempo
+# 02 — descomposición en milisegundos (la figura del boceto)
 # ─────────────────────────────────────────────────────────────────────────────
-def fig_mecanismo(d, kernel, titulo, base, hilos_obj=None):
-    hilos = hilos_de(d, kernel)
-    h = (hilos_obj if hilos_obj in hilos else (hilos[-1] if hilos else None))
-    if h is None:
-        return
-    filas = d["win"].get(f"{kernel}_t{h}_scheduler", [])
+
+def fig_descomposicion(df, kernel, figdir):
+    d = df[df["kernel"] == kernel]
+    if d.empty:
+        return None
+    fig, ejes = rejilla(d)
+    hay_datos = False
+
+    for tam, ax in ejes.items():
+        sub = d[d["size_tag"] == tam]
+        piv = sub.pivot_table(index="threads", columns="config",
+                              values="avg_ms", aggfunc="mean")
+        if not {"base", "obs", "scheduler"}.issubset(piv.columns):
+            ax.set_title(TITULO_TAMANO.get(tam, tam))
+            ax.text(0.5, 0.5, "faltan configuraciones", ha="center", va="center",
+                    transform=ax.transAxes, color=TINTA_MUTE, fontsize=9)
+            continue
+        hay_datos = True
+        hilos = list(piv.index)
+
+        ax.plot(hilos, piv["base"], marker="o", color=AZUL, label="T base")
+        ax.plot(hilos, piv["obs"], marker="s", color=NARANJA, label="T base + monitor")
+        ax.plot(hilos, piv["scheduler"], marker="D", color=AGUA, label="T con scheduler")
+
+        # El overhead de la PROPUESTA COMPLETA: monitorizar y migrar, frente a
+        # OpenMP puro. Es −G_neta, o sea la distancia vertical entre la linea azul
+        # y la de agua, dibujada explicitamente. NEGATIVO = la propuesta gana.
+        #
+        # Antes aqui iba C_monitor = T_obs − T_base (solo instrumentar). Sigue
+        # siendo legible en la figura sin dibujarla: es el hueco entre la azul y la
+        # naranja. Con las tres lineas absolutas puestas, los tres terminos de la
+        # descomposicion son huecos verticales, y el que se dibuja aparte es el que
+        # decide si el trabajo aporta algo.
+        #
+        # Va en tinta neutra, no en el cuarto slot categorico: ese slot es amarillo
+        # y quedaria junto al naranja, que es el par que la propia paleta declara
+        # que no separa.
+        ovh_propuesta = piv["scheduler"] - piv["base"]
+        ax.plot(hilos, ovh_propuesta, marker="^", color=TINTA_MUTE, linestyle="--",
+                label="overhead de la propuesta")
+
+        ax.axhline(0.0, color=EJE, linewidth=1)
+        eje_hilos(ax, hilos)
+        ax.set_ylabel("ms por repeticion (y diferencias)")
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+
+    if not hay_datos:
+        plt.close(fig)
+        return None
+
+    manejadores = [
+        plt.Line2D([], [], color=AZUL,       marker="o", lw=2, label="T base (OpenMP puro)"),
+        plt.Line2D([], [], color=NARANJA,    marker="s", lw=2, label="T base + monitorizar"),
+        plt.Line2D([], [], color=AGUA,       marker="D", lw=2, label="T con scheduler"),
+        plt.Line2D([], [], color=TINTA_MUTE, marker="^", lw=2, ls="--",
+                   label="overhead de la PROPUESTA = T_sched − T_base  (< 0 = gana)"),
+    ]
+    fig.legend(handles=manejadores, loc="upper center", ncol=2,
+               bbox_to_anchor=(0.5, 1.07))
+    fig.suptitle(f"{KERNELS[kernel][0]} — descomposicion del tiempo, en milisegundos",
+                 y=1.13, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Todo en ms absolutos: los terminos SUMAN. "
+              "G_neta = (T_obs − T_sched) − (T_obs − T_base). "
+              "Sin razones ni porcentajes, asi que no hay 'sobrecoste negativo'. "
+              "La discontinua gris es el overhead de la PROPUESTA COMPLETA (monitorizar "
+              "y migrar) frente a OpenMP puro: es la distancia entre la linea azul y la "
+              "de agua, y POR DEBAJO DE CERO significa que la propuesta gana. El "
+              "overhead de solo monitorizar no se dibuja pero se lee igual: es el hueco "
+              "entre la azul y la naranja.")
+    return guardar(fig, figdir, f"{kernel}_02_descomposicion_ms")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 03 — ganancia en milisegundos (positivo = gana)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def fig_ganancia(df, kernel, figdir):
+    d = df[df["kernel"] == kernel]
+    if d.empty:
+        return None
+
+    filas = []
+    for tam in tamanos_presentes(d):
+        sub = d[d["size_tag"] == tam]
+        piv = sub.pivot_table(index="threads", columns="config",
+                              values="avg_ms", aggfunc="mean")
+        if not {"base", "obs", "scheduler"}.issubset(piv.columns):
+            continue
+        for h in piv.index:
+            filas.append({"size_tag": tam, "threads": h,
+                          "magnitud": "ganancia por migrar",
+                          "ms": piv.loc[h, "obs"] - piv.loc[h, "scheduler"]})
+            filas.append({"size_tag": tam, "threads": h,
+                          "magnitud": "ganancia neta",
+                          "ms": piv.loc[h, "base"] - piv.loc[h, "scheduler"]})
     if not filas:
-        return
-    por_hilo = defaultdict(list)
-    for r in filas:
-        t = num(r.get("t_ms")); b = num(r.get("bucket")); ra = num(r.get("ratio_rm"))
-        # ratio_rm == -1 es el CENTINELA de "no medible" (sin eventos NUMA o
-        # ventana sin fills). Dibujarlo como si fuera un dato produciria una
-        # linea plana en -1 que se leeria como una medida real.
-        if t is None or b is None or ra is None or ra < 0:
-            continue
-        por_hilo[r["tid"]].append((t, b, ra, num(r.get("thr_T")),
-                                   r.get("flagged") == "1"))
-    por_hilo = {k: v for k, v in por_hilo.items() if len(v) >= 3}
-    if not por_hilo:
-        print("  [--] mecanismo: sin ratio_rm medible (¿PMU sin los eventos NUMA?)")
-        return
-    for v in por_hilo.values():
-        v.sort()
-    # El hilo que mas llena el balde es el que cuenta la historia.
-    protagonista = max(por_hilo, key=lambda k: max(p[1] for p in por_hilo[k]))
+        return None
+    g = pd.DataFrame(filas)
 
-    fig, (a1, a2) = plt.subplots(2, 1, figsize=(8.4, 6.2), sharex=True)
-    for tid, v in por_hilo.items():
-        if tid == protagonista:
-            continue
-        a1.plot([p[0] for p in v], [p[1] for p in v], color=TINTA_TENUE,
-                linewidth=0.6, alpha=0.28, zorder=1)
-    v = por_hilo[protagonista]
-    a1.plot([p[0] for p in v], [p[1] for p in v], color=ESTILO["scheduler"]["color"],
-            linewidth=2, zorder=3, label=f"hilo {protagonista} (el que mas se llena)")
-    disparos = [p[0] for p in v if p[4]]
-    if disparos:
-        a1.scatter(disparos, [p[1] for p in v if p[4]], s=70, marker="*",
-                   color=ESTILO["close"]["color"], zorder=5, label="disparo de migracion")
-    a1.plot([], [], color=TINTA_TENUE, linewidth=1, alpha=0.5,
-            label=f"otros {len(por_hilo)-1} hilos")
-    a1.set_ylabel("Nivel del balde")
-    a1.set_title(f"{titulo} — mecanismo de decision con {h} hilos", fontsize=12)
-    a1.legend(loc="upper left")
+    fig, ejes = rejilla(g)
+    for tam, ax in ejes.items():
+        sub = g[g["size_tag"] == tam]
+        sns.barplot(data=sub, x="threads", y="ms", hue="magnitud", ax=ax,
+                    palette={"ganancia por migrar": AGUA, "ganancia neta": AZUL},
+                    edgecolor=SUPERFICIE, linewidth=2)   # separador de 2 px
+        ax.axhline(0.0, color=EJE, linewidth=1.2)
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+        ax.set_xlabel("hilos")
+        ax.set_ylabel("milisegundos ganados")
+        if ax.get_legend():
+            ax.get_legend().remove()
 
-    a2.plot([p[0] for p in v], [p[2] for p in v], color=ESTILO["scheduler"]["color"],
-            linewidth=1.6, label="ratio_rm del hilo")
-    a2.plot([p[0] for p in v], [p[3] for p in v], color=ESTILO["spread"]["color"],
-            linewidth=1.6, linestyle="--", label="umbral T = g_ref + MAD")
-    a2.set_ylabel("Proporcion de accesos remotos")
-    a2.set_xlabel("Tiempo desde el inicio del monitor (ms)")
-    a2.legend(loc="upper left")
-    nota(fig, "El balde se llena por el EXCESO de ratio_rm sobre el umbral y se vacia "
-              "lentamente si no lo supera; exige elevacion sostenida, no un pico aislado.")
-    guardar(fig, base)
+    manejadores = [
+        plt.Line2D([], [], color=AGUA, lw=8, label="ganancia por migrar = T_obs − T_sched"),
+        plt.Line2D([], [], color=AZUL, lw=8, label="ganancia neta = T_base − T_sched"),
+    ]
+    fig.legend(handles=manejadores, loc="upper center", ncol=2,
+               bbox_to_anchor=(0.5, 1.05))
+    fig.suptitle(f"{KERNELS[kernel][0]} — ganancia en tiempo  ·  POSITIVO ES MEJOR",
+                 y=1.10, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Positivo = el scheduler ahorra tiempo; negativo = lo cuesta. "
+              "Se llama ganancia, no sobrecoste, para que el signo apunte al lado bueno.")
+    return guardar(fig, figdir, f"{kernel}_03_ganancia_ms")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 10. IPC
+# 04 — rendimiento (MLUPS / GFLOPS)
 # ─────────────────────────────────────────────────────────────────────────────
-def fig_ipc(d, kernel, titulo, base):
-    hilos = hilos_de(d, kernel)
-    fig, ax = plt.subplots(figsize=(7.2, 4.6))
-    hay = False
-    for cfg in ("spread", "close", "scheduler"):
-        xs, ys = [], []
-        for h in hilos:
-            r = d["agg"].get((kernel, h, cfg))
-            v = num(r.get("ipc")) if r else None
-            if v is not None and v >= 0:
-                xs.append(h); ys.append(v)
-        if not xs:
+
+def fig_rendimiento(df, kernel, figdir):
+    d = df[df["kernel"] == kernel]
+    if d.empty:
+        return None
+    _, campo, unidad = KERNELS[kernel]
+    if campo not in d.columns or d[campo].isna().all():
+        return None
+
+    fig, ejes = rejilla(d)
+    for tam, ax in ejes.items():
+        sub = d[d["size_tag"] == tam]
+        hilos = sorted(sub["threads"].unique())
+        marcas = []
+        for cfg in CFG_NUCLEO:
+            s = sub[sub["config"] == cfg].sort_values("threads")
+            if s.empty or s[campo].isna().all():
+                continue
+            ax.plot(s["threads"], s[campo], marker="o", color=COLOR_CFG[cfg])
+            marcas.append((s["threads"].iloc[-1], s[campo].iloc[-1], cfg))
+        eje_hilos(ax, hilos)
+        etiquetar_series(ax, marcas)
+        ax.set_ylabel(unidad)
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+
+    manejadores = [plt.Line2D([], [], color=COLOR_CFG[c], marker="o", lw=2,
+                              label=ETIQUETA_CFG[c]) for c in CFG_NUCLEO]
+    fig.legend(handles=manejadores, loc="upper center", ncol=3,
+               bbox_to_anchor=(0.5, 1.04))
+    fig.suptitle(f"{KERNELS[kernel][0]} — rendimiento  ·  MAS ES MEJOR",
+                 y=1.09, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Derivado del tiempo MEDIO. En el stencil GFLOPS = MLUPS/200 exactamente: "
+              "no es evidencia independiente.")
+    return guardar(fig, figdir, f"{kernel}_04_rendimiento")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 05 — tráfico real de memoria por origen  (la métrica del director)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def fig_trafico(df, kernel, figdir):
+    d = df[df["kernel"] == kernel]
+    if d.empty:
+        return None
+    cols = [c for c, _ in ORIGENES if c in d.columns]
+    if not cols or d[cols].fillna(0).to_numpy().sum() == 0:
+        return None
+
+    fig, ejes = rejilla(d)
+    for tam, ax in ejes.items():
+        sub = d[(d["size_tag"] == tam) & (d["config"].isin(CFG_NUCLEO))]
+        if sub.empty:
             continue
-        hay = True
-        e = ESTILO[cfg]
-        ax.plot(xs, ys, color=e["color"], marker=e["marker"], linestyle=e["ls"],
-                linewidth=2, markersize=7, label=e["label"],
-                markeredgecolor="white", markeredgewidth=1.2)
-    if not hay:
-        plt.close(fig); return
-    eje_hilos(ax, hilos)
-    ax.set_ylabel("IPC (instrucciones por ciclo)")
-    ax.set_title(f"{titulo} — IPC segun el grado de paralelismo")
-    ax.legend(loc="upper right")
-    nota(fig, "ALCANCES DISTINTOS: en las estaticas es perf agregado de todo el proceso; "
-              "en el scheduler es la suma de contadores por hilo (exclude_kernel=1), "
-              "acotada por omp_control_tool. Comparables con esa salvedad.")
-    guardar(fig, base)
+        piv = sub.pivot_table(index=["threads", "config"], values=cols, aggfunc="mean")
+        piv = piv.reset_index()
+        # Etiqueta corta y rotada: con 6 recuentos x 3 configuraciones son 18 barras
+        # por panel, y el texto horizontal se solapaba hasta ser ilegible.
+        corta = {"base": "base", "obs": "obs", "scheduler": "sched"}
+        piv["etiqueta"] = (piv["threads"].astype(str) + " "
+                           + piv["config"].map(corta).fillna(piv["config"]))
+        piv = piv.sort_values(["threads", "config"])
+
+        # GiB reales = rellenos * 64 B (tamano de linea de cache).
+        abajo = None
+        for (col, nombre), color in zip(ORIGENES, RAMPA_DISTANCIA):
+            if col not in piv.columns:
+                continue
+            gib = piv[col].fillna(0) * 64.0 / (1024 ** 3)
+            ax.bar(piv["etiqueta"], gib, bottom=abajo, color=color,
+                   edgecolor=SUPERFICIE, linewidth=2, label=nombre)
+            abajo = gib if abajo is None else abajo + gib
+
+        # Una configuracion cuyo desglose es todo cero NO tiene trafico cero: no
+        # se midio. Dejar el hueco en blanco invita a leer "el scheduler eliminio
+        # toda la memoria", que es justo lo contrario de la verdad. Se marca.
+        vacias = piv[cols].fillna(0).sum(axis=1) == 0
+        if vacias.any():
+            tope = ax.get_ylim()[1] or 1.0
+            for i, es_vacia in enumerate(vacias.to_numpy()):
+                if es_vacia:
+                    ax.text(i, tope * 0.02, "sin dato", rotation=90, fontsize=5.5,
+                            ha="center", va="bottom", color=TINTA_MUTE)
+
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+        ax.set_ylabel("GiB traidos a cache")
+        ax.tick_params(axis="x", labelsize=6.5)
+        ax.set_xticks(range(len(piv)))
+        ax.set_xticklabels(piv["etiqueta"], rotation=90, ha="center")
+        ax.set_xlabel("hilos y configuracion")
+
+    manejadores = [plt.Line2D([], [], color=c, lw=8, label=n)
+                   for (_, n), c in zip(ORIGENES, RAMPA_DISTANCIA)]
+    fig.legend(handles=manejadores, loc="upper center", ncol=3,
+               bbox_to_anchor=(0.5, 1.07))
+    fig.suptitle(f"{KERNELS[kernel][0]} — trafico REAL de memoria por origen"
+                 "  ·  MENOS ES MEJOR",
+                 y=1.13, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Rellenos de cache x 64 B, separados por procedencia de la linea. "
+              "Rampa ordenada por DISTANCIA al nucleo: claro = cerca, oscuro = lejos. "
+              "Solo se MIDEN las tres que cruzan una interconexion (otro CCD, cache "
+              "remota, DRAM remota); la banda local se DERIVA restandolas del total, "
+              "que es exacto. Esta es la magnitud que hay que bajar; no confundir con "
+              "el tiempo invertido. Las columnas marcadas 'sin dato' NO son trafico cero: en la campana 29390 el desglose por origen no se leyo para obs ni scheduler (bug corregido, ver ANALISIS_RESULTADOS_29390.md 6.1); solo el par exacto que sostiene ratio_rm es valido ahi.")
+    return guardar(fig, figdir, f"{kernel}_05_trafico_memoria")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 06 — localidad (proporción de rellenos remotos)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def fig_localidad(df, kernel, figdir):
+    d = df[df["kernel"] == kernel]
+    if d.empty or "ratio_rm" not in d.columns or d["ratio_rm"].isna().all():
+        return None
+
+    fig, ejes = rejilla(d)
+    for tam, ax in ejes.items():
+        sub = d[d["size_tag"] == tam]
+        hilos = sorted(sub["threads"].unique())
+        marcas = []
+        for cfg in CFG_NUCLEO:
+            s = sub[(sub["config"] == cfg)].sort_values("threads").dropna(subset=["ratio_rm"])
+            if s.empty:
+                continue
+            ax.plot(s["threads"], s["ratio_rm"], marker="o", color=COLOR_CFG[cfg])
+            marcas.append((s["threads"].iloc[-1], s["ratio_rm"].iloc[-1], cfg))
+        eje_hilos(ax, hilos)
+        etiquetar_series(ax, marcas)
+        ax.set_ylabel("rellenos remotos / rellenos totales")
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+
+    manejadores = [plt.Line2D([], [], color=COLOR_CFG[c], marker="o", lw=2,
+                              label=ETIQUETA_CFG[c]) for c in CFG_NUCLEO]
+    fig.legend(handles=manejadores, loc="upper center", ncol=3,
+               bbox_to_anchor=(0.5, 1.04))
+    fig.suptitle(f"{KERNELS[kernel][0]} — localidad  ·  MENOS ES MEJOR",
+                 y=1.09, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Proporcion de EVENTOS, no de paginas: el denominador incluye los "
+              "rellenos servidos por la cache local. -1 (no medible) se descarta.")
+    return guardar(fig, figdir, f"{kernel}_06_localidad")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 07 — migraciones
+# ─────────────────────────────────────────────────────────────────────────────
+
+def fig_migraciones(df, kernel, figdir):
+    d = df[(df["kernel"] == kernel) & (df["config"] == "scheduler")]
+    if d.empty or d["migrations"].fillna(0).sum() == 0:
+        return None
+
+    fig, ejes = rejilla(d)
+    for tam, ax in ejes.items():
+        sub = d[d["size_tag"] == tam].sort_values("threads")
+        if sub.empty:
+            continue
+        ax.bar(sub["threads"].astype(str), sub["migrations"].fillna(0),
+               color=AGUA, edgecolor=SUPERFICIE, linewidth=2)
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+        ax.set_xlabel("hilos")
+        ax.set_ylabel("hilos migrados")
+
+    fig.suptitle(f"{KERNELS[kernel][0]} — actividad del scheduler",
+                 y=1.04, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "MAX_MIGRATIONS = 1, asi que el conteo es tambien el numero de hilos "
+              "distintos que llegaron a migrar.")
+    return guardar(fig, figdir, f"{kernel}_07_migraciones")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 08 — distribución de las repeticiones
+# ─────────────────────────────────────────────────────────────────────────────
+
+def fig_boxplot(df, kernel, outdir, figdir):
+    g = cargar_repeticiones(outdir, kernel)
+    if g is None:
+        return None
+
+    fig, ejes = rejilla(g)
+    for tam, ax in ejes.items():
+        sub = g[g["size_tag"] == tam]
+        if sub.empty:
+            continue
+        sns.boxplot(data=sub, x="threads", y="ms", hue="config", ax=ax,
+                    hue_order=CFG_NUCLEO, palette=COLOR_CFG, showfliers=False,
+                    linewidth=1.0, linecolor=TINTA_2)
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+        ax.set_xlabel("hilos")
+        ax.set_ylabel("ms por repeticion")
+        if ax.get_legend():
+            ax.get_legend().remove()
+
+    manejadores = [plt.Line2D([], [], color=COLOR_CFG[c], lw=8, label=ETIQUETA_CFG[c])
+                   for c in CFG_NUCLEO]
+    fig.legend(handles=manejadores, loc="upper center", ncol=3,
+               bbox_to_anchor=(0.5, 1.05))
+    fig.suptitle(f"{KERNELS[kernel][0]} — distribucion de las repeticiones",
+                 y=1.10, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Caja mas estrecha = resultado mas predecible, aunque este a la misma "
+              "altura. Sin valores atipicos dibujados.")
+    return guardar(fig, figdir, f"{kernel}_08_boxplot")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 09 — optimizaciones estáticas (mapa de calor, rampa secuencial)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def fig_estaticas(df, kernel, figdir):
+    """Seis configuraciones no caben como seis colores: solo los tres primeros
+    slots de la paleta superan la comprobacion de todos los pares. Como lo que se
+    compara es MAGNITUD (tiempo), un mapa de calor de rampa secuencial es la forma
+    correcta y ademas hace legible el diseno factorial afinidad x politica."""
+    d = df[(df["kernel"] == kernel) & (df["config"].isin(CFG_ESTATICAS))]
+    if d.empty:
+        return None
+
+    fig, ejes = rejilla(d)
+    for tam, ax in ejes.items():
+        sub = d[d["size_tag"] == tam]
+        piv = sub.pivot_table(index="config", columns="threads",
+                              values="avg_ms", aggfunc="mean")
+        piv = piv.reindex([c for c in CFG_ESTATICAS if c in piv.index])
+        if piv.empty:
+            continue
+        # fmt=".3g" y no ".2f": los tamanos van de microsegundos a segundos, y con
+        # dos decimales fijos el panel de S0 salia entero a "0.00".
+        # El color del texto lo elige seaborn segun la celda: fijarlo a tinta oscura
+        # lo hacia ilegible sobre los azules mas oscuros de la rampa.
+        sns.heatmap(piv, ax=ax, cmap="Blues", annot=True, fmt=".3g",
+                    annot_kws={"fontsize": 7},
+                    cbar_kws={"label": "ms"}, linewidths=2, linecolor=SUPERFICIE)
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+        ax.set_xlabel("hilos")
+        ax.set_ylabel("")
+        ax.tick_params(axis="y", labelsize=8, rotation=0)
+
+    fig.suptitle(f"{KERNELS[kernel][0]} — optimizaciones estaticas frente al caso base"
+                 "  ·  MENOS ES MEJOR",
+                 y=1.04, fontsize=13, color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Tiempo medio en ms. Diseno factorial: afinidad {ninguna, close, spread} "
+              "x politica de memoria {first-touch, interleave}. Mas oscuro = mas lento. "
+              "OJO: la escala de color es POR PANEL, porque los tamanos difieren en "
+              "ordenes de magnitud; no se comparan celdas entre paneles.")
+    return guardar(fig, figdir, f"{kernel}_09_estaticas")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 10 — IPC: RETIRADA (campana V6)
+# ─────────────────────────────────────────────────────────────────────────────
+# La figura del IPC se elimina junto con el propio contador. No discriminaba entre
+# configuraciones: un IPC alto puede significar trabajo util o espera productiva en
+# un bucle de sincronizacion, y aqui significaba lo segundo tan a menudo como lo
+# primero, asi que la figura no permitia concluir nada. Los dos contadores del PMU
+# que ocupaba (ciclos e instrucciones) pasan al desglose de rellenos por origen,
+# que sube de 3 mascaras a 5. Las columnas `ipc` de las campanas anteriores siguen
+# en sus CSV; simplemente ya no se dibujan.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 12 — barrido de tamaños
+# ─────────────────────────────────────────────────────────────────────────────
+
+MARCAS_CACHE = [
+    (32 * 1024**2,  "L3 de un CCD\n32 MiB"),
+    (256 * 1024**2, "L3 de un nodo\n256 MiB"),
+    (512 * 1024**2, "L3 total\n512 MiB"),
+]
+
+
+def fig_barrido(df, kernel, figdir, hilos_fijos=None):
+    d = df[df["kernel"] == kernel].dropna(subset=["ws_bytes"])
+    if d.empty:
+        return None
+    disponibles = sorted(d["threads"].unique())
+    if hilos_fijos is None or hilos_fijos not in disponibles:
+        hilos_fijos = disponibles[-1]
+    d = d[d["threads"] == hilos_fijos]
+    if d.empty:
+        return None
+
+    fig, ax = plt.subplots(figsize=(8.4, 5.0))
+    marcas = []
+    for cfg in CFG_NUCLEO:
+        s = d[d["config"] == cfg].sort_values("ws_bytes")
+        if s.empty:
+            continue
+        ax.plot(s["ws_bytes"], s["avg_ms"], marker="o", color=COLOR_CFG[cfg],
+                label=ETIQUETA_CFG[cfg])
+        marcas.append((s["ws_bytes"].iloc[-1], s["avg_ms"].iloc[-1], cfg))
+
+    for x, texto in MARCAS_CACHE:
+        if d["ws_bytes"].min() <= x <= d["ws_bytes"].max() * 4:
+            ax.axvline(x, color=EJE, linestyle=":", linewidth=1.2)
+            ax.annotate(texto, xy=(x, 1.0), xycoords=("data", "axes fraction"),
+                        xytext=(3, -12), textcoords="offset points",
+                        fontsize=7.5, color=TINTA_MUTE, ha="left", va="top")
+
+    ax.set_xscale("log", base=2)
+    ax.set_yscale("log")
+    ax.set_xlabel("working set (bytes)")
+    ax.set_ylabel("tiempo medio por repeticion (ms)")
+    etiquetar_series(ax, marcas)
+    ax.legend(loc="upper left")
+    ax.set_title(f"{KERNELS[kernel][0]} — barrido de tamanos a {hilos_fijos} hilos"
+                 "  ·  MENOS ES MEJOR", color=TINTA)
+    fig.tight_layout()
+    nota(fig, "Las lineas verticales son los limites reales de exadell. El tramo entre "
+              "32 MiB y 256 MiB es donde el trabajo deja de caber en la L3 de un chiplet "
+              "y empieza a cruzar el Infinity Fabric.")
+    return guardar(fig, figdir, f"{kernel}_12_barrido_tamano")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 13 — LA COMPARACION COMPLETA: las ocho configuraciones a la vez
+# ─────────────────────────────────────────────────────────────────────────────
+
+def fig_comparacion_completa(df, kernel, figdir):
+    """Las ocho configuraciones en un solo panel por tamano.
+
+    POR QUE EXISTE: el resto de la campana esta partido en dos mitades que nunca
+    se cruzaban. Las figuras 01-08, 10 y 12 dibujan solo CFG_NUCLEO (base, obs,
+    scheduler) porque solo los tres primeros slots categoricos superan la
+    comprobacion de todos los pares; la 09 dibuja solo las seis estaticas. Ninguna
+    ponia la propuesta al lado de las optimizaciones estaticas, que es exactamente
+    la comparacion que decide si el trabajo aporta algo.
+
+    COMO SE LEE: el numero de cada celda es el tiempo medio en ms (la magnitud
+    real). El COLOR es la razon contra el caso base de esa misma celda, en escala
+    log2 y divergente: azul = mas rapido que base, rojo = mas lento que base, gris
+    = igual que base. La fila 'base' es gris entera por construccion, y hace de
+    linea de flotacion.
+
+    A diferencia de la figura 09, aqui el color SI es comparable entre paneles: la
+    escala es una razon adimensional, no un tiempo.
+    """
+    import numpy as np
+    from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
+
+    d = df[(df["kernel"] == kernel) & (df["config"].isin(CFG_TODAS))]
+    if d.empty:
+        return None
+
+    cmap = LinearSegmentedColormap.from_list("base_div", RAMPA_DIVERGENTE)
+    # Recorte a +-3 en log2, o sea 8x en cada sentido. Sin recortar, el 177x del
+    # scheduler en S0 se come toda la escala y las diferencias del rango util
+    # (donde se juega el argumento, entre 0.5x y 2x) quedan en un gris uniforme.
+    TOPE = 3.0
+    norma = TwoSlopeNorm(vmin=-TOPE, vcenter=0.0, vmax=TOPE)
+
+    fig, ejes = rejilla(d)
+    # Un 25 % mas ancho que la rejilla estandar: estos paneles llevan ocho etiquetas
+    # de fila largas a la izquierda, y con el ancho por defecto el rotulo de un panel
+    # queda pegado a las celdas del panel anterior.
+    ancho, alto = fig.get_size_inches()
+    fig.set_size_inches(ancho * 1.25, alto)
+    for tam, ax in ejes.items():
+        sub = d[d["size_tag"] == tam]
+        ms = sub.pivot_table(index="config", columns="threads",
+                             values="avg_ms", aggfunc="mean")
+        ms = ms.reindex([c for c in CFG_TODAS if c in ms.index])
+        if ms.empty or "base" not in ms.index:
+            continue
+        razon = np.log2(ms.div(ms.loc["base"], axis=1)).clip(-TOPE, TOPE)
+
+        # cbar=False: la escala es LA MISMA en los seis paneles, asi que se dibuja
+        # una sola vez al margen. Repetirla seis veces es cromo redundante y ademas
+        # roba a cada panel el ancho que necesitan las etiquetas de fila.
+        sns.heatmap(razon, ax=ax, cmap=cmap, norm=norma, cbar=False,
+                    annot=ms.to_numpy(), fmt=".3g", annot_kws={"fontsize": 6.5},
+                    linewidths=2, linecolor=SUPERFICIE)
+        ax.set_title(TITULO_TAMANO.get(tam, tam))
+        ax.set_xlabel("hilos")
+        ax.set_ylabel("")
+        ax.set_yticklabels([ETIQUETA_TODAS.get(c.get_text(), c.get_text())
+                            for c in ax.get_yticklabels()],
+                           fontsize=7.5, rotation=0)
+
+    fig.suptitle(f"{KERNELS[kernel][0]} — LAS OCHO CONFIGURACIONES"
+                 "  ·  numero = ms (menos es mejor)  ·  color = frente al caso base",
+                 y=1.04, fontsize=13, color=TINTA)
+    fig.tight_layout()
+
+    # Una unica barra de color para toda la figura.
+    fig.subplots_adjust(right=0.91)
+    cax = fig.add_axes([0.935, 0.18, 0.012, 0.64])
+    barra = fig.colorbar(plt.cm.ScalarMappable(norm=norma, cmap=cmap), cax=cax,
+                         ticks=[-3, -2, -1, 0, 1, 2, 3])
+    barra.set_label("log2(tiempo / tiempo del caso base)", color=TINTA_2, fontsize=9)
+    barra.ax.set_yticklabels(["8x mas rapido", "4x", "2x", "igual que base",
+                              "2x", "4x", "8x mas lento"], fontsize=8)
+    barra.outline.set_visible(False)
+    nota(fig, "AZUL = mas rapido que el caso base de esa misma celda; ROJO = mas lento; "
+              "GRIS = igual. La fila 'base' es gris por definicion y hace de linea de "
+              "flotacion. Escala recortada a 8x en cada sentido: el numero de la celda "
+              "sigue siendo el valor real. Aqui el color SI se compara entre paneles, "
+              "porque es una razon, no un tiempo.")
+    return guardar(fig, figdir, f"{kernel}_13_comparacion_completa")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--outdir", default="perf_out_v4")
-    ap.add_argument("--figdir", default="plots/figuras")
-    ap.add_argument("--hilos-mecanismo", type=int, default=128)
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--outdir", default="perf_out_v6")
+    ap.add_argument("--figdir", default="plots/figuras_v6")
+    ap.add_argument("--hilos-barrido", type=int, default=None)
     args = ap.parse_args()
 
-    d = cargar(args.outdir)
-    if not d["agg"]:
-        print(f"[!] No hay kernel_metrics.csv utilizable en {args.outdir}")
-        return 1
+    estilo()
     os.makedirs(args.figdir, exist_ok=True)
+    df = cargar(args.outdir)
 
-    for kernel, titulo, campo, etiqueta in KERNELS:
-        if not hilos_de(d, kernel):
+    generadas = []
+    for kernel in KERNELS:
+        if (df["kernel"] == kernel).sum() == 0:
             continue
-        print(f"[{kernel}]")
-        p = lambda n: os.path.join(args.figdir, f"{kernel}_{n}")
-        fig_throughput(d, kernel, titulo, campo, etiqueta, p("01_throughput"))
-        fig_speedup(d, kernel, titulo, p("02_speedup"))
-        fig_overhead(d, kernel, titulo, p("03_overhead"))
-        fig_descomposicion(d, kernel, titulo, p("04_descomposicion"))
-        fig_escalado(d, kernel, titulo, p("05_escalado"))
-        fig_localidad(d, kernel, titulo, p("06_localidad"))
-        fig_migraciones(d, kernel, titulo, p("07_migraciones"))
-        fig_boxplot(d, kernel, titulo, p("08_boxplot"))
-        fig_mecanismo(d, kernel, titulo, p("09_mecanismo"), args.hilos_mecanismo)
-        fig_ipc(d, kernel, titulo, p("10_ipc"))
-    print(f"\n[ok] Figuras en {args.figdir}/")
-    return 0
+        for f in (fig_tiempo, fig_descomposicion, fig_ganancia, fig_rendimiento,
+                  fig_trafico, fig_localidad, fig_migraciones, fig_estaticas,
+                  fig_comparacion_completa):
+            r = f(df, kernel, args.figdir)
+            if r:
+                generadas.append(r)
+        for f in (fig_boxplot, fig_tiempo_cuantiles):
+            r = f(df, kernel, args.outdir, args.figdir)
+            if r:
+                generadas.append(r)
+        r = fig_barrido(df, kernel, args.figdir, args.hilos_barrido)
+        if r:
+            generadas.append(r)
+
+    print(f"{len(generadas)} figuras en {args.figdir}")
+    for r in generadas:
+        print("  " + os.path.basename(r))
+    if not generadas:
+        sys.exit("ERROR: no se genero ninguna figura")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

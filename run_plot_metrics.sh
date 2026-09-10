@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 #
-# Genera TODAS las figuras del proyecto en un unico directorio: plots/figuras.
+# Genera TODAS las figuras del proyecto en un unico directorio por campana:
+#   perf_out_v6 -> plots/figuras_v6      (por defecto)
+#   perf_out_v5 -> plots/figuras         (los resultados anteriores, intactos)
+#
+# El directorio de figuras se DERIVA del de resultados, asi que las dos campanas
+# nunca se pisan y no hace falta acordarse de pasar FIGDIR a mano.
 #
 # Antes este script escribia en plots/figures mientras el resto del proyecto decia
 # plots/figuras, asi que en disco convivian dos generaciones distintas de figuras y
@@ -10,14 +15,24 @@
 # no necesita seaborn ni matplotlib.
 #
 # Uso:
-#   ./run_plot_metrics.sh                 # perf_out_v5 -> plots/figuras
-#   ./run_plot_metrics.sh perf_out_v5     # directorio de resultados explicito
+#   ./run_plot_metrics.sh                 # perf_out_v6 -> plots/figuras_v6
+#   ./run_plot_metrics.sh perf_out_v5     # perf_out_v5 -> plots/figuras
+#   FIGDIR=/otro/sitio ./run_plot_metrics.sh   # destino explicito
 
 set -euo pipefail
 
-OUTDIR="${1:-perf_out_v5}"
+OUTDIR="${1:-perf_out_v6}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-FIGDIR="${FIGDIR:-${ROOT_DIR}/plots/figuras}"
+
+# Destino derivado del origen: perf_out_v5 -> figuras, perf_out_vN -> figuras_vN.
+# Antes esto era una constante y las figuras de una campana sobrescribian las de la
+# otra en silencio, que es la misma clase de fallo que el CSV en modo append.
+case "$(basename "$OUTDIR")" in
+  perf_out_v5) FIG_POR_DEFECTO="${ROOT_DIR}/plots/figuras" ;;
+  perf_out_v*) FIG_POR_DEFECTO="${ROOT_DIR}/plots/figuras_${OUTDIR##*_}" ;;
+  *)           FIG_POR_DEFECTO="${ROOT_DIR}/plots/figuras_$(basename "$OUTDIR")" ;;
+esac
+FIGDIR="${FIGDIR:-${FIG_POR_DEFECTO}}"
 LAT_CSV="${LAT_CSV:-${ROOT_DIR}/caracterizacion/latencias_exadell.csv}"
 
 # Comprobacion de dependencias por adelantado: sin esto, un seaborn ausente

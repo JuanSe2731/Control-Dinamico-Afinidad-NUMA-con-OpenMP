@@ -33,23 +33,32 @@ import os
 import re
 from collections import defaultdict
 
-# ── Configuraciones y su papel (ver la cabecera de run_perf_metricsV4.sh) ─────
-CONFIGS = ["spread", "close", "nobind", "obs", "ovh", "scheduler"]
+# ── Configuraciones y su papel (las mismas en V5 y V6) ────────────────────────
+# Actualizado a V5/V6. Antes esta lista traia los nombres de V4 (spread, close,
+# nobind, ovh), que ya no existen: el script cargaba dos configuraciones de nueve
+# y no lo decia. La comprobacion del final avisa si vuelve a pasar.
+CONFIGS = ["base", "bind_close", "bind_spread", "interleave",
+           "bind_close_il", "bind_spread_il", "obs", "scheduler"]
 
 # Parejas que se contrastan. Cada una responde a UNA pregunta concreta.
 COMPARACIONES = [
-    ("scheduler", "spread", "propuesta vs baseline estatico"),
-    ("scheduler", "close",  "propuesta vs baseline secundario"),
-    ("ovh",       "spread", "overhead del tool a igual afinidad"),
-    ("nobind",    "spread", "coste de no fijar afinidad"),
-    ("obs",       "nobind", "coste de monitorizar"),
-    ("scheduler", "obs",    "efecto de migrar"),
+    ("scheduler", "base",      "propuesta vs OpenMP puro"),
+    ("scheduler", "obs",       "efecto de migrar"),
+    ("obs",       "base",      "coste de monitorizar"),
+    ("bind_spread", "base",    "mejor estatica vs base"),
+    ("interleave",  "base",    "politica de memoria vs base"),
 ]
 
 # Solo estas compiten de verdad; los controles no entran en el ANOVA.
-CONFIGS_ANOVA = ["spread", "close", "scheduler"]
+CONFIGS_ANOVA = ["base", "bind_spread", "scheduler"]
 
-TAG_RE = re.compile(r"^(?P<kernel>.+)_t(?P<threads>\d+)_(?P<config>[a-z]+)_times\.csv$")
+# Nombres V5/V6:  <kernel>_<S#>_t<hilos>_<config>_times.csv
+# Nombres V4:     <kernel>_t<hilos>_<config>_times.csv   (sin peldano de tamano)
+# El config admite digitos y guion bajo: sin eso, `bind_close_il` y `bind_spread_il`
+# no casaban y se descartaban en silencio.
+TAG_RE = re.compile(
+    r"^(?P<kernel>.+?)(?:_(?P<size>S\d+))?"
+    r"_t(?P<threads>\d+)_(?P<config>[a-z0-9_]+)_times\.csv$")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -182,30 +191,50 @@ def magnitud(d):
 
 # ─────────────────────────────────────────────────────────────────────────────
 def cargar_tiempos(outdir):
-    """{(kernel, threads, config): [tiempos_ms]}"""
+    """{(kernel_con_peldano, threads, config): [tiempos_ms]}
+
+    El peldano de tamano entra en la CLAVE, no se descarta: comparar S0 con S5 en
+    la misma prueba no tiene sentido fisico, son problemas distintos.
+    """
     datos = {}
+    descartados = defaultdict(int)
     patron = os.path.join(outdir, "metrics", "*_times.csv")
     for ruta in sorted(glob.glob(patron)):
         m = TAG_RE.match(os.path.basename(ruta))
         if not m:
+            descartados["nombre no reconocido"] += 1
             continue
         cfg = m.group("config")
         if cfg not in CONFIGS:
+            descartados[f"config '{cfg}'"] += 1
             continue          # p.ej. las corridas seriales, fuera del contraste
         with open(ruta, newline="") as f:
             xs = [float(r["time_ms"]) for r in csv.DictReader(f) if r.get("time_ms")]
         if len(xs) > 1:
-            datos[(m.group("kernel"), int(m.group("threads")), cfg)] = xs
+            tam = m.group("size")
+            etiqueta = f"{m.group('kernel')}_{tam}" if tam else m.group("kernel")
+            datos[(etiqueta, int(m.group("threads")), cfg)] = xs
+    if descartados:
+        print("[i] ficheros descartados: "
+              + ", ".join(f"{k} x{v}" for k, v in sorted(descartados.items())))
     return datos
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--outdir", default="perf_out_v4")
-    ap.add_argument("--destino", default="analisis")
+    ap.add_argument("--outdir", default="perf_out_v6")
+    ap.add_argument("--destino", default=None,
+                    help="por defecto analisis/<sufijo del outdir>, p.ej. analisis/v6")
     ap.add_argument("--alfa", type=float, default=0.05)
     args = ap.parse_args()
+
+    # Destino derivado, igual que las figuras: perf_out_v6 -> analisis/v6. Con un
+    # destino constante, la segunda campana sobrescribia los CSV de la primera.
+    if args.destino is None:
+        base = os.path.basename(os.path.normpath(args.outdir))
+        sufijo = base.split("_")[-1] if base.startswith("perf_out_") else base
+        args.destino = os.path.join("analisis", sufijo)
 
     datos = cargar_tiempos(args.outdir)
     if not datos:
@@ -264,11 +293,11 @@ def main():
     print(f"[ok] {ruta_a}")
 
     # ── Resumen legible de lo que de verdad importa ─────────────────────────
-    print("\n  scheduler vs spread (tiempo; negativo = el scheduler es mas rapido)")
+    print("\n  scheduler vs base (tiempo; negativo = el scheduler es mas rapido)")
     print(f"  {'kernel':<14}{'hilos':>6}{'diff':>10}{'p':>12}{'d':>9}  magnitud")
     for kernel in kernels:
         for th in hilos:
-            a, b = datos.get((kernel, th, "scheduler")), datos.get((kernel, th, "spread"))
+            a, b = datos.get((kernel, th, "scheduler")), datos.get((kernel, th, "base"))
             if not a or not b:
                 continue
             ma, mb, t, df, p, d = welch(a, b)
