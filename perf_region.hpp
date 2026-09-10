@@ -191,21 +191,23 @@ inline std::uint64_t config_remote_fills() { return (0xD0ULL << 8) | evento_fami
 // Estado por hilo
 // ─────────────────────────────────────────────────────────────────────────────
 
+// IPC RETIRADO (campana V6). Ya no se abren ciclos ni instrucciones: no
+// discriminaban nada entre configuraciones (un IPC alto puede significar trabajo
+// util o espera productiva en un bucle de espera, y aqui significaba lo segundo
+// tan a menudo como lo primero) y sobre todo ocupaban DOS de los contadores
+// programables del PMU. Con ellos fuera, el desglose de rellenos por origen puede
+// pasar de 3 origenes a 5, que es lo que de verdad hacia falta.
 struct EstadoHilo {
-    int fd_ciclos = -1;
-    int fd_instr  = -1;
     int fd_origen[N_ORIGENES] = {-1, -1, -1, -1, -1, -1};
 
     // Modo degradado (PERF_REGION_MASCARAS=0)
     int fd_all_fills = -1;
     int fd_remote_fills = -1;
 
-    std::uint64_t base_ciclos = 0, base_instr = 0;
     std::uint64_t base_origen[N_ORIGENES] = {0, 0, 0, 0, 0, 0};
     std::uint64_t base_all = 0, base_remote = 0;
 
     // Acumulado de la región (delta fin - inicio)
-    std::uint64_t d_ciclos = 0, d_instr = 0;
     std::uint64_t d_origen[N_ORIGENES] = {0, 0, 0, 0, 0, 0};
     std::uint64_t d_all = 0, d_remote = 0;
 
@@ -383,13 +385,7 @@ inline void abrir_este_hilo() {
 #if defined(__linux__)
     e.tid = static_cast<long>(syscall(SYS_gettid));
 
-    // Grupo 1: ciclos (líder) + instrucciones. Separado del grupo de rellenos a
-    // propósito: si el grupo grande no cupiera en la PMU, el IPC se salva igual.
-    e.fd_ciclos = abrir_contador(PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES, -1);
-    e.fd_instr  = abrir_contador(PERF_TYPE_HARDWARE, PERF_COUNT_HW_INSTRUCTIONS,
-                                 e.fd_ciclos);
-
-    // Grupo 2: el par 0xFF44/0xD044. SIEMPRE se abre, pase lo que pase con el
+    // El par 0xFF44/0xD044. SIEMPRE se abre, pase lo que pase con el
     // desglose. Son dos eventos, caben seguro, y de aqui sale ratio_rm EXACTO, que
     // es la variable de decision del mecanismo y la que alimenta la figura de
     // localidad. Perder el desglose es una molestia; perder ratio_rm invalida la
@@ -413,10 +409,6 @@ inline void abrir_este_hilo() {
         ++hilos_degradados();
     }
 
-    if (e.fd_ciclos >= 0) {
-        ioctl(e.fd_ciclos, PERF_EVENT_IOC_RESET, PERF_IOC_FLAG_GROUP);
-        ioctl(e.fd_ciclos, PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP);
-    }
     const int lideres[2] = {
         e.fd_all_fills,
         (n_origenes_activos() > 0) ? e.fd_origen[PRIORIDAD_ORIGEN[0]] : -1
@@ -436,8 +428,6 @@ inline void inicio_este_hilo() {
     int s = slot_de_este_hilo();
     if (s < 0 || s >= MAX_HILOS) return;
     EstadoHilo& e = tabla()[s];
-    leer_contador(e.fd_ciclos, e.base_ciclos);
-    leer_contador(e.fd_instr,  e.base_instr);
     for (int i = 0; i < N_ORIGENES; ++i)
         if (e.fd_origen[i] >= 0) leer_contador(e.fd_origen[i], e.base_origen[i]);
     leer_contador(e.fd_all_fills,    e.base_all);
@@ -453,8 +443,6 @@ inline void fin_este_hilo() {
     EstadoHilo& e = tabla()[s];
     std::uint64_t v = 0;
 
-    if (leer_contador(e.fd_ciclos, v) && v >= e.base_ciclos) e.d_ciclos += v - e.base_ciclos;
-    if (leer_contador(e.fd_instr,  v) && v >= e.base_instr)  e.d_instr  += v - e.base_instr;
 
     for (int i = 0; i < N_ORIGENES; ++i)
         if (e.fd_origen[i] >= 0 && leer_contador(e.fd_origen[i], v)
@@ -469,8 +457,6 @@ inline void cerrar_este_hilo() {
     int s = slot_de_este_hilo();
     if (s < 0 || s >= MAX_HILOS) return;
     EstadoHilo& e = tabla()[s];
-    if (e.fd_ciclos >= 0) { close(e.fd_ciclos); e.fd_ciclos = -1; }
-    if (e.fd_instr  >= 0) { close(e.fd_instr);  e.fd_instr  = -1; }
     for (int i = 0; i < N_ORIGENES; ++i)
         if (e.fd_origen[i] >= 0) { close(e.fd_origen[i]); e.fd_origen[i] = -1; }
     if (e.fd_all_fills    >= 0) { close(e.fd_all_fills);    e.fd_all_fills = -1; }
@@ -580,28 +566,40 @@ inline bool activo() { return esta_activo(); }
 // la firma inequívoca de ese caso (o de perf_event_paranoid demasiado alto).
 inline void diagnostico() {
     if (!esta_activo()) return;
-    std::uint64_t total_ciclos = 0, total_rellenos = 0;
+
+    // CANARIO SIN CICLOS. Antes este diagnostico usaba el contador de ciclos para
+    // distinguir los dos fallos posibles; retirado el IPC, el canario es el estado
+    // de los propios descriptores, que ademas es un indicador mas directo:
+    //
+    //   fd del par < 0            -> perf_event_open denegado (paranoid alto)
+    //   fd validos y rellenos = 0 -> la PMU acepta las mascaras 0x..44 pero no las
+    //                                implementa. Son especificas de AMD Zen; en
+    //                                otra PMU la llamada TIENE EXITO y devuelve
+    //                                cero para siempre, sin error, y todas las
+    //                                columnas de trafico quedan a cero sin que
+    //                                nadie se entere.
+    std::uint64_t total_rellenos = 0;
+    int con_fd = 0;
     const int n = n_hilos_registrados();
     for (int s = 0; s < n && s < MAX_HILOS; ++s) {
         const EstadoHilo& e = tabla()[s];
         if (!e.usado) continue;
-        total_ciclos += e.d_ciclos;
-        // Mira el PAR, no el desglose: el par es el que siempre debe estar. Antes
-        // miraba el desglose y habria dado una falsa alarma en cuanto el desglose
-        // se recortara a 3 mascaras (o a 0) aunque el par funcionara bien.
+        if (e.fd_all_fills >= 0) ++con_fd;
+        // Mira el PAR, no el desglose: el par es el que siempre debe estar.
         total_rellenos += e.d_all;
     }
-    if (total_ciclos == 0) {
+    if (con_fd == 0) {
         std::fprintf(stderr,
-            "[perf_region] ERROR: cero ciclos contados. perf_event_open no esta\n"
-            "              midiendo nada. Comprobar perf_event_paranoid <= 2.\n");
+            "[perf_region] ERROR: ningun hilo pudo abrir el par de rellenos.\n"
+            "              perf_event_open no esta midiendo nada.\n"
+            "              Comprobar perf_event_paranoid <= 2.\n");
     } else if (total_rellenos == 0) {
         std::fprintf(stderr,
-            "[perf_region] ERROR: %llu ciclos contados pero CERO rellenos.\n"
-            "              Los eventos PMCx044 son especificos de AMD Zen; en otra\n"
-            "              PMU perf_event_open tiene exito y devuelve cero siempre.\n"
-            "              Las columnas de trafico de esta corrida NO son validas.\n",
-            static_cast<unsigned long long>(total_ciclos));
+            "[perf_region] ERROR: %d hilos con contadores abiertos pero CERO\n"
+            "              rellenos. Los eventos PMCx044 son especificos de AMD\n"
+            "              Zen; en otra PMU perf_event_open tiene exito y devuelve\n"
+            "              cero siempre. Las columnas de trafico NO son validas.\n",
+            con_fd);
     }
 }
 
@@ -622,7 +620,7 @@ inline void escribir_csv(const char* ruta, const char* etiqueta) {
     if (nuevo) {
         // Nombres IDÉNTICOS a los de ompt_summary.csv a propósito: así el script de
         // campaña agrega los dos caminos de medida con el mismo awk.
-        std::fprintf(f, "tag,slot,tid,instructions,cycles");
+        std::fprintf(f, "tag,slot,tid");
         for (int i = 0; i < N_ORIGENES; ++i) std::fprintf(f, ",%s", NOMBRE_ORIGEN[i]);
         std::fprintf(f, ",fill_all,fill_remoto,mascaras,familia\n");
     }
@@ -637,10 +635,7 @@ inline void escribir_csv(const char* ruta, const char* etiqueta) {
         // aunque el desglose se haya quedado corto o vacio.
         const std::uint64_t all = e.d_all, remoto = e.d_remote;
 
-        std::fprintf(f, "%s,%d,%ld,%llu,%llu",
-                     etiqueta ? etiqueta : "-", s, e.tid,
-                     static_cast<unsigned long long>(e.d_instr),
-                     static_cast<unsigned long long>(e.d_ciclos));
+        std::fprintf(f, "%s,%d,%ld", etiqueta ? etiqueta : "-", s, e.tid);
         for (int i = 0; i < N_ORIGENES; ++i)
             std::fprintf(f, ",%llu", static_cast<unsigned long long>(e.d_origen[i]));
         std::fprintf(f, ",%llu,%llu,%d,%s\n",

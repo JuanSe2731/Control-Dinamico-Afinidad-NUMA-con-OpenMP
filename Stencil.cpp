@@ -129,7 +129,6 @@ struct BenchmarkResult {
     double avg_time_s{0};
     double max_time_s{0};
     double stddev_s{0};
-    double caudal_util_gibs{0};  // derivado de avg_time_s
     double mlups{0};             // derivado de avg_time_s
     double gflops{0};            // derivado de avg_time_s
 };
@@ -149,25 +148,13 @@ static Stats compute_stats(std::vector<double>& times) {
     return Stats{min_t, avg_t, max_t, stddev};
 }
 
-// CAUDAL ÚTIL, no "ancho de banda". Es bytes_del_modelo / tiempo, con los bytes
-// FIJADOS por N, así que es 1/t reescalado y nada más: para un tamaño dado,
-// caudal_util_gibs * avg_ms es una constante exacta. Más alto = más rápido.
-//
-// NO CONFUNDIR con el tráfico real de memoria. Los bytes que de verdad cruzan el
-// controlador y el enlace inter-nodo se miden con los contadores de rellenos por
-// origen (perf_region.hpp), y ahí MENOS ES MEJOR: significa que el procesador dejó
-// de esperar datos. Son dos magnitudes distintas y el proyecto las confundió.
-//
-// Además el modelo de bytes es de TRÁFICO COMPULSORIO (5 lecturas + 1 escritura
-// por punto, como si cada acceso fuera a DRAM). Un stencil de 5 puntos que barre
-// fila por fila tiene enorme reutilización de caché, así que el tráfico real son
-// ~2 flujos (8 B/punto, no 24): esta cifra sobreestima ~3x, y por eso un solo hilo
-// llegaba a dar ~70 GiB/s, que es físicamente imposible.
-static double compute_caudal_util_gibs(int n, double elapsed_s) {
-    const double points = static_cast<double>(n - 2) * (n - 2);
-    const double bytes = points * 6.0 * sizeof(float);
-    return (bytes / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
-}
+// caudal_util_gibs SE RETIRA (campana V6). Era bytes_del_modelo / tiempo con los
+// bytes FIJADOS por N, o sea 1/t reescalado: para un tamano dado el producto
+// caudal_util_gibs * avg_ms era una constante exacta, asi que la columna no
+// aportaba ni un bit sobre avg_ms y ademas se confundia sistematicamente con el
+// trafico real de memoria. El trafico real —los bytes que de verdad cruzan el
+// enlace inter-nodo, donde MENOS ES MEJOR— se mide con los contadores de rellenos
+// por origen (perf_region.hpp) y esa es la columna que hay que mirar.
 
 // MLUPS: millones de actualizaciones de malla por segundo = puntos_interiores / (t * 1e6).
 // Metrica de rendimiento propia del stencil (independiente del conteo de FLOPs).
@@ -208,7 +195,7 @@ static void export_csv(const std::string& filename,
     const double ws_bytes = 2.0 * static_cast<double>(n) * n * sizeof(float);
 
     f << "strategy,n,ws_bytes,threads,warmup,reps,"
-         "min_ms,avg_ms,max_ms,stddev_ms,caudal_util_gibs,mlups,gflops\n";
+         "min_ms,avg_ms,max_ms,stddev_ms,mlups,gflops\n";
     for (const auto& r : results) {
         f << r.strategy << ","
           << n << ","
@@ -221,7 +208,6 @@ static void export_csv(const std::string& filename,
           << r.avg_time_s * 1e3 << ","
           << r.max_time_s * 1e3 << ","
           << r.stddev_s * 1e3 << ","
-          << r.caudal_util_gibs << ","
           << r.mlups << ","
           << r.gflops << "\n";
     }
@@ -347,7 +333,6 @@ int main(int argc, char* argv[]) {
 
     const Stats st = compute_stats(times);
     // Todo sobre la MEDIA, no sobre el mínimo (ver el comentario de BenchmarkResult).
-    const double caudal = compute_caudal_util_gibs(n, st.avg_s);
     const double mlups  = compute_mlups(n, st.avg_s);
     const double gflops = compute_gflops(n, st.avg_s);
 
@@ -362,7 +347,6 @@ int main(int argc, char* argv[]) {
               << (st.stddev_s * 1e3) << " ms\n";
     std::cout << "MLUPS        : " << mlups << "  (sobre la media)\n";
     std::cout << "GFLOPS       : " << gflops << "  (= MLUPS/200, exacto)\n";
-    std::cout << "Caudal GiB/s : " << caudal << "  (caudal util, NO trafico real)\n";
     std::cout << "Checksum: " << checksum << "\n";
 
     std::vector<BenchmarkResult> results;
@@ -372,7 +356,6 @@ int main(int argc, char* argv[]) {
     res.avg_time_s = st.avg_s;
     res.max_time_s = st.max_s;
     res.stddev_s = st.stddev_s;
-    res.caudal_util_gibs = caudal;
     res.mlups = mlups;
     res.gflops = gflops;
     results.push_back(res);

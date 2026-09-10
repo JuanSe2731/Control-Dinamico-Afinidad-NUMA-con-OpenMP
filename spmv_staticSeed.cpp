@@ -458,18 +458,10 @@ double working_set_bytes(const CsrMatrix& mat)
          + static_cast<double>(mat.num_rows)     * sizeof(ValueType);
 }
 
-// CAUDAL ÚTIL, no "ancho de banda". Los bytes son una constante fijada por la
-// matriz, así que esto es 1/t reescalado: caudal_util_gibs * avg_ms es constante
-// exacta para una matriz dada. Más alto = más rápido.
-//
-// NO CONFUNDIR con el tráfico real de memoria. Los bytes que de verdad cruzan el
-// controlador y el enlace inter-nodo se cuentan con los rellenos por origen
-// (perf_region.hpp), y ahí MENOS ES MEJOR: menos tráfico remoto es menos tiempo
-// muerto de espera. Son dos magnitudes distintas y el proyecto las confundió.
-double compute_caudal_util_gibs(const CsrMatrix& mat, double elapsed_s)
-{
-    return (working_set_bytes(mat) / (1024.0 * 1024.0 * 1024.0)) / elapsed_s;
-}
+// caudal_util_gibs SE RETIRA (campana V6). Los bytes eran una constante fijada
+// por la matriz, asi que la columna era 1/t reescalado: no aportaba nada sobre
+// avg_ms y se confundia con el trafico real de memoria, que se mide aparte con
+// los rellenos por origen (perf_region.hpp) y donde MENOS ES MEJOR.
 
 // GFLOPS. El cuerpo del kernel es `sum += val[k] * xv[ci[k]]`: una multiplicación
 // y una suma por cada no-cero, es decir 2*nnz flop por producto matriz-vector.
@@ -490,7 +482,6 @@ struct BenchmarkResult {
     double avg_time_s{0};
     double max_time_s{0};
     double stddev_s{0};
-    double caudal_util_gibs{0};  // derivado de avg_time_s
     double gflops{0};            // derivado de avg_time_s
 };
 
@@ -547,13 +538,11 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
     double stddev = std::sqrt(var / ((reps > 1) ? (reps - 1) : 1));  // muestral (N-1)
 
     // Sobre la MEDIA, no sobre el mínimo.
-    double caudal = compute_caudal_util_gibs(A, avg_t);
     double gflops = compute_gflops(A, avg_t);
 
     printf("  Tiempo  : %.4f ms (min) | %.4f ms (avg) | %.4f ms (max) | stddev=%.4f ms\n",
            min_t*1e3, avg_t*1e3, max_t*1e3, stddev*1e3);
     printf("  GFLOPS       : %.3f  (sobre la media)\n", gflops);
-    printf("  Caudal GiB/s : %.3f  (caudal util, NO trafico real)\n", caudal);
 
     BenchmarkResult res;
     res.strategy         = strategy_name;
@@ -561,7 +550,6 @@ BenchmarkResult benchmark_spmv(const CsrMatrix& A,
     res.avg_time_s       = avg_t;
     res.max_time_s       = max_t;
     res.stddev_s         = stddev;
-    res.caudal_util_gibs = caudal;
     res.gflops           = gflops;
     return res;
 }
@@ -585,7 +573,7 @@ void export_csv(const std::string& filename,
 #endif
 
     f << "strategy,matrix,rows,cols,nnz,ws_bytes,threads,warmup,reps,"
-         "min_ms,avg_ms,max_ms,stddev_ms,caudal_util_gibs,gflops\n";
+         "min_ms,avg_ms,max_ms,stddev_ms,gflops\n";
 
     for (const auto& r : results) {
         f << r.strategy       << ","
@@ -602,7 +590,6 @@ void export_csv(const std::string& filename,
           << r.avg_time_s*1e3 << ","
           << r.max_time_s*1e3 << ","
           << r.stddev_s*1e3   << ","
-          << r.caudal_util_gibs << ","
           << r.gflops         << "\n";
     }
     std::cout << "[CSV] Resultados guardados en: " << filename << "\n";
@@ -732,18 +719,17 @@ std::cout << "\n[MAT] " << A.num_rows << " x " << A.num_cols
 
     // ── Tabla resumen
     std::cout << "\n"
-              << "+----------------------+----------+----------+----------+----------+\n"
-              << "| Estrategia           | min (ms) | avg (ms) | GFLOPS   | caudal   |\n"
-              << "+----------------------+----------+----------+----------+----------+\n";
+              << "+----------------------+----------+----------+----------+\n"
+              << "| Estrategia           | min (ms) | avg (ms) | GFLOPS   |\n"
+              << "+----------------------+----------+----------+----------+\n";
     for (const auto& r : results) {
-        printf("| %-20s | %8.3f | %8.3f | %8.3f | %8.3f |\n",
+        printf("| %-20s | %8.3f | %8.3f | %8.3f |\n",
                r.strategy,
                r.min_time_s * 1e3,
                r.avg_time_s * 1e3,
-               r.gflops,
-               r.caudal_util_gibs);
+               r.gflops);
     }
-    std::cout << "+----------------------+----------+----------+----------+----------+\n";
+    std::cout << "+----------------------+----------+----------+----------+\n";
 
     // ── Primeras entradas del resultado
     std::cout << "\n=== Primeras entradas de y = A*x ===\n";

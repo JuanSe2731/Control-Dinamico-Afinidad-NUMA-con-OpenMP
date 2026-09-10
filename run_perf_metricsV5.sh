@@ -180,8 +180,11 @@ csv_get() {
 }
 
 # Agrega los contadores por hilo y emite:
-#   ipc  ratio_rm  fill_l2 fill_l3_ccd fill_ccd_vecino fill_dram_local
+#   ratio_rm  fill_l2 fill_l3_ccd fill_ccd_vecino fill_dram_local
 #   fill_far_cache fill_far_dram  migraciones
+#
+# El IPC SE RETIRA (campana V6): no discriminaba entre configuraciones y ocupaba
+# dos contadores programables del PMU que ahora van al desglose por origen.
 #
 # Un solo agregador para los DOS caminos de medida, porque perf_region.hpp y el tool
 # OMPT emiten los mismos nombres de columna a proposito. Suma por columna y calcula
@@ -190,7 +193,7 @@ csv_get() {
 aggregate_counters() {
   local file="$1" tag_filter="${2:-}"
   if [[ ! -f "$file" ]]; then
-    echo "NA NA 0 0 0 0 0 0 0"; return
+    echo "NA 0 0 0 0 0 0 0"; return
   fi
   awk -F, -v tf="$tag_filter" '
     # Devuelve la columna por NOMBRE, o 0 si no existe. Sin esta guarda, un nombre
@@ -202,8 +205,6 @@ aggregate_counters() {
     NR==1 { for (i=1;i<=NF;i++) idx[$i]=i; next }
     {
       if (tf != "" && txt("tag") != tf) next
-      ins += col("instructions")
-      cyc += col("cycles")
       l2  += col("fill_l2")
       l3  += col("fill_l3_ccd")
       cv  += col("fill_ccd_vecino")
@@ -218,18 +219,19 @@ aggregate_counters() {
       n++
     }
     END {
-      if (n == 0) { print "NA NA 0 0 0 0 0 0 0"; exit }
+      if (n == 0) { print "NA 0 0 0 0 0 0 0"; exit }
       # ratio_rm SALE DEL PAR, nunca de sumar las mascaras del desglose.
       #
-      # Solo se miden TRES mascaras (las que cruzan una interconexion), porque el
-      # nmi_watchdog ocupa un contador y el par ocupa dos de los cinco libres.
+      # Retirado el IPC, el desglose puede llegar a CINCO mascaras: el nmi_watchdog
+      # ocupa un contador de los seis y el par exacto ocupa dos de los cinco libres,
+      # pero el par va en su propio grupo. Antes ciclos e instrucciones se llevaban
+      # otros dos y el tope estaba en tres.
       # Sumar las seis columnas daria all = ccd_vecino + far_cache + far_dram, que
       # no es el total sino solo la parte lejana: ratio_rm saldria ~0.7 en vez de
       # ~0.1. El par 0xFF44/0xD044 si es el total exacto.
       all = (par_all > 0) ? par_all : (l2 + l3 + cv + dl + fc + fd)
       rem = (par_all > 0) ? par_rem : (fc + fd)
-      printf "%s %s %.0f %.0f %.0f %.0f %.0f %.0f %d\n",
-        (cyc > 0 ? sprintf("%.6f", ins/cyc) : "NA"),
+      printf "%s %.0f %.0f %.0f %.0f %.0f %.0f %d\n",
         (all > 0 ? sprintf("%.6f", rem/all) : "NA"),
         l2, l3, cv, dl, fc, fd, mig
     }
@@ -244,10 +246,21 @@ need_cmd awk
 mkdir -p "$OUTDIR" "$METRICSDIR" "$LOGDIR" "$DONEDIR"
 compile_all
 
-# Cabecera del CSV agregado. Solo se escribe si el fichero no existe: la campaña es
-# reanudable y un `rm -f` aqui borraria el trabajo de las tandas anteriores.
+# FORCE=1 rehace todo, asi que el CSV agregado tiene que EMPEZAR DE CERO. Sin esto
+# el fichero se limita a acumular: tras la campana 29390 tenia 1543 filas de TRES
+# campanas mezcladas, incluida la 29355 con los contadores rotos. Analizar eso habria
+# mezclado datos de versiones distintas del codigo sin que nada lo delatara.
+# El fichero anterior no se borra, se archiva con marca de tiempo.
+if [[ "${FORCE:-0}" == "1" && -s "$KERNEL_CSV" ]]; then
+  archivo="${KERNEL_CSV%.csv}_$(date +%Y%m%d_%H%M%S).csv"
+  mv "$KERNEL_CSV" "$archivo"
+  echo "FORCE=1: CSV anterior archivado en $(basename "$archivo")"
+fi
+
+# Fuera de FORCE la cabecera solo se escribe si el fichero no existe: la campana es
+# reanudable y truncar aqui borraria el trabajo de las tandas anteriores.
 if [[ ! -s "$KERNEL_CSV" ]]; then
-  echo "kernel,size_tag,n_or_rows,ws_bytes,threads,config,binding,memory_policy,tool,migration,familia,warmup,reps,min_ms,avg_ms,max_ms,stdev_ms,migrations,caudal_util_gibs,mlups,gflops,ipc,fills_l2,fills_l3_ccd,fills_ccd_vecino,fills_dram_local,fills_far_cache,fills_far_dram,bw_remoto_gibs,gib_remotos_total,ratio_rm" > "$KERNEL_CSV"
+  echo "kernel,size_tag,n_or_rows,ws_bytes,threads,config,binding,memory_policy,tool,migration,familia,warmup,reps,min_ms,avg_ms,max_ms,stdev_ms,migrations,mlups,gflops,fills_l2,fills_l3_ccd,fills_ccd_vecino,fills_dram_local,fills_far_cache,fills_far_dram,bw_remoto_gibs,gib_remotos_total,ratio_rm" > "$KERNEL_CSV"
 fi
 
 TOOL_ABS="$(realpath "$TOOL_SO")"
@@ -349,7 +362,6 @@ for size_tag in "${SIZE_LIST[@]}"; do
         max_ms=$(csv_get "$kcsv" max_ms)
         stdev_ms=$(csv_get "$kcsv" stddev_ms)
         ws_bytes=$(csv_get "$kcsv" ws_bytes)
-        caudal=$(csv_get "$kcsv" caudal_util_gibs)
         gflops=$(csv_get "$kcsv" gflops)
         mlups=$(csv_get "$kcsv" mlups)          # NA en SpMV, por diseño
         warm=$(csv_get "$kcsv" warmup)
@@ -357,18 +369,16 @@ for size_tag in "${SIZE_LIST[@]}"; do
         # Contadores: del tool si estaba cargado, del propio kernel si no. Nunca de
         # los dos: un solo propietario por hilo.
         if [[ "$use_tool" == "1" ]]; then
-          read -r ipc ratio l2 l3 cv dl fc fd migraciones \
+          read -r ratio l2 l3 cv dl fc fd migraciones \
             <<< "$(aggregate_counters "$OMPT_SUMMARY_CSV_PATH" "$tag")"
         else
-          read -r ipc ratio l2 l3 cv dl fc fd migraciones \
+          read -r ratio l2 l3 cv dl fc fd migraciones \
             <<< "$(aggregate_counters "${csv_prefix}_counters.csv" "")"
           migraciones=0
         fi
 
         # Tráfico REAL hacia memoria: rellenos * 64 B (tamaño de línea). Esta es la
         # magnitud del director, y aquí MENOS ES MEJOR: menos tráfico remoto es menos
-        # tiempo muerto esperando datos. No confundir con caudal_util_gibs, que es
-        # 1/tiempo con unidades de ancho de banda.
         # Los bytes remotos salen del ratio exacto por el total exacto, no de sumar
         # mascaras: fc+fd solo coincide con el par si las tres mascaras se abrieron.
         read -r bw_remoto gib_remotos <<< "$(awk -v ratio="$ratio" -v fc="$fc" -v fd="$fd" -v ms="$avg_ms" '
@@ -384,7 +394,7 @@ for size_tag in "${SIZE_LIST[@]}"; do
         tool_label="$([[ "$use_tool" == "1" ]] && echo "ompt" || echo "no")"
         mig_label="$([[ "$use_tool" != "1" ]] && echo "-" || { [[ "$migrate" == "1" ]] && echo "on" || echo "off"; })"
 
-        echo "${label},${size_tag},${tam},${ws_bytes},${threads},${cfg_id},${binding_label},${mempol_label},${tool_label},${mig_label},${PERF_FAMILIA},${warm},${REPS},${min_ms},${avg_ms},${max_ms},${stdev_ms},${migraciones},${caudal},${mlups},${gflops},${ipc},${l2},${l3},${cv},${dl},${fc},${fd},${bw_remoto},${gib_remotos},${ratio}" \
+        echo "${label},${size_tag},${tam},${ws_bytes},${threads},${cfg_id},${binding_label},${mempol_label},${tool_label},${mig_label},${PERF_FAMILIA},${warm},${REPS},${min_ms},${avg_ms},${max_ms},${stdev_ms},${migraciones},${mlups},${gflops},${l2},${l3},${cv},${dl},${fc},${fd},${bw_remoto},${gib_remotos},${ratio}" \
           >> "$KERNEL_CSV"
 
         # rc=0 NO basta: si el kernel no pudo abrir su CSV de salida (descriptores
