@@ -1,0 +1,17 @@
+tag,slot,tid,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,0,986593,0,0,83032,0,9929,3887067,177898828,3896996,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,1,986594,0,0,76890,0,16257,2272592,177629552,2288851,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,2,986595,0,0,39067,0,39006,3865246,177902882,3904252,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,3,986596,0,0,51820,0,36270,1490703,178190582,1526973,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,4,986597,0,0,84337,0,3883,3798088,177939990,3801972,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,5,986598,0,0,78568,0,13308,1934268,178218271,1947576,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,6,986599,0,0,54024,0,42167,3703233,177865419,3745400,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,7,986600,0,0,51663,0,34517,1476963,177986606,1511481,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,8,986601,0,0,4734,0,90933,3707410,177574691,3798343,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,9,986602,0,0,14086,0,73980,2142588,177831893,2216570,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,10,986603,0,0,37461,0,37765,3705458,177691137,3743223,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,11,986604,0,0,41275,0,58689,3069570,178251178,3128259,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,12,986605,0,0,7597,0,92644,5937483,178006331,6030127,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,13,986606,0,0,13890,0,74719,3182779,177562257,3257499,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,14,986607,0,0,48415,0,47915,5881455,176396884,5929370,3,any
+perf_out_v6/metrics/spmv_static_S3_t16_bind_spread_il,15,986608,0,0,37459,0,53953,3253311,176374756,3307264,3,any

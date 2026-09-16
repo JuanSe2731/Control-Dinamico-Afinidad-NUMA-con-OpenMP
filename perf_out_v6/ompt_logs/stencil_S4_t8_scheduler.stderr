@@ -1,0 +1,2 @@
+[OMPT] ompt_start_tool: OMP_version=201611 runtime=LLVM OMP version: 5.0.20140926
+[OMPT] WARNING: OMP version=201611 < 5.0

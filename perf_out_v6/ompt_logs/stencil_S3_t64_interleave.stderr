@@ -1,0 +1,2 @@
+[perf_region] contadores: par 0xFF44/0xD044 (ratio_rm exacto) + 3 mascaras de desglose
+              (caben 3 ademas del par; tope por diseno 3). SIN multiplexado.

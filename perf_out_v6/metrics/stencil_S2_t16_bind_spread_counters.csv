@@ -1,0 +1,17 @@
+tag,slot,tid,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,0,976844,0,0,6257,0,1614,446,4554151,2061,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,1,976845,0,0,4335,0,677,868,4416194,1548,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,2,976846,0,0,4006,0,121,887,4341192,1008,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,3,976847,0,0,7249,0,474,669,4433814,1143,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,4,976848,0,0,5714,0,291,826,4345221,1117,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,5,976849,0,0,3825,0,242,838,4379861,1082,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,6,976850,0,0,7449,0,142,937,4300572,1079,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,7,976851,0,0,5694,0,117,859,4287603,976,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,8,976852,0,0,630,0,9765,2203,4378851,11968,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,9,976853,0,0,348,0,5439,385,4377087,5824,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,10,976854,0,0,314,0,5465,423,4308481,5888,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,11,976855,0,0,112,0,7973,3090,4312472,11063,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,12,976856,0,0,1144,0,5938,4106,4329590,10044,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,13,976857,0,0,263,0,7905,4636,4441454,12541,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,14,976858,0,0,424,0,6297,1849,4375152,8146,3,any
+perf_out_v6/metrics/stencil_S2_t16_bind_spread,15,976859,0,0,952,0,3916,1966,4350086,5882,3,any

@@ -1,0 +1,9 @@
+tag,slot,tid,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v6/metrics/spmv_static_S0_t8_bind_close_il,0,957494,0,0,10,0,8,62,279438,70,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_bind_close_il,1,957495,0,0,3,0,1,43,265598,44,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_bind_close_il,2,957496,0,0,0,0,0,2,134638,2,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_bind_close_il,3,957497,0,0,1,0,0,2,844,2,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_bind_close_il,4,957498,0,0,1,0,2,5,2416,7,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_bind_close_il,5,957499,0,0,0,0,0,0,856,0,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_bind_close_il,6,957500,0,0,1,0,0,0,1188,0,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_bind_close_il,7,957501,0,0,0,0,0,3,864,3,3,any

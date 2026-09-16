@@ -1,0 +1,17 @@
+tag,slot,tid,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,0,977061,0,0,4239,0,14248,3975,22644737,18223,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,1,977062,0,0,9273,0,4921,3670,22674432,8591,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,2,977063,0,0,10637,0,2821,3874,22729258,6695,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,3,977064,0,0,4874,0,7973,5463,22705460,13436,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,4,977065,0,0,2953,0,13115,5284,22639381,18401,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,5,977066,0,0,6475,0,5073,3545,22633817,8620,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,6,977067,0,0,10887,0,2827,3695,22649187,6522,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,7,977068,0,0,5027,0,9158,4632,22711539,13791,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,8,977069,0,0,14498,0,3210,1774,22510901,4984,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,9,977070,0,0,5049,0,8646,3822,22691004,12468,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,10,977071,0,0,2572,0,11261,2561,21109237,13822,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,11,977072,0,0,5933,0,4775,1601,21165990,6376,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,12,977073,0,0,11464,0,3443,1561,21257796,5004,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,13,977074,0,0,4649,0,8155,2502,21304862,10657,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,14,977075,0,0,2414,0,11583,3656,21195852,15239,3,any
+perf_out_v6/metrics/spmv_static_S2_t16_bind_spread_il,15,977076,0,0,20533,0,4787,1923,21206692,6710,3,any

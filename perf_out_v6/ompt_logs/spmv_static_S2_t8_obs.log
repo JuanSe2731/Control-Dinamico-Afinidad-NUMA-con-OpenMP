@@ -1,0 +1,43 @@
+[OMPT] ompt_initialize (OPCIÓN C: integrador con fugas)  verbose=0  migracion=DESACTIVADA
+[HWLOC] Nodos NUMA detectados: 2 (usados: 2)
+[HWLOC] Nodo 0: 128 CPUs
+[HWLOC] Nodo 1: 128 CPUs
+[OMPT] callback 'ompt_callback_thread_begin' registrado (result=5)
+[OMPT] callback 'ompt_callback_thread_end' registrado (result=5)
+[OMPT] callback 'ompt_callback_parallel_begin' registrado (result=5)
+[OMPT] callback 'ompt_callback_parallel_end' registrado (result=5)
+[OMPT] callback 'ompt_callback_implicit_task' registrado (result=5)
+[OMPT] callback 'ompt_callback_control_tool' registrado (result=5)
+[OMPT] Callbacks registrados
+[OMPT] Sistema: 0 procesadores lógicos
+[OMPT][MON] Monitor (C: integrador con fugas)  período=100ms  warmup=5  referencia=MIN  T=min+max(0.050, 3.00*MAD_bajo)  leak=0.50*margen  cap=8.00*margen  max_mig=1  migracion=DESACTIVADA
+[perf_region] tool OMPT detectado: los contadores los lleva el tool, no se abren aqui
+[OMPT] control_tool: INICIANDO medicion
+[OMPT] control_tool: PAUSANDO medicion
+[OMPT] ompt_finalize
+[OMPT][MON] Monitor detenido tras 1 ventanas
+[OMPT] CSV de ventanas: 0 filas volcadas (0 descartadas)
+[OMPT] ===== Tabla final: 8 hilos =====
+[OMPT] tid=976648 ompt_id=281474976710657 tipo=ompt_thread_initial    last_cpu=255 numa=1 mig=0 fallos=0 perf=full ratio_rm=0.0000
+[OMPT] tid=976650 ompt_id=562949953421313 tipo=ompt_thread_worker     last_cpu= 72 numa=1 mig=0 fallos=0 perf=full ratio_rm=0.0000
+[OMPT] tid=976651 ompt_id=844424930131969 tipo=ompt_thread_worker     last_cpu=231 numa=1 mig=0 fallos=0 perf=full ratio_rm=0.0000
+[OMPT] tid=976652 ompt_id=1125899906842625 tipo=ompt_thread_worker     last_cpu=239 numa=1 mig=0 fallos=0 perf=full ratio_rm=0.0000
+[OMPT] tid=976653 ompt_id=1407374883553281 tipo=ompt_thread_worker     last_cpu=  1 numa=0 mig=0 fallos=0 perf=full ratio_rm=0.0008
+[OMPT] tid=976654 ompt_id=1688849860263937 tipo=ompt_thread_worker     last_cpu=247 numa=1 mig=0 fallos=0 perf=full ratio_rm=0.0000
+[OMPT] tid=976655 ompt_id=1970324836974593 tipo=ompt_thread_worker     last_cpu=199 numa=1 mig=0 fallos=0 perf=full ratio_rm=0.0000
+[OMPT] tid=976656 ompt_id=2251799813685249 tipo=ompt_thread_worker     last_cpu=  0 numa=0 mig=0 fallos=0 perf=full ratio_rm=0.0008
+[OMPT] ===== Overhead intrínseco =====
+  monitor: 1 ticks, 9.3 us total (max 9.3 us/tick)
+  callbacks implicit_task: 1313, 17025.6 us total
+  migraciones: 0 (0.0 us total)
+  resyncs=0  lecturas escaladas por multiplexado=56
+  hilos con perf fallido=0  parcial=0
+  ventanas con fills=0
+
+[OMPT] *** AVISO GRAVE ***
+  56 lecturas de contador con exito y NINGUNA ventana con data
+  cache fills. Los eventos crudos 0xD044/0xFF44 abrieron pero cuentan
+  siempre 0: esta PMU no los implementa (son de AMD Zen). ratio_rm no
+  existe y el scheduler NO PUEDE decidir migraciones. Los resultados de
+  localidad de esta corrida no son válidos.
+
