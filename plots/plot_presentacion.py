@@ -20,9 +20,11 @@ deliberadas:
 3. VALORES SOBRE LOS PUNTOS. Son figuras para senalar mientras se habla, no
    para leer en papel.
 
-4. SIN IPC Y SIN caudal_util_gibs. El IPC no discrimina nada aqui y el caudal
-   util es 1/tiempo reescalado, o sea la misma figura del tiempo con otras
-   unidades.
+4. SIN IPC. El GiB/s SI se dibuja, junto con MLUPS y GFLOPS: son las metricas de
+   throughput que fija el plan de trabajo. Las tres salen del tiempo medio, asi que
+   no son evidencia independiente, y cada figura lo dice en su nota. Como V6 quito
+   caudal_util_gibs de los kernels, el GiB/s se reconstruye del tiempo cuando el
+   CSV no lo trae (ver gibs_del_plan).
 
 Uso:  python3 plots/plot_presentacion.py
 """
@@ -50,34 +52,75 @@ from plot_results import (AZUL, NARANJA, AGUA, TINTA, TINTA_2, TINTA_MUTE,
 AMARILLO, MAGENTA = "#eda100", "#e87ba4"
 
 # Campana y destino, parametrizables por entorno para que V5 y V6 no se pisen:
-#   CAMPANA=perf_out_v6 python3 plots/plot_presentacion.py  -> presentacion/figures_v6
-CAMPANA = os.environ.get("CAMPANA", "perf_out_v6")
+#   CAMPANA=perf_out_v4 python3 plots/plot_presentacion.py  -> presentacion/figures_v4
+CAMPANA = os.environ.get("CAMPANA", "perf_out_v5")
 _sufijo = CAMPANA.split("_")[-1] if CAMPANA.startswith("perf_out_") else CAMPANA
 FIGDIR = os.environ.get(
     "FIGDIR",
     "presentacion/figures" if _sufijo == "v5" else f"presentacion/figures_{_sufijo}")
 
+# ── Idioma de los TEXTOS de la figura ────────────────────────────────────────
+# IDIOMA=en genera el mismo juego con los rotulos en ingles y el sufijo _en en el
+# nombre, para que convivan con los de espanol. Se envuelve CADA texto visible en
+# tx(es, en); con el valor por defecto "es" devuelve la cadena de siempre, asi que
+# las figuras en espanol salen identicas byte a byte.
+IDIOMA = os.environ.get("IDIOMA", "es").lower()
+if IDIOMA not in ("es", "en"):
+    sys.exit(f"ERROR: IDIOMA={IDIOMA} no reconocido (es | en)")
+
+
+def tx(es, en):
+    """Texto visible en la figura, en el idioma pedido. NO se usa para nombres de
+    archivo ni para claves de datos: solo para lo que lee el publico."""
+    return en if IDIOMA == "en" else es
+
+
 # Los peldanos donde el mecanismo puede actuar. Ver el docstring.
 TAMANOS = ["S3", "S4", "S5"]
-TITULO_TAM = {
-    "S3": "S3 · 191 MiB — cabe en la L3 del nodo",
-    "S4": "S4 · 1,0 GiB — no cabe en ninguna cache",
-    "S5": "S5 · 4,1 GiB — plenamente en DRAM",
-}
-TITULO_TAM_CORTO = {"S3": "S3 · 191 MiB", "S4": "S4 · 1,0 GiB", "S5": "S5 · 4,1 GiB"}
 
-KERNELS = {"stencil": "Stencil 2D", "spmv_static": "SpMV (matriz dispersa)"}
+# ── Subconjunto de tamanos: las figuras "solo S5" ────────────────────────────
+# TAMANOS_FIG=S5 redibuja las mismas figuras con UNA sola faceta y anade el sufijo
+# _S5 al nombre, de modo que conviven con las de tres paneles en vez de pisarlas.
+# Un panel unico necesita mas ancho que un tercio de la rejilla, o el titulo de la
+# figura no cabe: de ahi PANEL_UNICO.
+#
+#   CAMPANA=perf_out_v5 TAMANOS_FIG=S5 KERNELS_FIG=spmv_static \
+#   FIGURAS=05,06,07,08,11,12 python3 plots/plot_presentacion.py
+_pedidos = os.environ.get("TAMANOS_FIG", "").replace(",", " ").split()
+if _pedidos:
+    TAMANOS = [t for t in TAMANOS if t in _pedidos]
+    if not TAMANOS:
+        sys.exit(f"ERROR: TAMANOS_FIG={_pedidos} no contiene ninguno de S3, S4, S5")
+SUFIJO = (("_" + "".join(TAMANOS)) if _pedidos else "") + ("_en" if IDIOMA == "en" else "")
+PANEL_UNICO = (9.6, 5.2) if len(TAMANOS) == 1 else None
+TITULO_TAM = {
+    "S3": tx("S3 · 191 MiB — cabe en la L3 del nodo",
+             "S3 · 191 MiB — fits in the node's L3"),
+    "S4": tx("S4 · 1,0 GiB — no cabe en ninguna cache",
+             "S4 · 1.0 GiB — fits in no cache"),
+    "S5": tx("S5 · 4,1 GiB — plenamente en DRAM",
+             "S5 · 4.1 GiB — entirely in DRAM"),
+}
+TITULO_TAM_CORTO = {"S3": "S3 · 191 MiB",
+                    "S4": tx("S4 · 1,0 GiB", "S4 · 1.0 GiB"),
+                    "S5": tx("S5 · 4,1 GiB", "S5 · 4.1 GiB")}
+
+KERNELS = {"stencil": "Stencil 2D",
+           "spmv_static": tx("SpMV (matriz dispersa)", "SpMV (sparse matrix)")}
 
 # Nombres para proyectar. La regla es que cada uno se entienda sin glosario.
 NOMBRE = {
-    "base":           "OpenMP sin optimizar",
-    "obs":            "solo medir, sin migrar (control)",
-    "scheduler":      "scheduler dinamico (propuesta)",
-    "bind_close":     "afinidad fija: hilos juntos",
-    "bind_spread":    "afinidad fija: hilos repartidos",
-    "interleave":     "datos repartidos entre nodos",
-    "bind_close_il":  "hilos juntos + datos repartidos",
-    "bind_spread_il": "hilos repartidos + datos repartidos",
+    "base":           tx("OpenMP sin optimizar", "plain OpenMP (baseline)"),
+    "obs":            tx("solo medir, sin migrar (control)",
+                         "measure only, no migration (control)"),
+    "scheduler":      tx("scheduler dinamico (propuesta)", "dynamic scheduler (proposal)"),
+    "bind_close":     tx("afinidad fija: hilos juntos", "static affinity: threads packed"),
+    "bind_spread":    tx("afinidad fija: hilos repartidos", "static affinity: threads spread"),
+    "interleave":     tx("datos repartidos entre nodos", "data interleaved across nodes"),
+    "bind_close_il":  tx("hilos juntos + datos repartidos",
+                         "threads packed + data interleaved"),
+    "bind_spread_il": tx("hilos repartidos + datos repartidos",
+                         "threads spread + data interleaved"),
 }
 
 COLOR = {
@@ -93,7 +136,12 @@ VERDE_GANA  = AGUA
 ROJO_CUESTA = "#c74845"     # mismo brazo rojo calibrado que la figura 13
 
 
-def rejilla_tam(ncols=3, alto=3.6, ancho=5.4):
+def rejilla_tam(ncols=None, alto=3.6, ancho=5.4):
+    """Una faceta por tamano de TAMANOS. Con un solo tamano manda PANEL_UNICO: el
+    ancho de un tercio de rejilla no da para el titulo de la figura."""
+    ncols = len(TAMANOS) if ncols is None else ncols
+    if PANEL_UNICO and len(TAMANOS) == 1:
+        ancho, alto = PANEL_UNICO
     fig, axes = plt.subplots(1, ncols, figsize=(ancho * ncols, alto), squeeze=False)
     return fig, {t: axes[0][i] for i, t in enumerate(TAMANOS[:ncols])}
 
@@ -102,7 +150,7 @@ def eje_hilos(ax, hilos):
     ax.set_xscale("log", base=2)
     ax.set_xticks(hilos)
     ax.set_xticklabels([str(h) for h in hilos])
-    ax.set_xlabel("numero de hilos")
+    ax.set_xlabel(tx("numero de hilos", "number of threads"))
 
 
 def etiqueta_puntos(ax, xs, ys, fmt="{:.3g}", dy=9, color=None, fontsize=7.5,
@@ -178,11 +226,12 @@ def f01_curva_latencia(figdir):
         for x in (32 * 1024, 1024 * 1024, 32 * 1024 * 1024, 256 * 1024 * 1024):
             a.axvline(x, color=EJE, lw=1, ls=":")
     # Etiquetas de frontera FUERA del marco, en horizontal: dentro y en vertical
-    # se cruzaban con la leyenda y con las propias curvas.
+    # se cruzaban con la leyenda y con las propias curvas. Van sobre el panel de
+    # ABAJO: encima del de arriba quedaban detras del titulo y no se leian enteras.
     for x, txt in [(32 * 1024, "L1d\n32 KiB"), (1024 * 1024, "L2\n1 MiB"),
                    (32 * 1024 * 1024, "L3 chiplet\n32 MiB"),
                    (256 * 1024 * 1024, "L3 nodo\n256 MiB")]:
-        ax.annotate(txt, xy=(x, 1.0), xycoords=("data", "axes fraction"),
+        ax2.annotate(txt, xy=(x, 1.0), xycoords=("data", "axes fraction"),
                     xytext=(0, 6), textcoords="offset points", fontsize=8,
                     color=TINTA_2, ha="center", va="bottom", linespacing=1.15,
                     annotation_clip=False)
@@ -238,16 +287,8 @@ def f02_fronteras(figdir):
     ax.set_ylabel("latencia de lectura (ns)")
     ax.set_ylim(0, max(vals) * 1.32)
 
-    # Los dos saltos, con su factor.
-    if len(vals) == 3:
-        for i, (a, b) in enumerate([(0, 1), (1, 2)]):
-            y = max(vals[a], vals[b]) * 1.10 + i * max(vals) * 0.07
-            ax.annotate("", xy=(a, y), xytext=(b, y),
-                        arrowprops=dict(arrowstyle="<->", color=TINTA_2, lw=1.4))
-            ax.annotate(f"x{vals[b] / vals[a]:.2f}", xy=((a + b) / 2, y),
-                        xytext=(0, 4), textcoords="offset points", ha="center",
-                        fontsize=12, fontweight="bold",
-                        color=ROJO_CUESTA if vals[b] / vals[a] > 2 else TINTA_2)
+    # Sin flechas ni factores dentro del grafico: los dos factores (x4,66 y x1,67)
+    # se dicen en el texto del slide y en la nota al pie.
 
     ax.set_title("Fase 0 — la frontera que domina es el CHIPLET, no el socket",
                  fontsize=13, color=TINTA)
@@ -404,17 +445,21 @@ def f05_tiempo(df, kernel, figdir):
                 etiqueta_puntos(ax, r["threads"], r["avg_ms"],
                                 dy=9 if cfg == "base" else -17, color=COLOR[cfg])
         eje_hilos(ax, hilos)
-        ax.set_ylabel("tiempo por repeticion (ms)")
+        ax.set_ylabel(tx("tiempo por repeticion (ms)", "time per repetition (ms)"))
         ax.set_title(TITULO_TAM.get(tam, tam), fontsize=11.5, color=TINTA)
         ax.margins(y=0.22)
     ejes[TAMANOS[0]].legend(frameon=False, fontsize=9, loc="best")
-    fig.suptitle(f"{KERNELS[kernel]} — tiempo por repeticion  ·  MENOS ES MEJOR",
+    fig.suptitle(f"{KERNELS[kernel]} — {tx('tiempo por repeticion', 'time per repetition')}"
+                 f"  ·  {tx('MENOS ES MEJOR', 'LOWER IS BETTER')}",
                  fontsize=13.5, color=TINTA, y=1.03)
     fig.tight_layout()
-    nota(fig, "Media de 150 repeticiones. La linea punteada es el control: la herramienta "
-              "cargada y midiendo, pero con la migracion apagada. Sirve para separar lo que "
-              "cuesta medir de lo que aporta migrar.")
-    return guardar(fig, figdir, f"p05_{kernel}_tiempo")
+    nota(fig, tx("Media de 150 repeticiones. La linea punteada es el control: la herramienta "
+                 "cargada y midiendo, pero con la migracion apagada. Sirve para separar lo que "
+                 "cuesta medir de lo que aporta migrar.",
+                 "Mean of 150 repetitions. The dotted line is the control: the tool loaded and "
+                 "measuring, but with migration switched off. It separates what measuring costs "
+                 "from what migrating contributes."))
+    return guardar(fig, figdir, f"p05_{kernel}_tiempo{SUFIJO}")
 
 
 def f06_ganancia_pct(df, kernel, figdir):
@@ -453,7 +498,7 @@ def f06_ganancia_pct(df, kernel, figdir):
             if arriba:
                 txt = f"{'^ ' if se_sale else '+'}{v:.1f} %"
             else:
-                txt = f"{v:.1f} %\n{factor:.2f}x mas rapido"
+                txt = f"{v:.1f} %\n{factor:.2f}x " + tx("mas rapido", "faster")
             ax.annotate(txt, xy=(bb.get_x() + bb.get_width() / 2, vr),
                         xytext=(0, 5 if arriba else -6), textcoords="offset points",
                         ha="center", va="bottom" if arriba else "top",
@@ -462,23 +507,33 @@ def f06_ganancia_pct(df, kernel, figdir):
         ax.axhline(0, color=TINTA, lw=1.2)
         ax.set_xticks(x)
         ax.set_xticklabels([str(t) for t in pct.index])
-        ax.set_xlabel("numero de hilos")
-        ax.set_ylabel("frente a OpenMP sin optimizar (%)")
+        ax.set_xlabel(tx("numero de hilos", "number of threads"))
+        ax.set_ylabel(tx("frente a OpenMP sin optimizar (%)", "vs plain OpenMP (%)"))
         ax.set_title(TITULO_TAM_CORTO.get(tam, tam), fontsize=11.5, color=TINTA)
         ax.set_ylim(min(recortado.min(), 0) * 1.45 - 6, max(recortado.max(), 0) * 1.30 + 8)
-    manejadores = [plt.Rectangle((0, 0), 1, 1, color=VERDE_GANA, label="la propuesta GANA tiempo"),
-                   plt.Rectangle((0, 0), 1, 1, color=ROJO_CUESTA, label="la propuesta CUESTA tiempo")]
+    manejadores = [plt.Rectangle((0, 0), 1, 1, color=VERDE_GANA,
+                                 label=tx("la propuesta GANA tiempo",
+                                          "the proposal SAVES time")),
+                   plt.Rectangle((0, 0), 1, 1, color=ROJO_CUESTA,
+                                 label=tx("la propuesta CUESTA tiempo",
+                                          "the proposal COSTS time"))]
     fig.legend(handles=manejadores, loc="upper center", ncol=2,
                bbox_to_anchor=(0.5, 1.02), frameon=False, fontsize=10)
-    fig.suptitle(f"{KERNELS[kernel]} — que aporta el scheduler frente a OpenMP sin optimizar",
+    fig.suptitle(f"{KERNELS[kernel]} — "
+                 + tx("que aporta el scheduler frente a OpenMP sin optimizar",
+                      "what the scheduler contributes vs plain OpenMP"),
                  fontsize=13.5, color=TINTA, y=1.10)
     fig.tight_layout()
-    nota(fig, "El color y la leyenda dicen el sentido; el numero solo dice la magnitud. Las "
-              "barras verdes llevan ademas el factor de aceleracion, para no tener que leer un "
-              "porcentaje negativo como si fuera algo malo. Una barra marcada con ^ se sale del "
-              "eje: se ha acotado la escala para que el resto del panel siga siendo legible, "
-              "pero la etiqueta lleva su valor real.")
-    return guardar(fig, figdir, f"p06_{kernel}_ganancia_pct")
+    nota(fig, tx("El color y la leyenda dicen el sentido; el numero solo dice la magnitud. Las "
+                 "barras verdes llevan ademas el factor de aceleracion, para no tener que leer un "
+                 "porcentaje negativo como si fuera algo malo. Una barra marcada con ^ se sale del "
+                 "eje: se ha acotado la escala para que el resto del panel siga siendo legible, "
+                 "pero la etiqueta lleva su valor real.",
+                 "Colour and legend carry the direction; the number only carries the magnitude. "
+                 "Green bars also show the speed-up factor, so a negative percentage need not be "
+                 "read as something bad. A bar marked ^ runs off the axis: the scale is capped so "
+                 "the rest of the panel stays legible, but its label shows the real value."))
+    return guardar(fig, figdir, f"p06_{kernel}_ganancia_pct{SUFIJO}")
 
 
 def _segmento(ax, x, ancho, y0, y1, color, alpha=1.0, hatch=None, z=3):
@@ -521,7 +576,9 @@ def f07_descomposicion_apilada(df, kernel, figdir):
     d = solo_tamanos(df[df["kernel"] == kernel])
     if d.empty:
         return None
-    fig, ejes_a = plt.subplots(1, 3, figsize=(19.5, 5.6), squeeze=False)
+    n_tam = len(TAMANOS)
+    tam_fig = PANEL_UNICO if (PANEL_UNICO and n_tam == 1) else (6.5 * n_tam, 5.6)
+    fig, ejes_a = plt.subplots(1, n_tam, figsize=tam_fig, squeeze=False)
     ejes = {t: ejes_a[0][i] for i, t in enumerate(TAMANOS)}
 
     for tam, ax in ejes.items():
@@ -552,7 +609,8 @@ def f07_descomposicion_apilada(df, kernel, figdir):
                         textcoords="offset points", ha="center", va="bottom",
                         fontsize=8, color="white", fontweight="bold", zorder=6)
             if cy is not None and abs(tb - ts) > 0.07 * max(tb, ts, to):
-                ax.annotate(f"{'ahorra' if gana else 'anade'}\n{abs(tb - ts):.3g}",
+                etq = tx("ahorra", "saves") if gana else tx("anade", "adds")
+                ax.annotate(f"{etq}\n{abs(tb - ts):.3g}",
                             xy=(xd, cy), ha="center", va="center", fontsize=8,
                             color=TINTA, fontweight="bold", zorder=7, linespacing=1.05)
 
@@ -568,34 +626,45 @@ def f07_descomposicion_apilada(df, kernel, figdir):
         ax.axhline(0, color=TINTA, lw=1)
         ax.set_xticks(x)
         ax.set_xticklabels([str(t) for t in hilos])
-        ax.set_xlabel("numero de hilos")
-        ax.set_ylabel("tiempo por repeticion (ms)")
+        ax.set_xlabel(tx("numero de hilos", "number of threads"))
+        ax.set_ylabel(tx("tiempo por repeticion (ms)", "time per repetition (ms)"))
         ax.set_title(TITULO_TAM_CORTO.get(tam, tam), fontsize=11.5, color=TINTA)
         ax.margins(y=0.18)
 
     manejadores = [
-        plt.Rectangle((0, 0), 1, 1, color=AZUL, label="OpenMP sin optimizar (referencia)"),
-        plt.Rectangle((0, 0), 1, 1, color=AGUA, label="tiempo final con la propuesta"),
+        plt.Rectangle((0, 0), 1, 1, color=AZUL,
+                      label=tx("OpenMP sin optimizar (referencia)", "plain OpenMP (reference)")),
+        plt.Rectangle((0, 0), 1, 1, color=AGUA,
+                      label=tx("tiempo final con la propuesta", "final time with the proposal")),
         plt.Rectangle((0, 0), 1, 1, facecolor=VERDE_GANA, alpha=0.42, hatch="//",
-                      label="lo que el usuario se ahorra"),
+                      label=tx("lo que el usuario se ahorra", "what the user saves")),
         plt.Rectangle((0, 0), 1, 1, facecolor=ROJO_CUESTA, alpha=0.42, hatch="//",
-                      label="lo que la propuesta anade"),
+                      label=tx("lo que la propuesta anade", "what the proposal adds")),
         plt.Line2D([], [], color=ROJO_CUESTA, lw=2, ls=(0, (2, 1.4)),
-                   label="control: medir sin migrar"),
+                   label=tx("control: medir sin migrar", "control: measure without migrating")),
     ]
     fig.legend(handles=manejadores, loc="upper center", ncol=5,
                bbox_to_anchor=(0.5, 1.03), frameon=False, fontsize=9.5)
-    fig.suptitle(f"{KERNELS[kernel]} — de donde sale la ganancia: migrar recupera mas de lo que se ve",
+    fig.suptitle(f"{KERNELS[kernel]} — "
+                 + tx("de donde sale la ganancia: migrar recupera mas de lo que se ve",
+                      "where the gain comes from: migrating recovers more than you see"),
                  fontsize=13.5, color=TINTA, y=1.10)
     fig.tight_layout()
-    nota(fig, "La llave de la derecha va del tiempo de la propuesta a la marca del control: eso "
-              "es LO QUE APORTA MIGRAR. La capa rayada sola es lo que el usuario acaba notando. "
-              "La diferencia entre las dos es lo que cuesta el instrumento. Es una identidad "
-              "exacta, no una estimacion: lo_que_aporta_migrar = ahorro_final + coste_del_"
-              "instrumento. Cuando la marca roja del control queda POR ENCIMA de la barra azul, "
-              "el instrumento esta costando tiempo; cuando queda por debajo, esa diferencia es "
-              "ruido de medida entre procesos distintos.")
-    return guardar(fig, figdir, f"p07_{kernel}_descomposicion")
+    nota(fig, tx("La llave de la derecha va del tiempo de la propuesta a la marca del control: eso "
+                 "es LO QUE APORTA MIGRAR. La capa rayada sola es lo que el usuario acaba notando. "
+                 "La diferencia entre las dos es lo que cuesta el instrumento. Es una identidad "
+                 "exacta, no una estimacion: lo_que_aporta_migrar = ahorro_final + coste_del_"
+                 "instrumento. Cuando la marca roja del control queda POR ENCIMA de la barra azul, "
+                 "el instrumento esta costando tiempo; cuando queda por debajo, esa diferencia es "
+                 "ruido de medida entre procesos distintos.",
+                 "The bracket on the right spans from the proposal's time to the control mark: "
+                 "that is WHAT MIGRATING CONTRIBUTES. The hatched layer alone is what the user "
+                 "actually notices. The difference between the two is what the instrument costs. "
+                 "It is an exact identity, not an estimate: what_migrating_contributes = "
+                 "final_saving + instrument_cost. When the red control mark sits ABOVE the blue "
+                 "bar, the instrument is costing time; when it sits below, that difference is "
+                 "measurement noise between separate processes."))
+    return guardar(fig, figdir, f"p07_{kernel}_descomposicion{SUFIJO}")
 
 
 # Las cinco que entran en la comparacion del mazo. Se dejan FUERA a proposito:
@@ -636,20 +705,33 @@ def f08_estaticas_lineas(df, kernel, figdir):
                                 dy=10 if cfg == "base" else -18, color=COLOR[cfg])
         eje_hilos(ax, hilos)
         ax.set_yscale("log")
-        ax.set_ylabel("tiempo por repeticion (ms, escala log)")
+        ax.set_ylabel(tx("tiempo por repeticion (ms, escala log)",
+                         "time per repetition (ms, log scale)"))
         ax.set_title(TITULO_TAM.get(tam, tam), fontsize=11.5, color=TINTA)
         ax.margins(y=0.20)
     ejes[TAMANOS[0]].legend(frameon=False, fontsize=8.5, loc="best")
-    fig.suptitle(f"{KERNELS[kernel]} — la propuesta frente a las optimizaciones estaticas"
-                 "  ·  MENOS ES MEJOR",
+    fig.suptitle(f"{KERNELS[kernel]} — "
+                 + tx("la propuesta frente a las optimizaciones estaticas  ·  MENOS ES MEJOR",
+                      "the proposal vs the static optimizations  ·  LOWER IS BETTER"),
                  fontsize=13.5, color=TINTA, y=1.03)
     fig.tight_layout()
-    nota(fig, "Cada linea cambia UNA cosa respecto a OpenMP sin optimizar: o donde se colocan "
-              "los hilos (juntos / repartidos), o donde se colocan los datos (repartidos entre "
-              "nodos), o el mecanismo dinamico. Las combinaciones que cambian las dos a la vez "
-              "se dejan fuera a proposito, para que cada comparacion tenga una sola variable. "
-              "Escala logaritmica porque los tres tamanos abarcan tres ordenes de magnitud.")
-    return guardar(fig, figdir, f"p08_{kernel}_estaticas")
+    texto_est = tx("Cada linea cambia UNA cosa respecto a OpenMP sin optimizar: o donde se "
+                   "colocan los hilos (juntos / repartidos), o donde se colocan los datos "
+                   "(repartidos entre nodos), o el mecanismo dinamico. Las combinaciones que "
+                   "cambian las dos a la vez se dejan fuera a proposito, para que cada "
+                   "comparacion tenga una sola variable.",
+                   "Each line changes ONE thing with respect to plain OpenMP: either where the "
+                   "threads are placed (packed / spread), or where the data is placed "
+                   "(interleaved across nodes), or the dynamic mechanism. The combinations that "
+                   "change both at once are deliberately left out, so that every comparison has "
+                   "a single variable.")
+    if len(TAMANOS) > 1:
+        texto_est += tx(" Escala logaritmica porque los tres tamanos abarcan tres ordenes "
+                        "de magnitud.",
+                        " Logarithmic scale because the three sizes span three orders of "
+                        "magnitude.")
+    nota(fig, texto_est)
+    return guardar(fig, figdir, f"p08_{kernel}_estaticas{SUFIJO}")
 
 
 def f09_trafico(df, kernel, figdir):
@@ -691,11 +773,245 @@ def f09_trafico(df, kernel, figdir):
                  "  ·  MENOS ES MEJOR",
                  fontsize=13.5, color=TINTA, y=1.03)
     fig.tight_layout()
-    nota(fig, "Se comparan las dos configuraciones que llevan el instrumento cargado, para que "
-              "la unica diferencia entre ellas sea migrar o no migrar. En las 13 ejecuciones en "
-              "que el scheduler llego a migrar, esta barra bajo SIN EXCEPCION: hasta 27 veces "
-              "menos en SpMV a 4,1 GiB con 8 hilos.")
-    return guardar(fig, figdir, f"p09_{kernel}_trafico")
+    if kernel == "spmv_static":
+        nota(fig, "Se comparan las dos configuraciones que llevan el instrumento cargado, para que "
+                  "la unica diferencia entre ellas sea migrar o no migrar. En las 13 ejecuciones en "
+                  "que el scheduler llego a migrar, esta barra bajo SIN EXCEPCION: hasta 27 veces "
+                  "menos en SpMV a 4,1 GiB con 8 hilos.")
+    else:
+        nota(fig, _nota_trafico_desde_datos(d, kernel))
+    return guardar(fig, figdir, f"p09_{kernel}_trafico{SUFIJO}")
+
+
+def _nota_trafico_desde_datos(d, kernel):
+    """Nota de la figura de trafico calculada con los datos del kernel, para que
+    nunca vuelva a citar cifras de otro kernel. Solo afirma que las barras que
+    suben son de ejecuciones sin migrar si los datos lo confirman."""
+    etiqueta = {"S3": "S3 (191 MiB)", "S4": "S4 (1,0 GiB)", "S5": "S5 (4,1 GiB)"}
+    sc = d[d["config"] == "scheduler"].set_index(["size_tag", "threads"])
+    ob = d[d["config"] == "obs"].set_index(["size_tag", "threads"])
+    comun = sc.index.intersection(ob.index)
+    sc, ob = sc.loc[comun], ob.loc[comun]
+    migro = sc["migrations"].fillna(0) > 0
+    bajo = sc["ratio_rm"] < ob["ratio_rm"]
+    subio = sc["ratio_rm"] > ob["ratio_rm"]
+    texto = ("Se comparan las dos configuraciones que llevan el instrumento cargado, para que "
+             "la unica diferencia entre ellas sea migrar o no migrar. ")
+    n = int(migro.sum())
+    if n == 0:
+        return texto + f"En el {KERNELS[kernel]} el scheduler no llego a migrar en S3-S5."
+    factor = (ob["ratio_rm"] / sc["ratio_rm"])[migro]
+    tam, hil = factor.idxmax()
+    texto += (f"El {KERNELS[kernel]} migro en {n} ejecuciones y en {int((migro & bajo).sum())} "
+              f"de ellas esta barra bajo; el mayor descenso es {factor.max():.0f} veces menos, "
+              f"en {etiqueta.get(tam, tam)} con {hil} hilos.")
+    if subio.any() and not (subio & migro).any():
+        texto += (" Las barras que suben son todas de ejecuciones sin ninguna migracion: dos "
+                  "procesos distintos, no un efecto del mecanismo.")
+    return texto
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# BLOQUE 4 — throughput en las unidades del plan de trabajo: MLUPS, GFLOPS, GiB/s
+# ═════════════════════════════════════════════════════════════════════════════
+
+def fmt_valor(v):
+    """Etiqueta legible en cualquier escala: nada de 1.45e+04 sobre un punto que
+    hay que senalar en voz alta."""
+    a = abs(v)
+    if a >= 1000:
+        # Separador de millares: espacio en espanol, coma en ingles.
+        return f"{v:,.0f}" if IDIOMA == "en" else f"{v:,.0f}".replace(",", " ")
+    if a >= 100:
+        return f"{v:.0f}"
+    if a >= 10:
+        return f"{v:.1f}"
+    return f"{v:.2f}"
+
+
+def gibs_del_plan(d):
+    """GiB/s como lo define el marco teorico: bytes que recorre una pasada del
+    kernel, dividido por (t * 2^30), con t el tiempo medio de una pasada.
+
+    Usa caudal_util_gibs si el CSV la trae (campanas hasta V5) y la reconstruye si
+    no, porque V6 la quito de los kernels. La reconstruccion es EXACTA: los bytes
+    estan fijados por el tamano del problema, asi que la columna siempre fue
+    bytes_constantes / t. Contra perf_out_v5 el error relativo maximo es 4e-6, que
+    es el redondeo a 6 decimales con que el kernel escribe avg_ms.
+
+      SpMV:    ws_bytes = 8*nnz + 4*nnz + 4*(N+1) + 8*N + 8*N  -> la formula del
+               marco teorico (ValueType = double, IndexType = int)
+      Stencil: 6 accesos * 4 B * (N-2)^2  -> 5 lecturas + 1 escritura por punto.
+               Modelo nominal que sobreestima el trafico real ~3x (convencion
+               declarada en MARCO_TEORICO.md); vale para comparar configuraciones
+               del mismo tamano, no como ancho de banda fisico."""
+    t_s = d["avg_ms"].astype(float) / 1000.0
+    bytes_pasada = np.where(d["kernel"] == "stencil",
+                            (d["n_or_rows"].astype(float) - 2) ** 2 * 6 * 4,
+                            d["ws_bytes"].astype(float))
+    derivado = pd.Series(bytes_pasada, index=d.index) / 2**30 / t_s
+    if "caudal_util_gibs" in d.columns:
+        return d["caudal_util_gibs"].where(d["caudal_util_gibs"].notna(), derivado)
+    return derivado
+
+
+METRICAS = {
+    "mlups": dict(
+        prefijo="p10", kernels=("stencil",), eje="MLUPS",
+        titulo=tx("MLUPS: millones de puntos de malla actualizados por segundo",
+                  "MLUPS: millions of grid points updated per second"),
+        nota={"stencil": tx(
+              "MLUPS = (N-2)^2 / (t * 10^6): puntos interiores de la malla actualizados por "
+              "segundo, en millones, con t = tiempo medio de una pasada. Es la metrica de "
+              "throughput que el plan de trabajo fija para el Stencil 2D. Se calcula a partir del "
+              "tiempo medio: la razon entre dos lineas es exactamente la inversa de la razon entre "
+              "sus tiempos, asi que no es evidencia independiente sino el mismo resultado en la "
+              "unidad del plan. La linea punteada es el control (medir sin migrar).",
+              "MLUPS = (N-2)^2 / (t * 10^6): interior grid points updated per second, in "
+              "millions, with t = mean time of one sweep. It is the throughput metric the thesis "
+              "plan sets for the 2D Stencil. It is computed from the mean time: the ratio between "
+              "two lines is exactly the inverse of the ratio between their times, so it is not "
+              "independent evidence but the same result in the plan's unit. The dotted line is "
+              "the control (measuring without migrating).")}),
+    "gflops": dict(
+        prefijo="p11", kernels=("spmv_static", "stencil"), eje="GFLOPS",
+        titulo=tx("GFLOPS: miles de millones de operaciones de coma flotante por segundo",
+                  "GFLOPS: billions of floating-point operations per second"),
+        nota={"spmv_static": tx(
+              "GFLOPS = 2 * nnz / (t * 10^9): una multiplicacion y una suma por cada no-cero de la "
+              "matriz, en miles de millones por segundo. Se calcula a partir del tiempo medio: la "
+              "razon entre dos lineas es la inversa de la razon entre sus tiempos. Es la unica "
+              "unidad que pone los dos kernels en la misma escala. La linea punteada es el control.",
+              "GFLOPS = 2 * nnz / (t * 10^9): one multiplication and one addition for every "
+              "non-zero of the matrix, in billions per second. It is computed from the mean time: "
+              "the ratio between two lines is the inverse of the ratio between their times. It is "
+              "the only unit that puts both kernels on the same scale. The dotted line is the "
+              "control."),
+              "stencil": tx(
+              "GFLOPS = 5 * (N-2)^2 / (t * 10^9): cuatro sumas y una multiplicacion por punto. En el "
+              "Stencil es EXACTAMENTE MLUPS / 200, la misma curva que la figura de MLUPS con otra "
+              "escala. Su utilidad es poner los dos kernels en la misma unidad. La linea punteada "
+              "es el control.",
+              "GFLOPS = 5 * (N-2)^2 / (t * 10^9): four additions and one multiplication per point. "
+              "In the Stencil it is EXACTLY MLUPS / 200, the same curve as the MLUPS figure on "
+              "another scale. Its use is to put both kernels in the same unit. The dotted line is "
+              "the control.")}),
+    "gibs": dict(
+        prefijo="p12", kernels=("spmv_static", "stencil"), eje="GiB/s",
+        titulo=tx("GiB/s: datos del kernel recorridos por segundo",
+                  "GiB/s: kernel data traversed per second"),
+        nota={"spmv_static": tx(
+              "GiB/s = (8*nnz + 4*nnz + 4*(N+1) + 8*N + 8*N) / (t * 2^30): los bytes de val, colidx, "
+              "rowptr, x e y que recorre un producto matriz-vector, por segundo. Es la formula del "
+              "marco teorico. Sale del tiempo medio: NO es el trafico medido con contadores, que "
+              "esta en la figura del mecanismo. En S3 los datos caben en la L3 del nodo y los sirve "
+              "la cache, por eso los valores son mayores. La linea punteada es el control.",
+              "GiB/s = (8*nnz + 4*nnz + 4*(N+1) + 8*N + 8*N) / (t * 2^30): the bytes of val, "
+              "colidx, rowptr, x and y that one matrix-vector product traverses, per second. It is "
+              "the formula from the theoretical framework. It comes from the mean time: it is NOT "
+              "the traffic measured with counters, which is in the mechanism figure. In S3 the "
+              "data fits in the node's L3 and the cache serves it, which is why the values are "
+              "higher. The dotted line is the control."),
+              "stencil": tx(
+              "GiB/s = 6 * 4 B * (N-2)^2 / (t * 2^30): cinco lecturas y una escritura por punto, por "
+              "segundo. Modelo NOMINAL: supone que cada acceso va a memoria; con la reutilizacion "
+              "de cache del barrido por filas sobreestima el trafico real unas 3 veces, y en S3, "
+              "donde los datos caben en la cache, no representa trafico de memoria. Sirve para "
+              "comparar configuraciones del mismo tamano, no como ancho de banda fisico. La linea "
+              "punteada es el control.",
+              "GiB/s = 6 * 4 B * (N-2)^2 / (t * 2^30): five reads and one write per point, per "
+              "second. NOMINAL model: it assumes every access goes to memory; with the cache reuse "
+              "of the row-wise sweep it overestimates the real traffic by about 3x, and in S3, "
+              "where the data fits in cache, it does not represent memory traffic. Use it to "
+              "compare configurations of the same size, not as physical bandwidth. The dotted "
+              "line is the control.")}),
+}
+
+
+# Frases de las notas que solo tienen sentido si S3 esta EN la figura. En las
+# variantes de un solo tamano (TAMANOS_FIG=S5) describirian un panel que no esta,
+# asi que se quitan del texto ya compuesto.
+FRASES_SOLO_SI_S3 = {
+    "spmv_static": tx(" En S3 los datos caben en la L3 del nodo y los sirve la cache, "
+                      "por eso los valores son mayores.",
+                      " In S3 the data fits in the node's L3 and the cache serves it, "
+                      "which is why the values are higher."),
+    "stencil": tx(", y en S3, donde los datos caben en la cache, no representa trafico "
+                  "de memoria",
+                  ", and in S3, where the data fits in cache, it does not represent "
+                  "memory traffic"),
+}
+
+
+def f10_throughput(df, kernel, metrica, figdir):
+    """Una figura por metrica y kernel, con las mismas tres series que la figura
+    del tiempo (p05) para que se lean una al lado de la otra: OpenMP sin
+    optimizar, el control punteado y la propuesta. MAS ES MEJOR.
+
+    Etiquetas: en cada numero de hilos, la mayor de las dos lineas lleva su valor
+    ENCIMA y la menor DEBAJO. Con una posicion fija por serie, las etiquetas se
+    montaban justo en los puntos donde las lineas se cruzan, que es donde mas
+    interesa senalar."""
+    spec = METRICAS[metrica]
+    if kernel not in spec["kernels"]:
+        return None
+    d = solo_tamanos(df[(df["kernel"] == kernel) &
+                        df["config"].isin(["base", "obs", "scheduler"])]).copy()
+    if d.empty:
+        return None
+    if metrica == "gibs":
+        d["valor"] = gibs_del_plan(d)
+    elif metrica in d.columns:
+        d["valor"] = pd.to_numeric(d[metrica], errors="coerce")
+    else:
+        return None
+    if d["valor"].isna().all():
+        return None
+
+    fig, ejes = rejilla_tam(alto=4.0)
+    for tam, ax in ejes.items():
+        sub = d[d["size_tag"] == tam]
+        hilos = sorted(sub["threads"].unique())
+        serie = {}
+        for cfg, estilo_l, grosor in [("base", "-", 2.2), ("obs", ":", 1.4),
+                                      ("scheduler", "-", 2.2)]:
+            r = sub[sub["config"] == cfg].sort_values("threads")
+            if r.empty:
+                continue
+            ax.plot(r["threads"], r["valor"], marker="o", ms=5, lw=grosor,
+                    ls=estilo_l, color=COLOR[cfg], label=NOMBRE[cfg])
+            serie[cfg] = r.set_index("threads")["valor"]
+        if {"base", "scheduler"} <= serie.keys():
+            for h in hilos:
+                vb, vs = serie["base"].get(h), serie["scheduler"].get(h)
+                if vb is None or vs is None:
+                    continue
+                for cfg, v, arriba in [("scheduler", vs, vs >= vb), ("base", vb, vs < vb)]:
+                    if not np.isfinite(v):
+                        continue
+                    # Fondo del color de la superficie: los marcadores grises del
+                    # control caen a menudo justo debajo de una etiqueta y la dejaban
+                    # ilegible ("19 143" se leia "19 .43").
+                    ax.annotate(fmt_valor(v), xy=(h, v), xytext=(0, 8 if arriba else -8),
+                                textcoords="offset points", ha="center",
+                                va="bottom" if arriba else "top", fontsize=7.5,
+                                color=COLOR[cfg], zorder=7, clip_on=False,
+                                bbox=dict(boxstyle="round,pad=0.12", fc=SUPERFICIE,
+                                          ec="none", alpha=0.9))
+        eje_hilos(ax, hilos)
+        ax.set_ylabel(spec["eje"])
+        ax.set_title(TITULO_TAM.get(tam, tam), fontsize=11.5, color=TINTA)
+        ax.margins(y=0.22)
+    ejes[TAMANOS[0]].legend(frameon=False, fontsize=9, loc="best")
+    fig.suptitle(f"{KERNELS[kernel]} — {spec['titulo']}"
+                 f"  ·  {tx('MAS ES MEJOR', 'HIGHER IS BETTER')}",
+                 fontsize=13.5, color=TINTA, y=1.03)
+    fig.tight_layout()
+    texto = spec["nota"][kernel]
+    if "S3" not in TAMANOS:
+        texto = texto.replace(FRASES_SOLO_SI_S3.get(kernel, "\0"), "")
+    nota(fig, texto)
+    return guardar(fig, figdir, f"{spec['prefijo']}_{kernel}_{metrica}{SUFIJO}")
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -706,20 +1022,40 @@ def main():
     df = cargar(CAMPANA)
     generadas = []
 
-    for f in (f01_curva_latencia, f02_fronteras):
-        r = f(FIGDIR)
-        if r:
-            generadas.append(r)
-    for f in (f03_por_que_no_s0s2, f04_migraciones):
-        r = f(df, FIGDIR)
-        if r:
-            generadas.append(r)
+    kernels_pedidos = os.environ.get("KERNELS_FIG", "").replace(",", " ").split()
+    figs_pedidas = os.environ.get("FIGURAS", "").replace(",", " ").split()
+    subconjunto = bool(_pedidos or kernels_pedidos or figs_pedidas)
+
+    # Las 01-04 son figuras de contexto (Fase 0, y por que S0-S2 queda fuera), no
+    # del recorrido de un kernel: no tienen version "solo S5" y se saltan en cuanto
+    # se pide un subconjunto, para no reescribirlas con el mismo contenido.
+    if not subconjunto:
+        for f in (f01_curva_latencia, f02_fronteras):
+            r = f(FIGDIR)
+            if r:
+                generadas.append(r)
+        for f in (f03_por_que_no_s0s2, f04_migraciones):
+            r = f(df, FIGDIR)
+            if r:
+                generadas.append(r)
+
     for kernel in KERNELS:
         if (df["kernel"] == kernel).sum() == 0:
             continue
-        for f in (f05_tiempo, f06_ganancia_pct, f07_descomposicion_apilada,
-                  f08_estaticas_lineas, f09_trafico):
+        if kernels_pedidos and kernel not in kernels_pedidos:
+            continue
+        for codigo, f in (("05", f05_tiempo), ("06", f06_ganancia_pct),
+                          ("07", f07_descomposicion_apilada),
+                          ("08", f08_estaticas_lineas), ("09", f09_trafico)):
+            if figs_pedidas and codigo not in figs_pedidas:
+                continue
             r = f(df, kernel, FIGDIR)
+            if r:
+                generadas.append(r)
+        for metrica, spec in METRICAS.items():
+            if figs_pedidas and spec["prefijo"].lstrip("p") not in figs_pedidas:
+                continue
+            r = f10_throughput(df, kernel, metrica, FIGDIR)
             if r:
                 generadas.append(r)
 

@@ -1,2 +1,0 @@
-strategy,n,ws_bytes,threads,warmup,reps,min_ms,avg_ms,max_ms,stddev_ms,mlups,gflops
-OpenMP-SeqInit,5000,200000000,16,5,150,0.892000,0.924567,0.967561,0.015742,27018.055932,135.090280

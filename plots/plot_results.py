@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""Figuras de las campañas V5 y V6 — seaborn, solo PNG, una carpeta por campaña.
-
-Las figuras son LAS MISMAS para las dos campañas: mismas configuraciones, mismas
-series, mismos nombres de fichero. En V6 la serie `scheduler` sale del disparador
-con el umbral al minimo alcanzable; la comparacion V5/V6 se hace poniendo las dos
-figuras lado a lado, no dentro de una misma figura:
-    --outdir perf_out_v5 --figdir plots/figuras      (V5)
-    --outdir perf_out_v6 --figdir plots/figuras_v6   (V6, por defecto)
+"""Figuras de la campaña V5 — seaborn, solo PNG, todo en plots/figuras.
 
 QUÉ CAMBIA RESPECTO A LA VERSIÓN ANTERIOR
 -----------------------------------------
@@ -1032,8 +1025,8 @@ def fig_comparacion_completa(df, kernel, figdir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--outdir", default="perf_out_v6")
-    ap.add_argument("--figdir", default="plots/figuras_v6")
+    ap.add_argument("--outdir", default="perf_out_v5")
+    ap.add_argument("--figdir", default="plots/figuras")
     ap.add_argument("--hilos-barrido", type=int, default=None)
     args = ap.parse_args()
 

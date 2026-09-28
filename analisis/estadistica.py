@@ -223,13 +223,13 @@ def cargar_tiempos(outdir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--outdir", default="perf_out_v6")
+    ap.add_argument("--outdir", default="perf_out_v5")
     ap.add_argument("--destino", default=None,
-                    help="por defecto analisis/<sufijo del outdir>, p.ej. analisis/v6")
+                    help="por defecto analisis/<sufijo del outdir>, p.ej. analisis/v5")
     ap.add_argument("--alfa", type=float, default=0.05)
     args = ap.parse_args()
 
-    # Destino derivado, igual que las figuras: perf_out_v6 -> analisis/v6. Con un
+    # Destino derivado, igual que las figuras: perf_out_v5 -> analisis/v5. Con un
     # destino constante, la segunda campana sobrescribia los CSV de la primera.
     if args.destino is None:
         base = os.path.basename(os.path.normpath(args.outdir))

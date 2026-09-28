@@ -19,40 +19,6 @@
 //     por picos aislados y exige elevación SOSTENIDA.
 //   - Cuando el balde supera su capacidad CAP => se marca para migrar UNA vez.
 //
-//   DOS ORÍGENES POSIBLES PARA EL UMBRAL  (OMPT_REFERENCIA)
-//   --------------------------------------------------------------------------
-//   `media` (por defecto, el mecanismo de la campaña V5)
-//        T = g_ref + LEAK_MARGIN_SIG * g_dev
-//        PUNTO CIEGO MEDIDO Y DEMOSTRADO (ver LIMITE_DISPARADOR_BIMODAL.md):
-//        normalizando, la distancia de un hilo mal colocado al umbral vale
-//        z = (ratio - g_ref)/g_dev = 1/(2p), donde p es la FRACCIÓN de hilos mal
-//        colocados. La gravedad del fallo se cancela, así que el disparador solo
-//        puede actuar si p < 1/2 — y p = 1/2 (media plantilla en el nodo
-//        equivocado) es justamente el fallo NUMA de manual. Medido en exadell:
-//        32 hilos a ratio~0 y 32 a ratio~0.61, T/ratio_malo = 1.0048, cero
-//        migraciones. Cuanto peor es el desequilibrio, más sube el listón que
-//        debía detectarlo.
-//
-//   `min` (campaña V6, la corrección)
-//        T = g_min + margen,  margen = max(OMPT_MARGEN_MIN,
-//                                          REF_MIN_SIG * g_dev_low)
-//        g_min    = EWMA del ratio_rm MÍNIMO de la ventana. Un hilo con ratio
-//                   bajo DEMUESTRA empíricamente que en esta ejecución existe
-//                   una colocación buena; cualquiera muy por encima está mal
-//                   colocado, sea mayoría o minoría.
-//        g_dev_low= EWMA de la MAD respecto al mínimo, restringida a los hilos
-//                   POR DEBAJO del agregado. En una población bimodal ese
-//                   subconjunto ES el modo bueno, así que mide ruido y no la
-//                   separación entre modos — que es lo que contamina a g_dev.
-//        El piso absoluto es lo que impide que el ruido de una población
-//        homogénea dispare: ratio_rm ya es una fracción, así que un margen
-//        constante es adimensional y no depende de la escala del problema.
-//        Con este origen, z = (ratio - g_min)/margen NO depende de p.
-//
-//        Limitación declarada: si NINGÚN hilo está bien colocado (p = 1) no hay
-//        mínimo que sirva de evidencia y tampoco dispara. Ninguna referencia
-//        relativa puede con ese caso; haría falta un umbral absoluto.
-//
 //   Migración: hwloc_set_thread_cpubind() — NUMA-aware, overhead mínimo.
 //   Requisito: cada hilo migra COMO MÁXIMO 1 vez (MAX_MIGRATIONS = 1).
 //   Compatible con numactl --interleave=all (no se cambia la política de páginas).
@@ -74,10 +40,6 @@
 //   OMPT_VERBOSE=1          reactiva el trazo por ventana y por región
 //   OMPT_DISABLE_MIGRATION=1  monitorea y registra igual, pero nunca migra
 //                             (configuraciones de control para medir overhead)
-//   OMPT_REFERENCIA=media|min  origen del umbral (por defecto 'media', el
-//                             mecanismo V5, para no cambiar nada en silencio)
-//   OMPT_MARGEN_MIN=<0..1>    piso absoluto del margen en modo 'min' (0.05)
-//   OMPT_MIN_SIG=<x>          multiplicador de g_dev_low en modo 'min' (3.0)
 //
 // Compilar:
 //   clang++ -std=c++17 -fPIC -shared -fopenmp -pthread -O2 \
@@ -124,21 +86,6 @@ static constexpr double   DEV_FLOOR         = 0.005;  // piso de dispersión (ev
 static constexpr double   LEAK_MARGIN_SIG   = 1.0;    // umbral T = g_ref + LEAK_MARGIN_SIG*dev
 static constexpr double   LEAK_RATE_SIG     = 0.5;    // fuga por ventana (en MAD) cuando ratio<=T
 static constexpr double   LEAK_CAP_SIG      = 8.0;    // capacidad del balde (en MAD) -> dispara
-
-// ── Modo 'min': el umbral cuelga del MÍNIMO alcanzable, no del promedio ──────
-// El piso es un margen ABSOLUTO en unidades de ratio_rm (una fracción), no un
-// múltiplo de la dispersión: usar la dispersión como unidad es exactamente lo
-// que produce el punto ciego bimodal del modo 'media'. 0.05 = cinco puntos
-// porcentuales de fracción remota por encima del mejor hilo de la corrida.
-static constexpr double   REF_MARGEN_MIN    = 0.05;
-// Multiplicador de g_dev_low. NO se reutiliza LEAK_MARGIN_SIG: son dos cosas
-// distintas. Este solo actúa cuando la población es homogénea pero ruidosa —en
-// una bimodal g_dev_low ~ 0 y manda el piso absoluto—, así que subirlo protege
-// contra falsos positivos SIN tocar el caso que hay que arreglar. Con 3.0, una
-// población de ratio 0,30 +- 0,10 exige 17 ventanas de evidencia sostenida antes
-// de mover a los dos peores hilos; con 1.0 movía seis de ocho en cinco ventanas.
-static constexpr double   REF_MIN_SIG       = 3.0;
-enum RefModo { REF_MEDIA = 0, REF_MIN = 1 };
 
 // Una sola migración por hilo (requisito).
 static constexpr uint64_t MAX_MIGRATIONS    = 1;
@@ -192,16 +139,6 @@ static hwloc_cpuset_t   g_node_cpusets[MAX_NUMA_NODES];
 static double g_ref      = 0.0;   // EWMA del ratio_rm agregado de la ventana
 static double g_dev      = 0.0;   // EWMA de la MAD entre hilos
 static bool   g_ref_init = false;
-
-// Modo 'min' (V6). g_min es la evidencia de que existe una colocación buena;
-// g_dev_low es el ruido de los hilos que YA la tienen. Los dos se actualizan
-// siempre, en los dos modos, para que el CSV de ventanas permita comparar los
-// dos criterios sobre la MISMA corrida sin repetirla.
-static double g_min      = 0.0;   // EWMA del ratio_rm mínimo de la ventana
-static double g_dev_low  = 0.0;   // EWMA de la MAD del grupo bien colocado
-static int    g_ref_modo = REF_MEDIA;
-static double g_margen_min_abs = REF_MARGEN_MIN;
-static double g_min_sig        = REF_MIN_SIG;
 
 // =============================================================================
 // Contadores de diagnóstico y de overhead intrínseco
@@ -462,8 +399,6 @@ struct WindowRow {
     uint64_t d_rm, d_all;
     double   ratio;      // -1 => el hilo no tiene los eventos NUMA
     double   bucket, thr_T, ref, dev;
-    double   min_ref;    // g_min de la ventana (evidencia de colocación buena)
-    double   margen;     // T - origen: la unidad en la que se mide el exceso
     int      flagged;    // 1 => en esta ventana el balde cruzó la capacidad
 };
 static WindowRow* g_window_rows = nullptr;
@@ -786,24 +721,13 @@ static pthread_t         g_monitor_pthread;
 static bool              g_monitor_valid = false;
 
 static void* monitor_loop(void*) {
-    if (g_ref_modo == REF_MIN) {
-        fprintf(stderr,
-            "[OMPT][MON] Monitor (C: integrador con fugas)  período=%dms"
-            "  warmup=%d  referencia=MIN  T=min+max(%.3f, %.2f*MAD_bajo)"
-            "  leak=%.2f*margen  cap=%.2f*margen  max_mig=%" PRIu64
-            "  migracion=%s\n",
-            MONITOR_MS, WARMUP_WINDOWS, g_margen_min_abs,
-            g_min_sig, LEAK_RATE_SIG, LEAK_CAP_SIG, MAX_MIGRATIONS,
-            g_disable_migration ? "DESACTIVADA" : "activa");
-    } else {
-        fprintf(stderr,
-            "[OMPT][MON] Monitor (C: integrador con fugas)  período=%dms"
-            "  warmup=%d  referencia=MEDIA  T=ref+%.2f*MAD  leak=%.2f*MAD"
-            "  cap=%.2f*MAD  max_mig=%" PRIu64 "  migracion=%s\n",
-            MONITOR_MS, WARMUP_WINDOWS,
-            LEAK_MARGIN_SIG, LEAK_RATE_SIG, LEAK_CAP_SIG, MAX_MIGRATIONS,
-            g_disable_migration ? "DESACTIVADA" : "activa");
-    }
+    fprintf(stderr,
+        "[OMPT][MON] Monitor (C: integrador con fugas)  período=%dms"
+        "  warmup=%d  T=ref+%.2f*MAD  leak=%.2f*MAD  cap=%.2f*MAD  max_mig=%" PRIu64
+        "  migracion=%s\n",
+        MONITOR_MS, WARMUP_WINDOWS,
+        LEAK_MARGIN_SIG, LEAK_RATE_SIG, LEAK_CAP_SIG, MAX_MIGRATIONS,
+        g_disable_migration ? "DESACTIVADA" : "activa");
 
     g_mon_t0 = std::chrono::steady_clock::now();
 
@@ -820,7 +744,6 @@ static void* monitor_loop(void*) {
         int      ns      = 0;
         uint64_t sum_rm  = 0;
         uint64_t sum_all = 0;
-        double   win_min = -1.0;   // ratio_rm mínimo entre los hilos filtrados
 
         for (int i = 0; i < g_count; ++i) {
             ThreadInfo& t = g_threads[i];
@@ -876,10 +799,7 @@ static void* monitor_loop(void*) {
 
             if (d_all > 0) ++g_win_with_fills;
 
-            if (s.gated) {
-                sum_rm += d_rm; sum_all += d_all;
-                if (win_min < 0.0 || s.ratio < win_min) win_min = s.ratio;
-            }
+            if (s.gated) { sum_rm += d_rm; sum_all += d_all; }
         }
 
         // ── Sembrar la referencia global si es la primera ventana con datos ─
@@ -892,17 +812,6 @@ static void* monitor_loop(void*) {
             for (int k = 0; k < ns; ++k)
                 if (g_samples[k].gated) { acc += fabs(g_samples[k].ratio - g_ref); ++c; }
             g_dev      = c ? acc / c : 0.0;
-            // La referencia del modo 'min' se siembra en la misma ventana y con
-            // el mismo criterio: sin esto tardaría ~1/REF_BETA = 20 ventanas en
-            // bajar desde 0 hasta el mínimo real, que en las corridas cortas es
-            // toda la región medida.
-            g_min = (win_min >= 0.0) ? win_min : 0.0;
-            double acc_low = 0.0; int c_low = 0;
-            for (int k = 0; k < ns; ++k)
-                if (g_samples[k].gated && g_samples[k].ratio <= g_ref) {
-                    acc_low += fabs(g_samples[k].ratio - g_min); ++c_low;
-                }
-            g_dev_low  = c_low ? acc_low / c_low : 0.0;
             g_ref_init = true;
         }
 
@@ -910,26 +819,10 @@ static void* monitor_loop(void*) {
         // del bucle por hilo, así que el hilo 0 se comparaba contra la
         // referencia de la ventana anterior y el hilo 127 contra una ya
         // desplazada 127 veces: el veredicto dependía del orden del arreglo.
-        const double dev = (g_dev > DEV_FLOOR) ? g_dev : DEV_FLOOR;
-        double thrT, leak, cap, margen;
-        if (g_ref_modo == REF_MIN) {
-            // El margen se mide con la dispersión del grupo BIEN COLOCADO, nunca
-            // con g_dev: g_dev crece con la separación entre modos, así que
-            // usarla aquí reintroduciría el punto ciego por la puerta de atrás.
-            // El piso absoluto es la protección contra el ruido de una población
-            // homogénea, donde el mínimo es un estadístico de orden extremo y
-            // queda muy por debajo del centro.
-            margen = g_min_sig * g_dev_low;
-            if (margen < g_margen_min_abs) margen = g_margen_min_abs;
-            thrT = g_min + margen;
-            leak = LEAK_RATE_SIG * margen;
-            cap  = LEAK_CAP_SIG  * margen;
-        } else {
-            margen = LEAK_MARGIN_SIG * dev;
-            thrT   = g_ref + margen;
-            leak   = LEAK_RATE_SIG * dev;
-            cap    = LEAK_CAP_SIG  * dev;
-        }
+        const double dev  = (g_dev > DEV_FLOOR) ? g_dev : DEV_FLOOR;
+        const double thrT = g_ref + LEAK_MARGIN_SIG * dev;
+        const double leak = LEAK_RATE_SIG * dev;
+        const double cap  = LEAK_CAP_SIG  * dev;
 
         // ── PASE 2: evaluar a todos contra el MISMO umbral ──────────────────
         for (int k = 0; k < ns; ++k) {
@@ -967,7 +860,7 @@ static void* monitor_loop(void*) {
                         g_win_idx, t_ms, t.ompt_id, (int)t.tid_linux, t.ompt_type,
                         t.last_cpu, t.numa_node,
                         s.d_rm, s.d_all, s.ratio,
-                        t.bucket, thrT, g_ref, g_dev, g_min, margen, flagged};
+                        t.bucket, thrT, g_ref, g_dev, flagged};
                 } else {
                     ++g_window_rows_dropped;
                 }
@@ -988,23 +881,8 @@ static void* monitor_loop(void*) {
                 if (g_samples[k].gated) { acc += fabs(g_samples[k].ratio - g_ref); ++c; }
             const double win_mad = c ? acc / c : 0.0;
 
-            // Dispersión del grupo bien colocado: MAD respecto al mínimo de la
-            // ventana, restringida a los hilos por DEBAJO del agregado. En una
-            // población bimodal ese subconjunto es el modo bueno; en una
-            // homogénea es la mitad inferior, que sigue siendo una medida
-            // razonable del ruido. No hace falta ordenar nada.
-            double acc_low = 0.0; int c_low = 0;
-            for (int k = 0; k < ns; ++k)
-                if (g_samples[k].gated && g_samples[k].ratio <= win_ratio) {
-                    acc_low += fabs(g_samples[k].ratio - win_min); ++c_low;
-                }
-            const double win_dev_low = c_low ? acc_low / c_low : 0.0;
-
-            g_ref     += REF_BETA * (win_ratio   - g_ref);
-            g_dev     += REF_BETA * (win_mad     - g_dev);
-            if (win_min >= 0.0)
-                g_min += REF_BETA * (win_min     - g_min);
-            g_dev_low += REF_BETA * (win_dev_low - g_dev_low);
+            g_ref += REF_BETA * (win_ratio - g_ref);
+            g_dev += REF_BETA * (win_mad   - g_dev);
         }
 
         ++g_win_idx;
@@ -1269,11 +1147,10 @@ static void flush_window_csv() {
         fprintf(g_window_csv,
             "%s,%" PRIu64 ",%.3f,%" PRIu64 ",%d,%s,%d,%d,"
             "%" PRIu64 ",%" PRIu64 ","
-            "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%d\n",
+            "%.6f,%.6f,%.6f,%.6f,%.6f,%d\n",
             g_tag, r.win_idx, r.t_ms, r.ompt_id, r.tid,
             thread_type_str((ompt_thread_t)r.ompt_type), r.cpu, r.numa,
-            r.d_rm, r.d_all, r.ratio, r.bucket, r.thr_T, r.ref, r.dev,
-            r.min_ref, r.margen, r.flagged);
+            r.d_rm, r.d_all, r.ratio, r.bucket, r.thr_T, r.ref, r.dev, r.flagged);
     }
     fflush(g_window_csv);
     fprintf(stderr, "[OMPT] CSV de ventanas: %zu filas volcadas (%" PRIu64 " descartadas)\n",
@@ -1315,24 +1192,6 @@ static int ompt_initialize(
     g_verbose           = env_flag("OMPT_VERBOSE");
     g_disable_migration = env_flag("OMPT_DISABLE_MIGRATION");
 
-    // Origen del umbral. Por defecto 'media' — el mecanismo de la campaña V5 —
-    // para que cargar el tool sin pedir nada no cambie el comportamiento en
-    // silencio. La campaña V6 pide 'min' de forma explícita en su configuración.
-    if (const char* e = getenv("OMPT_REFERENCIA")) {
-        if (strcmp(e, "min") == 0)        g_ref_modo = REF_MIN;
-        else if (strcmp(e, "media") == 0) g_ref_modo = REF_MEDIA;
-    }
-    if (const char* e = getenv("OMPT_MARGEN_MIN")) {
-        const double v = atof(e);
-        // Un margen <= 0 haría T = g_min y dispararía sobre el ruido de
-        // cualquier población; >= 1 lo pone fuera del rango de una fracción.
-        if (v > 0.0 && v < 1.0) g_margen_min_abs = v;
-    }
-    if (const char* e = getenv("OMPT_MIN_SIG")) {
-        const double v = atof(e);
-        if (v > 0.0) g_min_sig = v;
-    }
-
     const char* log_path = getenv("OMPT_LOG_FILE");
     if (log_path && *log_path) {
         (void)freopen(log_path, "w", stderr);
@@ -1347,14 +1206,14 @@ static int ompt_initialize(
 
     open_csv_file(getenv("OMPT_WINDOW_CSV"),
                   "tag,win_idx,t_ms,ompt_id,tid,thread_type,cpu,numa,"
-                  "d_rm,d_all,ratio_rm,bucket,thr_T,g_ref,g_dev,g_min,margen,flagged",
+                  "d_rm,d_all,ratio_rm,bucket,thr_T,g_ref,g_dev,flagged",
                   &g_window_csv);
     open_csv_file(getenv("OMPT_SUMMARY_CSV"),
                   "tag,tid,ompt_id,thread_type,last_cpu,numa_node,migrations,mig_failures,"
                   "remote_fills,all_fills,ratio_rm,"
                   "windows_counted,first_migration_win,perf_status,"
                   "fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,"
-                  "fill_far_cache,fill_far_dram,mascaras,familia,referencia",
+                  "fill_far_cache,fill_far_dram,mascaras,familia",
                   &g_summary_csv);
     open_csv_file(getenv("OMPT_OVERHEAD_CSV"),
                   "tag,monitor_ticks,monitor_us_total,monitor_us_max,callback_calls,"
@@ -1520,10 +1379,9 @@ static void ompt_finalize(ompt_data_t* tool_data) {
                 fprintf(g_summary_csv, ",%" PRIu64, t.fin_origen[k]);
             // 'mascaras' = cuantas del desglose se midieron de verdad. Con el par
             // exacto siempre abierto, 0 aqui NO significa que falte ratio_rm.
-            fprintf(g_summary_csv, ",%d,%s,%s\n",
+            fprintf(g_summary_csv, ",%d,%s\n",
                     usar_mascaras_origen() ? tope_origenes() : 0,
-                    familia_es_demanda() ? "dmnd" : "any",
-                    (g_ref_modo == REF_MIN) ? "min" : "media");
+                    familia_es_demanda() ? "dmnd" : "any");
         }
 
         fprintf(stderr,
