@@ -1,0 +1,14 @@
+# Binarios: run_replicas.sh los recompila en cada envío.
+stencil
+spmv_static
+numa_sched_optC.so
+
+# Traza por ventana de 100 ms: ~70 MB por réplica, ~700 MB las diez. Supera lo que
+# conviene meter en git y el análisis por proceso no la necesita, así que se queda
+# en el clúster. El resto de resultados (~5 MB por réplica) sí se versiona.
+resultados/*/ompt_window_metrics.csv
+
+# La prueba de humo no se mezcla con la campaña.
+prueba_humo/
+
+__pycache__/
