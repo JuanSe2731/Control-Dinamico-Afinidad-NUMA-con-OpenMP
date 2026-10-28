@@ -33,6 +33,9 @@ import os
 import re
 from collections import defaultdict
 
+# Raiz del repositorio (este fichero vive en scripts/analisis/).
+RAIZ = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+
 # ── Configuraciones y su papel (las mismas en V5 y V6) ────────────────────────
 # Actualizado a V5/V6. Antes esta lista traia los nombres de V4 (spread, close,
 # nobind, ovh), que ya no existen: el script cargaba dos configuraciones de nueve
@@ -223,18 +226,19 @@ def cargar_tiempos(outdir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--outdir", default="perf_out_v5")
+    ap.add_argument("--outdir", default=os.path.join(RAIZ, "data", "perf_out_v5"))
     ap.add_argument("--destino", default=None,
-                    help="por defecto analisis/<sufijo del outdir>, p.ej. analisis/v5")
+                    help="por defecto data/analisis/intra_proceso/<sufijo del outdir>, "
+                         "p.ej. data/analisis/intra_proceso/v5")
     ap.add_argument("--alfa", type=float, default=0.05)
     args = ap.parse_args()
 
-    # Destino derivado, igual que las figuras: perf_out_v5 -> analisis/v5. Con un
-    # destino constante, la segunda campana sobrescribia los CSV de la primera.
+    # Destino derivado, igual que las figuras: perf_out_v5 -> intra_proceso/v5. Con
+    # un destino constante, la segunda campana sobrescribia los CSV de la primera.
     if args.destino is None:
         base = os.path.basename(os.path.normpath(args.outdir))
         sufijo = base.split("_")[-1] if base.startswith("perf_out_") else base
-        args.destino = os.path.join("analisis", sufijo)
+        args.destino = os.path.join(RAIZ, "data", "analisis", "intra_proceso", sufijo)
 
     datos = cargar_tiempos(args.outdir)
     if not datos:

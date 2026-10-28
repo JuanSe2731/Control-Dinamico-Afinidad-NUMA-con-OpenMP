@@ -33,11 +33,15 @@
 # LO RECOMENDABLE ES TROCEAR POR TAMAÑO, no alargar el --time: el backfill del
 # planificador mete antes los trabajos cortos en los huecos, asi que cuatro trabajos
 # troceados suelen terminar antes que uno largo esperando una ventana enorme.
-#     SIZES="S0 S1 S2" sbatch run_perf_metricsV5.sbatch
-#     SIZES="S3"       sbatch run_perf_metricsV5.sbatch
-#     SIZES="S4"       sbatch run_perf_metricsV5.sbatch
-#     SIZES="S5"       sbatch run_perf_metricsV5.sbatch
+#     SIZES="S0 S1 S2" sbatch scripts/run_perf_metricsV5.sbatch
+#     SIZES="S3"       sbatch scripts/run_perf_metricsV5.sbatch
+#     SIZES="S4"       sbatch scripts/run_perf_metricsV5.sbatch
+#     SIZES="S5"       sbatch scripts/run_perf_metricsV5.sbatch
 # (SIZES se propaga por el entorno, igual que el resto de perillas.)
+#
+# Se lanza desde la raiz del repositorio o desde scripts/; los resultados van a
+# data/perf_out_v5 (o al OUTDIR que se exporte) y el .out/.err de SLURM queda en el
+# directorio desde el que se hizo sbatch.
 #
 # Igual que el resto de .sbatch del proyecto, NO carga modulos: depende de que SLURM
 # propague el entorno del shell que lo lanza (--export=ALL por defecto), asi que hay
@@ -48,7 +52,16 @@
 #     perf list | grep -i fills                    # validar las mascaras de PMCx044
 
 set -euo pipefail
-cd "$SLURM_SUBMIT_DIR"
+
+# SLURM ejecuta una COPIA de este fichero desde su directorio de spool, asi que
+# BASH_SOURCE no sirve para encontrar el repositorio: se parte del directorio desde
+# el que se hizo sbatch y se sube hasta dar con la raiz.
+RAIZ="${SLURM_SUBMIT_DIR:-$PWD}"
+until [[ -f "$RAIZ/scripts/run_perf_metricsV5.sh" ]]; do
+  [[ "$RAIZ" != "/" ]] || { echo "ERROR: hay que lanzar sbatch desde dentro del repositorio" >&2; exit 1; }
+  RAIZ="$(dirname "$RAIZ")"
+done
+cd "$RAIZ"
 
 # ── LIMITE DE DESCRIPTORES ────────────────────────────────────────────────────
 # OBLIGATORIO, no opcional. Cada hilo OpenMP abre varios fd de perf_event_open, y
@@ -74,4 +87,4 @@ fi
 echo "=== nmi_watchdog: $(cat /proc/sys/kernel/nmi_watchdog 2>/dev/null || echo '?') ==="
 echo "=== perf_event_paranoid: $(cat /proc/sys/kernel/perf_event_paranoid) ==="
 
-srun ./run_perf_metricsV5.sh
+srun ./scripts/run_perf_metricsV5.sh

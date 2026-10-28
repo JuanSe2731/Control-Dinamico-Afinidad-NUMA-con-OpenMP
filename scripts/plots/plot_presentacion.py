@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Figuras del MAZO DE PRESENTACION. Salida: presentacion/figures/.
+"""Figuras del MAZO DE PRESENTACION. Salida: data/figuras/presentacion/.
 
-NO sustituye a plots/plot_results.py. Aquel es la referencia tecnica de la
+NO sustituye a scripts/plots/plot_results.py. Aquel es la referencia tecnica de la
 campana y se queda como esta; este produce un juego distinto, pensado para
 proyectar ante un publico que no conoce el proyecto. Las diferencias son
 deliberadas:
@@ -26,7 +26,7 @@ deliberadas:
    caudal_util_gibs de los kernels, el GiB/s se reconstruye del tiempo cuando el
    CSV no lo trae (ver gibs_del_plan).
 
-Uso:  python3 plots/plot_presentacion.py
+Uso:  python3 scripts/plots/plot_presentacion.py
 """
 
 import os
@@ -42,8 +42,10 @@ import pandas as pd
 import seaborn as sns
 
 from plot_results import (AZUL, NARANJA, AGUA, TINTA, TINTA_2, TINTA_MUTE,
-                          REJILLA, EJE, SUPERFICIE, ORDEN_TAMANOS,
+                          REJILLA, EJE, SUPERFICIE, ORDEN_TAMANOS, RAIZ,
                           cargar, cargar_repeticiones, nota, guardar, estilo)
+
+LAT_CSV = os.path.join(RAIZ, "data", "caracterizacion", "latencias_exadell.csv")
 
 # Slots categoricos 4 y 5 de la paleta de referencia, que la figura de las
 # estaticas necesita para llegar a cinco series. El 4 (amarillo) queda por
@@ -51,13 +53,16 @@ from plot_results import (AZUL, NARANJA, AGUA, TINTA, TINTA_2, TINTA_MUTE,
 # esa figura lleva etiqueta directa en cada serie ademas de la leyenda.
 AMARILLO, MAGENTA = "#eda100", "#e87ba4"
 
-# Campana y destino, parametrizables por entorno para que V5 y V6 no se pisen:
-#   CAMPANA=perf_out_v4 python3 plots/plot_presentacion.py  -> presentacion/figures_v4
-CAMPANA = os.environ.get("CAMPANA", "perf_out_v5")
-_sufijo = CAMPANA.split("_")[-1] if CAMPANA.startswith("perf_out_") else CAMPANA
+# Campana y destino, parametrizables por entorno para que las series no se pisen:
+#   CAMPANA=data/series_adicionales/perf_out_v6 python3 scripts/plots/plot_presentacion.py
+#       -> data/figuras/presentacion_v6
+CAMPANA = os.environ.get("CAMPANA", os.path.join(RAIZ, "data", "perf_out_v5"))
+_base = os.path.basename(os.path.normpath(CAMPANA))
+_sufijo = _base.split("_")[-1] if _base.startswith("perf_out_") else _base
 FIGDIR = os.environ.get(
     "FIGDIR",
-    "presentacion/figures" if _sufijo == "v5" else f"presentacion/figures_{_sufijo}")
+    os.path.join(RAIZ, "data", "figuras",
+                 "presentacion" if _sufijo == "v5" else f"presentacion_{_sufijo}"))
 
 # ── Idioma de los TEXTOS de la figura ────────────────────────────────────────
 # IDIOMA=en genera el mismo juego con los rotulos en ingles y el sufijo _en en el
@@ -84,8 +89,8 @@ TAMANOS = ["S3", "S4", "S5"]
 # Un panel unico necesita mas ancho que un tercio de la rejilla, o el titulo de la
 # figura no cabe: de ahi PANEL_UNICO.
 #
-#   CAMPANA=perf_out_v5 TAMANOS_FIG=S5 KERNELS_FIG=spmv_static \
-#   FIGURAS=05,06,07,08,11,12 python3 plots/plot_presentacion.py
+#   TAMANOS_FIG=S5 KERNELS_FIG=spmv_static \
+#   FIGURAS=05,06,07,08,11,12 python3 scripts/plots/plot_presentacion.py
 _pedidos = os.environ.get("TAMANOS_FIG", "").replace(",", " ").split()
 if _pedidos:
     TAMANOS = [t for t in TAMANOS if t in _pedidos]
@@ -190,7 +195,7 @@ def f01_curva_latencia(figdir):
     El resultado que decide el experimento: en L1d y L2 la penalizacion es 1,00.
     Un scheduler NUMA no tiene NADA que corregir ahi, y eso se sabe ANTES de
     lanzar la campana. Solo aparece cuando el dato se sale de la cache."""
-    ruta = "caracterizacion/latencias_exadell.csv"
+    ruta = LAT_CSV
     if not os.path.exists(ruta):
         return None
     d = pd.read_csv(ruta)
@@ -265,7 +270,7 @@ def f02_fronteras(figdir):
     """Las dos fronteras de la maquina, medidas. El titular es que la que se
     suele ignorar (el chiplet) cuesta casi tres veces mas que la que todo el
     mundo mira (el socket)."""
-    ruta = "caracterizacion/latencias_exadell.csv"
+    ruta = LAT_CSV
     if not os.path.exists(ruta):
         return None
     d = pd.read_csv(ruta)

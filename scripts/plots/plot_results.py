@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Figuras de la campaña V5 — seaborn, solo PNG, todo en plots/figuras.
+"""Figuras de la campaña V5 — seaborn, solo PNG, todo en data/figuras.
 
 QUÉ CAMBIA RESPECTO A LA VERSIÓN ANTERIOR
 -----------------------------------------
@@ -52,6 +52,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+
+# Raiz del repositorio (este fichero vive en scripts/plots/). Los valores por
+# defecto se resuelven desde ella, asi el script funciona desde cualquier directorio.
+RAIZ = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Paleta (skill dataviz, instancia de referencia, modo claro)
@@ -1025,8 +1029,8 @@ def fig_comparacion_completa(df, kernel, figdir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--outdir", default="perf_out_v5")
-    ap.add_argument("--figdir", default="plots/figuras")
+    ap.add_argument("--outdir", default=os.path.join(RAIZ, "data", "perf_out_v5"))
+    ap.add_argument("--figdir", default=os.path.join(RAIZ, "data", "figuras"))
     ap.add_argument("--hilos-barrido", type=int, default=None)
     args = ap.parse_args()
 

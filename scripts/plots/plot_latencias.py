@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Figuras de la caracterizacion de latencias (Fase 0) -> plots/figuras.
+"""Figuras de la caracterizacion de latencias (Fase 0) -> data/figuras.
 
-Lee caracterizacion/latencias_exadell.csv, producido por latencias_numa.cpp, y
+Lee data/caracterizacion/latencias_exadell.csv, producido por src/latencias_numa.cpp, y
 genera las tres figuras que sostienen todo el marco teorico del trabajo:
 
   lat_curva    modo A: latencia frente al tamano del working set, memoria local
@@ -33,6 +33,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+
+# Raiz del repositorio (este fichero vive en scripts/plots/): los valores por
+# defecto se resuelven desde ella.
+RAIZ = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 AZUL, NARANJA, AGUA = "#2a78d6", "#eb6834", "#1baf7a"
 TINTA, TINTA_2, TINTA_MUTE = "#0b0b0b", "#52514e", "#898781"
@@ -194,13 +198,14 @@ def fig_clases(df, figdir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--csv", default="caracterizacion/latencias_exadell.csv")
-    ap.add_argument("--figdir", default="plots/figuras")
+    ap.add_argument("--csv", default=os.path.join(RAIZ, "data", "caracterizacion",
+                                                  "latencias_exadell.csv"))
+    ap.add_argument("--figdir", default=os.path.join(RAIZ, "data", "figuras"))
     args = ap.parse_args()
 
     if not os.path.exists(args.csv):
         sys.exit(f"ERROR: no existe {args.csv}\n"
-                 f"       Ejecuta antes: sbatch caracterizacion/run_latencias.sbatch")
+                 f"       Ejecuta antes: sbatch scripts/run_latencias.sbatch")
 
     estilo()
     os.makedirs(args.figdir, exist_ok=True)
