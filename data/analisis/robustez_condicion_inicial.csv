@@ -1,0 +1,11 @@
+serie,kernel,config,fuente,remotos_inicio,remotos_max,frac_ventanas_3,s_hasta_3,remotos_region,ratios
+principal,spmv_static,obs,trazas por ventana,2.0000,3.0000,0.9294,4.4000,,
+principal,spmv_static,scheduler,trazas por ventana,3.0000,3.0000,0.0466,0.0000,,
+principal,spmv_static,base,contadores por hilo,,,,,3.0000,0.634;0.632;0.596
+principal,stencil,obs,trazas por ventana,2.0000,2.0000,0.0000,,,
+principal,stencil,scheduler,trazas por ventana,1.0000,1.0000,0.0000,,,
+principal,stencil,base,contadores por hilo,,,,,2.0000,0.277;0.162;0.011
+adicional,spmv_static,obs,trazas por ventana,2.0000,3.0000,0.9423,3.6000,,
+adicional,spmv_static,base,contadores por hilo,,,,,3.0000,0.633;0.633;0.604
+adicional,stencil,obs,trazas por ventana,2.0000,3.0000,0.5362,3.2000,,
+adicional,stencil,base,contadores por hilo,,,,,2.0000,0.276;0.211;0.006

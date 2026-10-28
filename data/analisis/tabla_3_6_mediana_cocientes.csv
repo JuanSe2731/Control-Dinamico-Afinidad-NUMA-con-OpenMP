@@ -1,0 +1,7 @@
+kernel,size_tag,Close,Spread,Interleave,Scheduler
+spmv_static,S3,0.8037,0.7943,1.1818,1.3073
+spmv_static,S4,0.7744,1.0274,0.8801,0.9426
+spmv_static,S5,1.0376,1.0018,0.8057,0.9214
+stencil,S3,1.1020,0.3484,1.2605,1.3914
+stencil,S4,1.0293,0.7343,0.8275,1.0013
+stencil,S5,1.0899,0.9687,0.7166,1.0134

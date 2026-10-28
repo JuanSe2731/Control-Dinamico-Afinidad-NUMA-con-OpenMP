@@ -1,0 +1,9 @@
+tag,slot,tid,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v6/metrics/spmv_static_S0_t8_interleave,0,957448,0,0,2439,0,2245,153,278897,2398,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_interleave,1,957449,0,0,1279,0,2705,150,267521,2855,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_interleave,2,957450,0,0,1742,0,1023,147,138022,1170,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_interleave,3,957451,0,0,462,0,35,128,869,163,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_interleave,4,957452,0,0,1364,0,453,0,1936,453,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_interleave,5,957453,0,0,627,0,2,150,996,152,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_interleave,6,957454,0,0,23,0,458,149,2037,607,3,any
+perf_out_v6/metrics/spmv_static_S0_t8_interleave,7,957455,0,0,603,0,155,0,843,155,3,any

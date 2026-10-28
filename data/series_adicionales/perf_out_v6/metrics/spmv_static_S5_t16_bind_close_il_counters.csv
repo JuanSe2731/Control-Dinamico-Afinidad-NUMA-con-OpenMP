@@ -1,0 +1,17 @@
+tag,slot,tid,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,0,1005731,0,0,151443,0,155394,1204134918,3940402390,1204290311,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,1,1005732,0,0,45782,0,40806,1201117176,3941079880,1201157982,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,2,1005733,0,0,42263,0,39939,1201994733,3941277238,1202034671,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,3,1005734,0,0,42183,0,39717,1201390952,3943098046,1201430670,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,4,1005735,0,0,42826,0,39582,1197986191,3942129964,1198025774,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,5,1005736,0,0,42035,0,39577,1199707684,3942740315,1199747261,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,6,1005737,0,0,42469,0,39833,1198096484,3941254505,1198136317,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,7,1005738,0,0,298625,0,319862,1199959361,3943268539,1200279223,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,8,1005739,0,0,46290,0,43580,1195556621,3941510458,1195600201,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,9,1005740,0,0,45121,0,42948,1194845733,3941470730,1194888681,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,10,1005741,0,0,45784,0,43369,1194477414,3941060874,1194520785,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,11,1005742,0,0,45862,0,43035,1195542654,3941852449,1195585689,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,12,1005743,0,0,46089,0,43574,1193075747,3939951780,1193119322,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,13,1005744,0,0,45531,0,43111,1193656412,3940295688,1193699523,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,14,1005745,0,0,45298,0,43059,1192838437,3940403364,1192881496,3,any
+perf_out_v6/metrics/spmv_static_S5_t16_bind_close_il,15,1005746,0,0,46123,0,50474,1193985264,3939920230,1194035738,3,any

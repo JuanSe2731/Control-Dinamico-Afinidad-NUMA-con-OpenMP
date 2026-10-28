@@ -1,0 +1,9 @@
+tag,slot,tid,instructions,cycles,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v5/metrics/stencil_S2_t8_bind_spread_il,0,418539,265754539,63451545,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/stencil_S2_t8_bind_spread_il,1,418540,265723267,63409412,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/stencil_S2_t8_bind_spread_il,2,418541,266783956,63467860,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/stencil_S2_t8_bind_spread_il,3,418542,266659862,63464132,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/stencil_S2_t8_bind_spread_il,4,418543,266001102,63423598,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/stencil_S2_t8_bind_spread_il,5,418544,265211165,63394764,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/stencil_S2_t8_bind_spread_il,6,418545,264297751,63391632,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/stencil_S2_t8_bind_spread_il,7,418546,264411960,63408284,0,0,0,0,0,0,0,0,1,any

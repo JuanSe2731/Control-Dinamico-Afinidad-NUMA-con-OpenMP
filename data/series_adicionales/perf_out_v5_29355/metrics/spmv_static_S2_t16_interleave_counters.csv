@@ -1,0 +1,17 @@
+tag,slot,tid,instructions,cycles,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,0,418911,111808724,54393503,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,1,418912,112151118,54387740,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,2,418913,111868840,54397875,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,3,418914,114138422,54384562,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,4,418915,112920304,54422176,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,5,418916,114421175,54377096,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,6,418917,114030677,54426963,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,7,418918,114259055,54417969,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,8,418919,113103032,54416079,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,9,418920,114411704,54391275,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,10,418921,109275056,53964598,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,11,418922,107161750,54382512,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,12,418923,106277016,54417296,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,13,418924,107854179,54302696,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,14,418925,107615928,54346406,0,0,0,0,0,0,0,0,1,any
+perf_out_v5/metrics/spmv_static_S2_t16_interleave,15,418926,108093876,54307826,0,0,0,0,0,0,0,0,1,any

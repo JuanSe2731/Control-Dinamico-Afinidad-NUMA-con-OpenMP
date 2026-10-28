@@ -1,0 +1,10 @@
+contraste,kernel,size_tag,threads,G,s_p,s_star,cv_star,veces_sp
+frente a Base,spmv_static,S4,8,16.7522,2.0163,5.9203,19.4707,2.9363
+frente a Base,spmv_static,S4,16,2.9696,0.8073,0.9627,4.8475,1.1925
+frente a Base,spmv_static,S4,32,1.2368,0.3457,0.3983,3.7838,1.1521
+frente a Base,spmv_static,S5,8,143.6890,0.8221,51.7507,18.9457,62.9512
+frente a Base,spmv_static,S5,16,67.2676,0.7902,24.2237,16.5390,30.6541
+frente a Base,spmv_static,S5,32,19.6780,0.7917,7.0727,6.6673,8.9339
+frente a Base,stencil,S5,8,6.9280,0.8319,2.4486,6.0065,2.9433
+frente a Interleave,spmv_static,S5,8,81.3344,0.8221,29.2950,10.7248,35.6353
+frente a Interleave,spmv_static,S5,16,32.6162,0.7902,11.7507,8.0229,14.8701

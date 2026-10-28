@@ -1,0 +1,17 @@
+tag,slot,tid,fill_l2,fill_l3_ccd,fill_ccd_vecino,fill_dram_local,fill_far_cache,fill_far_dram,fill_all,fill_remoto,mascaras,familia
+perf_out_v6/metrics/stencil_S3_t16_interleave,0,986438,0,0,1716,0,6819,131127,60286531,137947,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,1,986439,0,0,2379,0,5616,151139,60334307,156756,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,2,986440,0,0,5079,0,3789,147193,60305554,150982,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,3,986441,0,0,4201,0,1762,104653,60330510,106416,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,4,986442,0,0,6280,0,319,6116355,59533506,6116674,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,5,986443,0,0,6,0,14,5883018,59575675,5883032,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,6,986444,0,0,23,0,2424,5572036,59375350,5574460,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,7,986445,0,0,2660,0,4568,135767,60091664,140335,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,8,986446,0,0,4905,0,3040,105071,60103843,108112,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,9,986447,0,0,4215,0,5077,126953,60094773,132030,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,10,986448,0,0,3092,0,4904,112950,60104592,117854,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,11,986449,0,0,1664,0,4984,168315,60090228,173299,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,12,986450,0,0,6500,0,3640,2785223,59600723,2788863,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,13,986451,0,0,2837,0,3821,154966,60071957,158787,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,14,986452,0,0,4980,0,3076,106787,60100311,109863,3,any
+perf_out_v6/metrics/stencil_S3_t16_interleave,15,986453,0,0,292,0,6475,153324,60093273,159799,3,any

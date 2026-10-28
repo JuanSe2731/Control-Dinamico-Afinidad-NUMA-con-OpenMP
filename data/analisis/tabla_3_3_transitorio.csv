@@ -1,0 +1,6 @@
+kernel,size_tag,threads,media_ms,ganancia_media,reps_transitorio,estacionario_ms,ganancia_estacionaria
+spmv_static,S4,8,30.4063,1.4622,21,28.0701,1.5839
+spmv_static,S5,8,273.1528,1.5287,6,266.6718,1.5658
+spmv_static,S5,16,146.4645,1.4635,6,143.5921,1.4928
+spmv_static,S5,32,106.0815,1.1892,10,104.7302,1.2045
+stencil,S5,8,40.7665,1.1587,13,40.4583,1.1675
