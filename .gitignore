@@ -1,0 +1,39 @@
+# ── Binarios compilados ──────────────────────────────────────────────────────
+# Los scripts compilan en build/ en cada ejecucion; no se versionan.
+build/
+*.so
+*.o
+# Binarios sueltos en la raiz, de cuando los scripts compilaban alli.
+/stencil
+/stencil_serial
+/spmv_static
+/spmv_serial
+/latencias_numa
+/latenciaMemoria_clang
+
+# ── Salidas regenerables ─────────────────────────────────────────────────────
+# Figuras: scripts/run_plot_metrics.sh y scripts/plots/*.py -> data/figuras/
+data/figuras/
+# Contraste intra-proceso de scripts/analisis/estadistica.py. Las tablas del libro
+# (data/analisis/*.csv) SI se versionan.
+data/analisis/intra_proceso/
+# Directorios de salida sueltos en la raiz, de cuando la campana escribia alli.
+/perf_out_*/
+
+# ── Trazas de SLURM y de perf ────────────────────────────────────────────────
+# SLURM deja su .out/.err en el directorio desde el que se hizo sbatch. Los
+# registros de las tres series SI se versionan, junto a sus datos.
+*.out
+*.err
+!data/**/*.out
+perf.data
+perf.data.old
+
+# ── Entrada de datos ─────────────────────────────────────────────────────────
+# Matrices MatrixMarket: pesan del orden de GB. La campana usa la matriz sintetica.
+*.mtx
+
+# ── Python y temporales ──────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.zip
